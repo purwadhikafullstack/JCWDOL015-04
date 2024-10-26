@@ -13,7 +13,6 @@ const countries = [
   { code: 'CN', name: 'China' },
 ];
 
-// Format the options for react-select
 const countryOptions = countries.map(country => ({
   value: country.name,
   label: (
@@ -25,9 +24,7 @@ const countryOptions = countries.map(country => ({
 }));
 
 const CountrySelector = () => {
-  // Handle selection change
   const handleChange = (selectedOption: any) => {
-    console.log('Selected Country:', selectedOption.value);
   };
 
   return (

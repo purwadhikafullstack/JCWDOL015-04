@@ -1,14 +1,9 @@
 'use client';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
-import { GoLocation } from 'react-icons/go'; // Import the location icon
-import LogoApple from '../assets/company-logo/Logo-Apple.svg';
+import { GoLocation } from 'react-icons/go';
 import LogoDribbble from '../assets/company-logo/Logo-Dribbble.svg';
-import LogoFacebook from '../assets/company-logo/Logo-Facebook.svg';
-import LogoFigma from '../assets/company-logo/Logo-Figma.svg';
 import LogoFreepik from '../assets/company-logo/Logo-Freepik.svg';
-import LogoGoogle from '../assets/company-logo/Logo-Google.svg';
-import LogoUdemy from '../assets/company-logo/Logo-Udemy.svg';
 import LogoUpwork from '../assets/company-logo/Logo-Upwork.svg';
 import LogoSlack from '../assets/company-logo/Logo-Slack.svg';
 
@@ -77,7 +72,6 @@ const FeaturedCompany = ({ companies = [] }: FeaturedCompanyProps) => {
   );
 };
 
-// CompanyCard component
 interface CompanyCardComponentProps {
   company: CompanyCardProps;
 }
@@ -100,7 +94,7 @@ const CompanyCard = ({ company }: CompanyCardComponentProps) => {
             {company.company_name}
           </h3>
           <div className="flex items-center justify-center text-sm text-gray-600">
-            <GoLocation className="mr-1" /> {/* Location icon */}
+            <GoLocation className="mr-1" />
             <span>{company.location}</span>
           </div>
         </div>

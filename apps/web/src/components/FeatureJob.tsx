@@ -97,8 +97,8 @@ const FeatureJob = ({ jobs = [] }: FeatureJobProps) => {
     <div className="bg-white py-16">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Featured Jobs</h2>
-          <Link href="/view-all" className="text-blue-600 font-semibold flex items-center hover:text-blue-700 transition-colors">
+          <h2 className="text-3xl font-bold">Featured Jobs Nearby</h2>
+          <Link href="/job-page" className="text-blue-600 font-semibold flex items-center hover:text-blue-700 transition-colors">
             View All
             <span className="ml-2">→</span>
           </Link>

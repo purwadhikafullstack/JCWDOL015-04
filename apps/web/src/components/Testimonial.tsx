@@ -8,7 +8,7 @@ const testimonials = [
     name: "Robert Fox",
     title: "UI/UX Designer",
     feedback:
-      "Ut ullamcorper hendrerit tempor. Aliquam in rutrum dui. Maecenas ac placerat metus, in faucibus est.",
+      "The platform's intuitive design and user-friendly features have truly elevated my workflow. It's a great tool for creative professionals!",
     rating: 3,
   },
   {
@@ -16,7 +16,7 @@ const testimonials = [
     name: "Bessie Cooper",
     title: "Creative Director",
     feedback:
-      "Mauris eget lorem odio. Mauris convallis justo molestie metus aliquam blandit. Suspendisse ut dui vulputate augue condimentum ornare.",
+      "This tool has streamlined our team's projects, making it easy to collaborate and execute our vision seamlessly. Highly recommend it!",
     rating: 4,
   },
   {
@@ -24,7 +24,7 @@ const testimonials = [
     name: "Jane Cooper",
     title: "Photographer",
     feedback:
-      "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.",
+      "An essential part of my creative process! The platform provides fantastic resources and inspiration that help me bring my ideas to life.",
     rating: 5,
   },
 ];

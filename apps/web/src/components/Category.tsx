@@ -1,7 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
-// Importing the icons for each category
 import IconData from '../assets/category/Icon-data.png';
 import IconDigitalMarketing from '../assets/category/Icon-digitalmarketing.png';
 import IconFinance from '../assets/category/Icon-finance.png';
@@ -58,7 +56,7 @@ const PopularCategory = () => {
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-3xl font-bold">Popular Category</h2>
           <Link
-            href="/view-all"
+            href="/job-page"
             className="text-blue-600 font-semibold flex items-center hover:text-blue-700 transition-colors"
           >
             View All

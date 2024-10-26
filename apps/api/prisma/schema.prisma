@@ -118,18 +118,72 @@ enum InterviewType {
   virtual
 }
 
+// Enum for Education
+enum EducationLevel {
+  HIGH_SCHOOL
+  ASSOCIATES
+  BACHELORS
+  MASTERS
+  DOCTORATE
+  DIPLOMA
+  VOCATIONAL
+  CERTIFICATION
+  SOME_COLLEGE
+  POSTGRADUATE
+}
+
+// Enum for Gender
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// Enum for Job Category
+enum JobCategory {
+  fullTime
+  partTime
+  freelance
+  contractor
+}
+
+// Enum for Country Code
+enum CountryCode {
+  ID // Indonesia
+  SG // Singapore
+  MY // Malaysia
+  US // United States
+  GB // United Kingdom
+  DE // Germany
+  JP // Japan
+  CN // China
+}
+
 // User model
 model User {
-  user_id         Int      @id @default(autoincrement())
-  email           String   @unique
-  password        String
-  role            UserRole
-  first_name      String?
-  last_name       String?
-  profile_picture String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  is_verified     Boolean
+  user_id             Int             @id @default(autoincrement())
+  email               String          @unique
+  password            String
+  role                UserRole
+  first_name          String
+  last_name           String
+  profile_picture     String?
+  phone               String?
+  website             String?
+  title               String?
+  education           EducationLevel?
+  biography           String?         @db.Text()
+  location            String?
+  skills              String?
+  languages           String?
+  nationality         String?
+  gender              Gender?
+  DateOfBirth         DateTime?
+  resume              String?
+  years_of_experience Int?
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+  is_verified         Boolean
 
   // Relations
   applications            Application[]
@@ -145,22 +199,29 @@ model User {
   jobSaves                JobSave[]
   paymentTransactions     PaymentTransaction[]
   userAssessmentResponses UserAssessmentResponse[]
+  jobs                    Job[]
 
   @@index([email])
 }
 
 // Company model
 model Company {
-  company_id   Int      @id @default(autoincrement())
-  company_name String
-  email        String   @unique
-  phone        String?
-  address      String?
-  website      String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  description  String?
-  logo         String?
+  company_id      Int         @id @default(autoincrement())
+  company_name    String
+  email           String      @unique
+  phone           String?
+  aboutUs         String?     @db.Text()
+  yearOfEstablish DateTime?
+  IndustryType    String?
+  TeamSize        Int?
+  country         CountryCode
+  address         String?
+  website         String?
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+  description     String?     @db.Text()
+  logo            String?
+  banner          String?
 
   // Relations
   jobs    Job[]
@@ -172,14 +233,15 @@ model Company {
 
 // Job model
 model Job {
-  job_id      Int      @id @default(autoincrement())
+  job_id      Int         @id @default(autoincrement())
   job_title   String
-  description String
+  description String      @db.Text()
+  country     CountryCode
   location    String?
   salary      Decimal?
-  category    String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  category    JobCategory
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
   is_active   Boolean
 
   // Relations
@@ -189,6 +251,8 @@ model Job {
   jobReports   JobReport[]
   jobViews     JobView[]
   jobSaves     JobSave[]
+  User         User?         @relation(fields: [userUser_id], references: [user_id])
+  userUser_id  Int?
 
   @@index([company_id])
   @@index([is_active, category])
@@ -262,7 +326,7 @@ model SkillAssessment {
 model Review {
   review_id       Int      @id @default(autoincrement())
   rating          Int
-  comment         String?
+  comment         String?  @db.Text()
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
   salary_estimate Decimal?
@@ -282,7 +346,7 @@ model Review {
 // AssessmentQuestion model
 model AssessmentQuestion {
   question_id      Int              @id @default(autoincrement())
-  question_text    String
+  question_text    String           @db.Text()
   question_type    QuestionType
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
@@ -318,7 +382,7 @@ model AssessmentAnswer {
 // UserAssessmentResponse model
 model UserAssessmentResponse {
   response_id Int      @id @default(autoincrement())
-  answer_text String?
+  answer_text String?  @db.Text()
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
@@ -468,7 +532,7 @@ model Interview {
   application_id   Int
   scheduled_time   DateTime
   status           InterviewStatus
-  feedback         String?
+  feedback         String?         @db.Text()
   interviewer_name String?
   interview_link   String?
   interview_type   InterviewType?

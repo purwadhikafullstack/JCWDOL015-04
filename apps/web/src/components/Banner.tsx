@@ -1,17 +1,18 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaSearch } from 'react-icons/fa';
 import Illustration from '../assets/Illustration.png';
 import JobIcon from '../assets/Icon_Job.png';
-import PeopleIcon from '../assets/Icon_People.png';
 import CompIcon from '../assets/Icon_Company.png';
-import Select from 'react-select'; // Import react-select
-import Flag from 'react-world-flags'; // Import react-world-flags
+import PeopleIcon from '../assets/Icon_People.png';
+import Select from 'react-select';
+import Flag from 'react-world-flags';
 import { GoLocation } from 'react-icons/go';
 
-// Define a list of countries with their codes
 const countries = [
+  { code: '', name: 'All Countries' },
   { code: 'ID', name: 'Indonesia' },
   { code: 'SG', name: 'Singapore' },
   { code: 'MY', name: 'Malaysia' },
@@ -22,18 +23,40 @@ const countries = [
   { code: 'CN', name: 'China' },
 ];
 
-// Format the countries as options for react-select
 const countryOptions = countries.map((country) => ({
   value: country.name,
   label: (
     <div className="flex items-center p-2.5">
-      <Flag code={country.code} alt={country.name} className="mr-2 w-6 h-4" />
+      <Flag
+        code={country.code || 'XX'}
+        alt={country.name}
+        className="mr-2 w-6 h-4"
+      />
       <span>{country.name}</span>
     </div>
   ),
 }));
 
 const LandingPage = () => {
+  const [search, setSearch] = useState('');
+  const [country, setCountry] = useState('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+        },
+        () => {
+          console.log('Location access denied');
+        },
+      );
+    }
+  }, []);
+
   return (
     <div className="min-h-screen mt-10 pt-16 lg:pt-0 pb-8 lg:pb-0 lg:-mt-7 bg-[#F1F2F4] flex flex-col justify-center md:mt-10">
       <div className="container mx-auto px-4 lg:px-8">
@@ -60,6 +83,8 @@ const LandingPage = () => {
                 <input
                   type="text"
                   placeholder="Job title, Keyword..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="flex-grow focus:outline-none"
                 />
               </div>
@@ -74,13 +99,32 @@ const LandingPage = () => {
                       <span>Location</span>
                     </div>
                   }
+                  onChange={(option) => setCountry(option ? option.value : '')}
+                  isSearchable={false}
                   classNamePrefix="react-select"
+                  styles={{
+                    container: (base) => ({ ...base, width: '100%' }),
+                    control: (base) => ({ ...base, minHeight: '44px' }),
+                  }}
                 />
               </div>
 
-              <button className="bg-blue-600 text-white ml-3 py-2 sm:py-3 px-6 sm:px-8 rounded-md hover:bg-blue-700 transition-colors mt-4 sm:mt-0 w-full sm:w-auto">
-                Find Job
-              </button>
+              {/* Redirect Find Job Button */}
+              <Link
+                href={{
+                  pathname: '/job-page',
+                  query: {
+                    search,
+                    location: country,
+                    lat: latitude?.toString() || '',
+                    lng: longitude?.toString() || '',
+                  },
+                }}
+              >
+                <button className="bg-blue-600 text-white ml-3 py-2 sm:py-3 px-6 sm:px-8 rounded-md hover:bg-blue-700 transition-colors mt-4 sm:mt-0 w-full sm:w-auto">
+                  Find Job
+                </button>
+              </Link>
             </div>
 
             {/* Suggestions */}
@@ -92,13 +136,14 @@ const LandingPage = () => {
           </div>
 
           {/* Illustration Image */}
-          <div className="mt-8 lg:mt-0 lg:w-1/2 flex justify-center lg:justify-end">
+          <div className="mt-8 lg:pr-16 lg:mt-0 lg:w-1/2 flex justify-center lg:justify-end">
             <div className="max-w-full lg:max-w-lg w-[90%] sm:w-[80%] lg:w-auto">
               <Image
                 src={Illustration}
                 alt="Illustration"
                 width={700}
                 height={700}
+                priority
               />
             </div>
           </div>

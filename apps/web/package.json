@@ -10,18 +10,27 @@
     "test": "npx cypress verify & cypress run --component"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.3.0",
+    "axios": "^1.7.7",
     "cross-env": "^7.0.3",
+    "js-cookie": "^3.0.5",
     "next": "^14.2.15",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.3.0",
-    "react-select": "^5.8.1",
-    "react-world-flags": "^1.6.0"
+    "react-redux": "^9.1.2",
+    "react-select": "^5.8.2",
+    "react-toastify": "^10.0.6",
+    "react-world-flags": "^1.6.0",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-redux": "^7.1.34",
     "@types/react-world-flags": "^1.6.0",
     "autoprefixer": "^10.4.20",
     "cypress": "^13.6.2",
