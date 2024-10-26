@@ -14,3 +14,4 @@ export default function FbButton({ slug, url }: { slug: string; url: string }) {
     </FacebookShareButton>
   );
 }
+
