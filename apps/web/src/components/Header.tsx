@@ -1,3 +1,3 @@
 export const Header = () => {
-  return <div>Header</div>;
+  return <div className="font-bold text-red-500">Header</div>;
 };
