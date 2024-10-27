@@ -37,7 +37,15 @@ const JobPage = () => {
     }
   }, [id]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div className="h-screen w-screen flex flex-col justify-center items-center bg-gray-50">
+        <span className="loading loading-dots loading-lg animate-pulse text-blue-600"></span>
+        <p className="mt-4 text-gray-600 text-lg animate-fade">
+          Loading, please wait...
+        </p>
+      </div>
+    );
   if (error) return <div className="text-red-500 text-center">{error}</div>;
   if (!job) return <p>No job data available</p>;
 
@@ -52,18 +60,30 @@ const JobPage = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Job Details Section */}
           <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-6">
-            <HeaderSection job={job} isSaved={isSaved} handleSaveClick={handleSaveClick} />
-            
+            <HeaderSection
+              job={job}
+              isSaved={isSaved}
+              handleSaveClick={handleSaveClick}
+            />
+
             {/* Job Description Section */}
             <section>
-              <h2 className="text-lg md:text-xl font-semibold mb-2">Job Description</h2>
-              <p className="text-gray-700 text-sm md:text-base">{job.description}</p>
+              <h2 className="text-lg md:text-xl font-semibold mb-2">
+                Job Description
+              </h2>
+              <p className="text-gray-700 text-sm md:text-base">
+                {job.description}
+              </p>
             </section>
 
             {/* Responsibilities Section */}
             <section>
-              <h2 className="text-lg md:text-xl font-semibold mb-2">Responsibilities</h2>
-              <p className="text-gray-700 text-sm md:text-base">{job.responsibility}</p>
+              <h2 className="text-lg md:text-xl font-semibold mb-2">
+                Responsibilities
+              </h2>
+              <p className="text-gray-700 text-sm md:text-base">
+                {job.responsibility}
+              </p>
             </section>
           </div>
 

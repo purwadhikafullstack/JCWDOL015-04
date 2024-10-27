@@ -111,7 +111,9 @@ export default function JobListingsPage() {
         ) : (
           <div className="flex flex-col justify-center items-center w-full h-64 space-y-4">
             <span className="loading loading-bars loading-lg"></span>
-            <p className="text-gray-500 text-center">No Jobs at the moment...</p>
+            <p className="text-gray-500 text-center">
+              No Jobs at the moment...
+            </p>
           </div>
         )}
       </div>

@@ -5,7 +5,9 @@ import 'react-quill/dist/quill.snow.css';
 
 const ApplyModal = ({ jobId }: any) => {
   const [coverLetter, setCoverLetter] = useState('');
-  const [showConfirmation, setShowConfirmation] = useState<{ type: 'apply' | 'cancel' | null }>({ type: null });
+  const [showConfirmation, setShowConfirmation] = useState<{
+    type: 'apply' | 'cancel' | null;
+  }>({ type: null });
 
   const handleApplyClick = () => {
     setShowConfirmation({ type: 'apply' });
@@ -31,17 +33,23 @@ const ApplyModal = ({ jobId }: any) => {
   return (
     <div className="modal" role="dialog" id="my_modal_8">
       <div className="modal-box w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-5xl p-4 md:p-6 lg:p-8 overflow-y-auto">
-        <h3 className="text-lg sm:text-xl font-bold mb-4 text-center lg:text-left">Apply for the Job</h3>
+        <h3 className="text-lg sm:text-xl font-bold mb-4 text-center lg:text-left">
+          Apply for the Job
+        </h3>
 
         {/* Upload Resume */}
-        <label className="block text-sm font-medium text-gray-700 mb-2">Upload Resume</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Upload Resume
+        </label>
         <input
           type="file"
           className="file-input file-input-bordered w-full mb-6"
         />
 
         {/* Cover Letter with Larger Rich Text Editor */}
-        <label className="block text-sm font-medium text-gray-700 mb-2">Cover Letter</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Cover Letter
+        </label>
         <ReactQuill
           value={coverLetter}
           onChange={setCoverLetter}
@@ -49,16 +57,23 @@ const ApplyModal = ({ jobId }: any) => {
           style={{ height: '200px', marginBottom: '24px' }}
           modules={{
             toolbar: [
-              [{ 'header': '1' }, { 'header': '2' }],
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              [{ header: '1' }, { header: '2' }],
+              [{ list: 'ordered' }, { list: 'bullet' }],
               ['bold', 'italic', 'underline'],
-              [{ 'color': [] }],
-              ['link']
-            ]
+              [{ color: [] }],
+              ['link'],
+            ],
           }}
           formats={[
-            'header', 'bold', 'italic', 'underline', 'blockquote',
-            'list', 'bullet', 'link', 'color'
+            'header',
+            'bold',
+            'italic',
+            'underline',
+            'blockquote',
+            'list',
+            'bullet',
+            'link',
+            'color',
           ]}
         />
 
@@ -80,7 +95,10 @@ const ApplyModal = ({ jobId }: any) => {
 
         {/* Confirmation Alert */}
         {showConfirmation.type && (
-          <div role="alert" className="alert flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8 p-4 border border-gray-300 rounded-md bg-gray-50">
+          <div
+            role="alert"
+            className="alert flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8 p-4 border border-gray-300 rounded-md bg-gray-50"
+          >
             <div className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -102,8 +120,15 @@ const ApplyModal = ({ jobId }: any) => {
               </span>
             </div>
             <div className="flex space-x-2 mt-4 sm:mt-0">
-              <button onClick={handleDeny} className="btn btn-sm">Cancel</button>
-              <button onClick={handleConfirm} className="btn btn-sm btn-primary">Confirm</button>
+              <button onClick={handleDeny} className="btn btn-sm">
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="btn btn-sm btn-primary"
+              >
+                Confirm
+              </button>
             </div>
           </div>
         )}

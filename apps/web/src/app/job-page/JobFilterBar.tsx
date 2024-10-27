@@ -104,12 +104,18 @@ export default function JobFilterBar({
           placeholder={
             <div className="flex p-2.5 items-center">
               <GoLocation className="text-blue-600 mr-2" />
-              <span>{manualLocation ? 'Select Location' : 'All Countries'}</span>
+              <span>
+                {manualLocation ? 'Select Location' : 'All Countries'}
+              </span>
             </div>
           }
           classNamePrefix="react-select"
           onChange={(option) => setCountry(option ? option.value : '')}
-          value={country ? mappedCountryOptions.find((option) => option.value === country) : null}
+          value={
+            country
+              ? mappedCountryOptions.find((option) => option.value === country)
+              : null
+          }
           isSearchable={false}
           styles={{
             container: (base) => ({ ...base, width: '100%' }),
@@ -131,9 +137,15 @@ export default function JobFilterBar({
           }
           classNamePrefix="react-select"
           onChange={(selectedOptions) =>
-            setJobType(selectedOptions ? selectedOptions.map((option) => option.value) : [])
+            setJobType(
+              selectedOptions
+                ? selectedOptions.map((option) => option.value)
+                : [],
+            )
           }
-          value={jobTypeOptions.filter((option) => jobType.includes(option.value))}
+          value={jobTypeOptions.filter((option) =>
+            jobType.includes(option.value),
+          )}
           isSearchable={false}
           styles={{
             container: (base) => ({ ...base, width: '100%' }),
@@ -181,9 +193,15 @@ export default function JobFilterBar({
               placeholder="Select Salary Range(s)"
               classNamePrefix="react-select"
               onChange={(selectedOptions) =>
-                setSalary(selectedOptions ? selectedOptions.map((option) => option.value) : [])
+                setSalary(
+                  selectedOptions
+                    ? selectedOptions.map((option) => option.value)
+                    : [],
+                )
               }
-              value={salaryRanges.filter((option) => salary.includes(option.value))}
+              value={salaryRanges.filter((option) =>
+                salary.includes(option.value),
+              )}
               isSearchable={false}
               styles={{
                 container: (base) => ({ ...base, width: '100%' }),
@@ -201,9 +219,15 @@ export default function JobFilterBar({
               placeholder="Select Category(s)"
               classNamePrefix="react-select"
               onChange={(selectedOptions) =>
-                setJobCategory(selectedOptions ? selectedOptions.map((option) => option.value) : [])
+                setJobCategory(
+                  selectedOptions
+                    ? selectedOptions.map((option) => option.value)
+                    : [],
+                )
               }
-              value={jobCategories.filter((option) => jobCategory.includes(option.value))}
+              value={jobCategories.filter((option) =>
+                jobCategory.includes(option.value),
+              )}
               isSearchable={false}
               styles={{
                 container: (base) => ({ ...base, width: '100%' }),
@@ -222,10 +246,14 @@ export default function JobFilterBar({
               classNamePrefix="react-select"
               onChange={(selectedOptions) =>
                 setJobEducationLevel(
-                  selectedOptions ? selectedOptions.map((option) => option.value) : []
+                  selectedOptions
+                    ? selectedOptions.map((option) => option.value)
+                    : [],
                 )
               }
-              value={jobEducationLevels.filter((option) => jobEducationLevel.includes(option.value))}
+              value={jobEducationLevels.filter((option) =>
+                jobEducationLevel.includes(option.value),
+              )}
               isSearchable={false}
               styles={{
                 container: (base) => ({ ...base, width: '100%' }),
@@ -243,9 +271,15 @@ export default function JobFilterBar({
               placeholder="Select Experience Level(s)"
               classNamePrefix="react-select"
               onChange={(selectedOptions) =>
-                setJobExperience(selectedOptions ? selectedOptions.map((option) => option.value) : [])
+                setJobExperience(
+                  selectedOptions
+                    ? selectedOptions.map((option) => option.value)
+                    : [],
+                )
               }
-              value={jobExperienceLevels.filter((option) => jobExperience.includes(option.value))}
+              value={jobExperienceLevels.filter((option) =>
+                jobExperience.includes(option.value),
+              )}
               isSearchable={false}
               styles={{
                 container: (base) => ({ ...base, width: '100%' }),
