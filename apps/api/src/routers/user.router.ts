@@ -23,6 +23,9 @@ export class UserRouter {
     this.router.post('/', this.userController.createUser);
     this.router.post('/login', this.userController.loginUser);
     this.router.patch('/verify', verifyToken, this.userController.verifyUser);
+
+    // Resend verification link
+    this.router.post('/resend-verification', this.userController.resendVerificationLink);
   }
 
   getRouter(): Router {

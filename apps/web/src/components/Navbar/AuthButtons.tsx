@@ -1,18 +1,17 @@
-"use client"
 import React from 'react';
 import Link from 'next/link';
 import { UserRole } from '@/types/role';
 import AvatarMenu from './AvatarMenu';
 
 interface AuthButtonsProps {
-  token: string | null;
+  isLoggedIn: boolean;
   userRole: UserRole | null;
   onLogout: () => void;
 }
 
-const AuthButtons: React.FC<AuthButtonsProps> = ({ token, userRole, onLogout }) => (
+const AuthButtons: React.FC<AuthButtonsProps> = ({ isLoggedIn, userRole, onLogout }) => (
   <div className="flex items-center space-x-2">
-    {token && userRole ? (
+    {isLoggedIn ? (
       <>
         {(userRole === UserRole.Admin || userRole === UserRole.Developer) && (
           <Link href="/post-jobs">
@@ -21,7 +20,9 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ token, userRole, onLogout }) 
             </button>
           </Link>
         )}
-        <AvatarMenu onLogout={onLogout} userRole={userRole} />
+        {userRole && (
+          <AvatarMenu onLogout={onLogout} userRole={userRole} />
+        )}
       </>
     ) : (
       <>

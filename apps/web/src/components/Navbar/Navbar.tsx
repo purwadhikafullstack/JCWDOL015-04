@@ -1,9 +1,10 @@
+// Navbar.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiMenu, FiX } from 'react-icons/fi';
-import { getToken, deleteToken } from '@/lib/server';
+import { deleteToken } from '@/lib/server';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logoutAction } from '@/redux/slice/authorSlice';
 import { UserRole } from '@/types/role';
@@ -17,28 +18,18 @@ import MobileMenu from './MobileMenu';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  
+  // Use Redux user state
   const user = useAppSelector((state) => state.user);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await getToken();
-      setToken(res || '');
-    };
-    setUserRole(user.role as UserRole | null);
-    fetchData();
-  }, [user, token]);
+  const isLoggedIn = !!user.user_id;
 
   const onLogout = async () => {
-    toast.success('Logged out successful!');
+    toast.success('Logged out successfully!');
     await deleteToken();
     dispatch(logoutAction());
     router.push('/');
-    setUserRole(null);
-    setToken(null);
   };
 
   return (
@@ -52,7 +43,6 @@ const Navbar = () => {
             width={40}
             height={40}
             style={{ objectFit: 'cover' }}
-            layout="fixed"
           />
           <Link href="/" className="text-2xl font-bold text-gray-700">
             HireMe
@@ -67,9 +57,9 @@ const Navbar = () => {
         {/* Desktop Navigation Links and Auth Buttons */}
         <div className="hidden lg:flex items-center space-x-4">
           <ul className="flex space-x-6 text-gray-700">
-            <NavLinks userRole={userRole} />
+            <NavLinks userRole={user.role as UserRole | null} />
           </ul>
-          <AuthButtons token={token} userRole={userRole} onLogout={onLogout} />
+          <AuthButtons isLoggedIn={isLoggedIn} userRole={user.role as UserRole | null} onLogout={onLogout} />
         </div>
 
         {/* Mobile Menu Toggle Button */}
@@ -82,7 +72,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <MobileMenu token={token} userRole={userRole} onLogout={onLogout} />
+        <MobileMenu isLoggedIn={isLoggedIn} userRole={user.role as UserRole | null} onLogout={onLogout} />
       )}
     </nav>
   );

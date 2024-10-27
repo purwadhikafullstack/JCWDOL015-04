@@ -1,3 +1,4 @@
+// MobileMenu.tsx
 "use client"
 import React from 'react';
 import Link from 'next/link';
@@ -5,16 +6,16 @@ import NavLinks from './NavLinks';
 import { UserRole } from '@/types/role';
 
 interface MobileMenuProps {
-  token: string | null;
+  isLoggedIn: boolean;
   userRole: UserRole | null;
   onLogout: () => void;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ token, userRole, onLogout }) => (
+const MobileMenu: React.FC<MobileMenuProps> = ({ isLoggedIn, userRole, onLogout }) => (
   <div className="lg:hidden bg-white shadow-lg rounded-md z-50 absolute top-16 w-full">
     <ul className="flex flex-col items-start space-y-4 py-4 ml-2 mr-2">
       <NavLinks userRole={userRole} />
-      {token && userRole ? (
+      {isLoggedIn ? (
         <>
           <Link href="/profile"><button className="hover:text-Primary-blue">Profile</button></Link>
           <Link href="/settings"><button className="hover:text-Primary-blue">Setting</button></Link>

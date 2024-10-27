@@ -166,7 +166,6 @@ export class UserController {
 
   async verifyUser(req: Request, res: Response) {
     try {
-      // Retrieve the token from the query or header
       const token =
         typeof req.query.token === 'string'
           ? req.query.token
@@ -179,7 +178,6 @@ export class UserController {
         });
       }
 
-      // Verify token and cast it to the expected type
       const decoded = verify(token, process.env.SECRET_JWT!) as unknown as {
         id: number;
       };
@@ -203,7 +201,6 @@ export class UserController {
         });
       }
 
-      // Update verification status
       await prisma.user.update({
         where: { user_id: userId },
         data: { is_verified: true },
@@ -323,5 +320,62 @@ export class UserController {
         msg: 'An error occurred while updating user information',
       });
     }
+   }
+
+   async resendVerificationLink(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+
+      const user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          status: 'error',
+          msg: 'User not found!',
+        });
+      }
+
+      if (user.is_verified) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'User is already verified.',
+        });
+      }
+
+      const payload = { id: user.user_id };
+      const token = sign(payload, process.env.SECRET_JWT!, {
+        expiresIn: '60m',
+      });
+
+      const templatePath = path.join(__dirname, '../templates', 'verification.hbs');
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+      const compiledTemplate = handlebars.compile(templateSource);
+
+      const emailHtml = compiledTemplate({
+        name: user.first_name + ' ' + user.last_name,
+        link: `http://localhost:3000/verify/${token}`,
+      });
+
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: 'Resend Verification - Verify Your HireMe Account',
+        html: emailHtml,
+      });
+
+      res.status(200).json({
+        status: 'ok',
+        msg: 'Verification link resent successfully!',
+      });
+    } catch (err) {
+      console.error('Resend Verification Error:', err);
+      res.status(500).json({
+        status: 'error',
+        msg: 'An error occurred while resending verification link.',
+      });
+    }
   }
+
 }

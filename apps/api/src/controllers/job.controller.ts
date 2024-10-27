@@ -1,6 +1,13 @@
 import prisma from '@/prisma';
 import { Request, Response } from 'express';
-import { CountryCode, JobCategory, Prisma } from '@prisma/client';
+import {
+  CountryCode,
+  JobCategory,
+  JobEducationLevel,
+  JobExperience,
+  JobType,
+  Prisma,
+} from '@prisma/client';
 
 export class JobController {
   async createJob(req: Request, res: Response) {
@@ -11,7 +18,10 @@ export class JobController {
         location,
         country,
         salary,
-        category,
+        jobType,
+        jobCategory,
+        jobEducationLevel,
+        jobExperience,
         companyId,
         is_active,
       } = req.body;
@@ -29,8 +39,11 @@ export class JobController {
         description,
         location,
         country,
+        jobType,
+        jobCategory,
+        jobExperience,
+        jobEducationLevel,
         salary: salary ? parseFloat(salary) : null,
-        category,
         is_active: is_active === 'true',
         company: { connect: { company_id: parseInt(companyId, 10) } },
         User: { connect: { user_id: userId } },
@@ -50,58 +63,82 @@ export class JobController {
 
   async getJobs(req: Request, res: Response) {
     try {
-      const { search, category, country, location, dateRange } = req.query;
+      const {
+        search,
+        jobType,
+        salary,
+        jobCategory,
+        jobEducationLevel,
+        jobExperience,
+        country,
+        location,
+        dateRange,
+      } = req.query;
 
-      const filter: Prisma.JobWhereInput = {
-        is_active: true,
-      };
+      const filter: Prisma.JobWhereInput = { is_active: true };
 
-      if (search) {
+      // Search filter
+      if (typeof search === 'string') {
+        const lowerSearch = search.toLowerCase();
         filter.OR = [
-          { job_title: { contains: (search as string).toLowerCase() } },
-          { location: { contains: (search as string).toLowerCase() } },
-          {
-            company: {
-              company_name: {
-                contains: (search as string).toLowerCase(),
-              },
-            },
-          },
-          {
-            company: {
-              IndustryType: {
-                contains: (search as string).toLowerCase(),
-              },
-            },
-          },
-          {
-            company: {
-              address: {
-                contains: (search as string).toLowerCase(),
-              },
-            },
-          },
+          { job_title: { contains: lowerSearch } },
+          { location: { contains: lowerSearch } },
+          { company: { company_name: { contains: lowerSearch } } },
         ];
       }
+      // Country filter
+      if (country) filter.country = country as CountryCode;
+      if (location) filter.location = { contains: location as string };
 
-      if (country) {
-        filter.country = country as CountryCode;
+      // Job Type filter
+      if (jobType) {
+        const jobTypeArray = Array.isArray(jobType) ? jobType : [jobType];
+        filter.jobType = { in: jobTypeArray as JobType[] };
       }
 
-      if (location) {
-        filter.location = { contains: (location as string).toLowerCase() };
+      // Job Category filter
+      if (jobCategory) {
+        const jobCategoryArray = Array.isArray(jobCategory) ? jobCategory : [jobCategory];
+        filter.jobCategory = { in: jobCategoryArray as JobCategory[] };
       }
 
-      if (category && Object.values(JobCategory).includes(category as JobCategory)) {
-        filter.category = category as JobCategory;
+      // Job Education Level filter
+      if (jobEducationLevel) {
+        const jobEducationLevelArray = Array.isArray(jobEducationLevel) ? jobEducationLevel : [jobEducationLevel];
+        filter.jobEducationLevel = { in: jobEducationLevelArray as JobEducationLevel[] };
       }
 
+      // Job Experience filter
+      if (jobExperience) {
+        const jobExperienceArray = Array.isArray(jobExperience) ? jobExperience : [jobExperience];
+        filter.jobExperience = { in: jobExperienceArray as JobExperience[] };
+      }
+
+      // Salary filter
+      if (salary) {
+        const salaryArray = Array.isArray(salary) ? salary : [salary];
+        filter.salary = {
+          OR: salaryArray.map((range) => {
+            if (typeof range === 'string') {
+              if (range === '5000') return { gte: 5000 };
+              const [minSalary, maxSalary] = range.split('-').map(Number);
+              return { gte: minSalary, ...(maxSalary ? { lte: maxSalary } : {}) };
+            }
+            return {};
+          }),
+        } as Prisma.IntFilter;
+      }
+
+      // Order jobs by date
+      const orderBy = {
+        created_at: dateRange === 'latest' ? 'desc' : 'asc',
+      } as Prisma.JobOrderByWithRelationInput;
+
+      // Fetch jobs with filters and ordering
       const jobs = await prisma.job.findMany({
         where: filter,
         include: { company: true },
-        orderBy: {
-          created_at: dateRange === 'latest' ? 'desc' : 'asc',
-        },
+        orderBy,
       });
 
       res.status(200).json({ status: 'ok', jobs });
@@ -114,36 +151,49 @@ export class JobController {
   async getJobById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-
+  
       if (!id || isNaN(Number(id))) {
         return res.status(400).json({ msg: 'Invalid job ID' });
       }
-
+  
       const job = await prisma.job.findUnique({
         where: { job_id: Number(id) },
         include: {
           company: {
-            include: { jobs: { where: { job_id: { not: Number(id) } } } },
-          },
-        },
+            include: {
+              jobs: { where: { job_id: { not: Number(id) } } }
+            }
+          }
+        }
       });
-
+  
       if (!job) {
         return res.status(404).json({ msg: 'Job not found' });
       }
-
+  
       res.status(200).json({ job });
     } catch (err) {
-      res.status(400).json({
-        msg: err instanceof Error ? err.message : 'An error occurred',
+      console.error('Error in getJobById:', err); // Enhanced error logging
+      res.status(500).json({
+        msg: 'An error occurred while fetching the job information'
       });
     }
   }
+  
 
   async updateJob(req: Request, res: Response) {
     try {
-      const { job_title, description, location, country, salary, category, is_active } =
-        req.body;
+      const {
+        job_title,
+        description,
+        location,
+        country,
+        salary,
+        jobCategory,
+        jobEducationLevel,
+        jobExperience,
+        is_active,
+      } = req.body;
       const jobId = parseInt(req.params.jobId, 10);
 
       if (isNaN(jobId)) {
@@ -165,7 +215,9 @@ export class JobController {
           location,
           country,
           salary: salary ? parseFloat(salary) : job.salary,
-          category,
+          jobCategory,
+          jobEducationLevel,
+          jobExperience,
           is_active: is_active !== undefined ? is_active : job.is_active,
         },
       });

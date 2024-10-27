@@ -1,5 +1,5 @@
 // lib/user.ts
-import { IUserLogin, IUserReg } from '@/types/iuser';
+import { IUserLogin, IUserReg, IUserVerify } from '@/types/iuser';
 
 const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
 
@@ -69,5 +69,31 @@ export const verifyUser = async (token: string) => {
   const result = await res.json();
   return { result, ok: res.ok };
 };
+
+export const resendVerificationEmail = async (email: string): Promise<{ message: string; ok: boolean; is_verified: boolean }> => {
+  try {
+    console.log('Calling resendVerificationEmail with email:', email);
+    const response = await fetch(`${base_url}/user/resend-verification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    console.log('Response status:', response.status);
+    const data: IUserVerify & { message?: string } = await response.json();
+    console.log('Response data:', data);
+
+    return { 
+      message: data.message || 'Verification email resent successfully!', 
+      ok: response.ok,
+      is_verified: data.is_verified 
+    };
+  } catch (error: any) {
+    console.error('Error in resendVerificationEmail:', error.message);
+    return { message: error.message || 'An error occurred. Please try again.', ok: false, is_verified: false };
+  }
+};
+
+
 
 export default base_url;

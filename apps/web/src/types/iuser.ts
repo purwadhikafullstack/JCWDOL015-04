@@ -11,6 +11,11 @@ export interface IUserLogin {
   password: string;
 }
 
+export interface IUserVerify {
+  email: string;
+  is_verified: boolean;
+}
+
 export interface DecodedToken {
   user_id: string;
   application_id: string;

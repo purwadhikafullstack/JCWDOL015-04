@@ -33,6 +33,13 @@ const ForgetPassword = () => {
             </Link>
           </p>
 
+          <p className="text-sm text-gray-600 mb-4">
+            Verify your Account?{' '}
+            <Link href="/email-verify" className="text-blue-600 hover:underline">
+              Verify here
+            </Link>
+          </p>
+
           {/* Input Field */}
           <div className="space-y-4">
             <input

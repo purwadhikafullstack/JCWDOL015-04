@@ -13,10 +13,10 @@ export class JobRouter {
   }
 
   private initializeRoutes(): void {
+    this.router.post('/', this.jobController.createJob);
     this.router.get('/', this.jobController.getJobs);
-    this.router.post('/jobs', this.jobController.createJob);
-    this.router.get('/jobs/:jobId', this.jobController.getJobById);
-    this.router.put('/jobs/:jobId', this.jobController.updateJob);
+    this.router.get('/:id', this.jobController.getJobById);
+    this.router.put('/:id', this.jobController.updateJob);
   }
 
   getRouter(): Router {

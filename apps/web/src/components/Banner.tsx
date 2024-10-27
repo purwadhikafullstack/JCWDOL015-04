@@ -42,6 +42,7 @@ const LandingPage = () => {
   const [country, setCountry] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
+  const [radius] = useState(25);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -51,7 +52,6 @@ const LandingPage = () => {
           setLongitude(position.coords.longitude);
         },
         () => {
-          console.log('Location access denied');
         },
       );
     }
@@ -118,6 +118,7 @@ const LandingPage = () => {
                     location: country,
                     lat: latitude?.toString() || '',
                     lng: longitude?.toString() || '',
+                    radius: radius.toString(),
                   },
                 }}
               >

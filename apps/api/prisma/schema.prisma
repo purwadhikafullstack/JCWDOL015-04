@@ -139,8 +139,8 @@ enum Gender {
   OTHER
 }
 
-// Enum for Job Category
-enum JobCategory {
+// Enum for Job Type
+enum JobType {
   fullTime
   partTime
   freelance
@@ -159,6 +159,48 @@ enum CountryCode {
   CN // China
 }
 
+// Enum for Job education
+enum JobEducationLevel {
+  high_school
+  intermediate
+  graduate
+  bachelor_degree
+  master_degree
+  doctor_degree
+}
+
+// Enum for Job Experience
+enum JobExperience {
+  entry_level
+  mid_level
+  senior_level
+  expert
+}
+
+// Enum for Job Category
+enum JobCategory {
+  software_engineering
+  data_science
+  machine_learning
+  artificial_intelligence
+  cybersecurity
+  business_intelligence
+  cyber_security
+  product_management
+  marketing
+  design
+  finance
+  accounting
+  legal
+  management
+  human_resources
+  customer_service
+  sales
+  legal_and_compliance
+  management_and_leadership
+  public_relations
+}
+
 // User model
 model User {
   user_id             Int             @id @default(autoincrement())
@@ -170,6 +212,11 @@ model User {
   profile_picture     String?
   phone               String?
   website             String?
+  linkedin            String?
+  github              String?
+  twitter             String?
+  facebook            String?
+  instagram           String?
   title               String?
   education           EducationLevel?
   biography           String?         @db.Text()
@@ -211,6 +258,10 @@ model Company {
   email           String      @unique
   phone           String?
   aboutUs         String?     @db.Text()
+  linkedin        String?
+  instagram       String?
+  twitter         String?
+  facebook        String?
   yearOfEstablish DateTime?
   IndustryType    String?
   TeamSize        Int?
@@ -233,16 +284,20 @@ model Company {
 
 // Job model
 model Job {
-  job_id      Int         @id @default(autoincrement())
-  job_title   String
-  description String      @db.Text()
-  country     CountryCode
-  location    String?
-  salary      Decimal?
-  category    JobCategory
-  created_at  DateTime    @default(now())
-  updated_at  DateTime    @updatedAt
-  is_active   Boolean
+  job_id            Int                @id @default(autoincrement())
+  job_title         String
+  description       String             @db.Text()
+  responsibility    String?            @db.Text()
+  country           CountryCode
+  location          String?
+  salary            Int?
+  jobType           JobType?
+  jobCategory       JobCategory?
+  jobEducationLevel JobEducationLevel?
+  jobExperience     JobExperience?
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  is_active         Boolean
 
   // Relations
   company      Company       @relation(fields: [company_id], references: [company_id])
@@ -255,13 +310,14 @@ model Job {
   userUser_id  Int?
 
   @@index([company_id])
-  @@index([is_active, category])
+  @@index([is_active, jobCategory])
 }
 
 // Application model
 model Application {
   application_id   Int               @id @default(autoincrement())
   resume           String?
+  coverLetter      String?           @db.Text()
   expected_salary  Decimal?
   status           ApplicationStatus
   applied_at       DateTime          @default(now())
