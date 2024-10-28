@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
       title: 'BASIC',
       description:
         'Praesent eget pulvinar orci. Duis ut pellentesque ligula convallis.',
-      price: '50000',
+      price: '55000',
       features: [
         'Post 1 Job',
         'Urgents & Featured Jobs',
@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
       title: 'STANDARD',
       description:
         'Praesent eget pulvinar orci. Duis ut pellentesque ligula convallis.',
-      price: '125000',
+      price: '135000',
       features: [
         '3 Active Jobs',
         'Urgents & Featured Jobs',
@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
       title: 'PREMIUM',
       description:
         'Praesent eget pulvinar orci. Duis ut pellentesque ligula convallis.',
-      price: '275000',
+      price: '299999',
       features: [
         '6 Active Jobs',
         'Urgents & Featured Jobs',
