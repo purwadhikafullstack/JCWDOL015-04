@@ -128,6 +128,7 @@ export class JobController {
           }),
         } as Prisma.IntFilter;
       }
+      console.log('asd',dateRange)
 
       // Order jobs by date
       const orderBy = {
@@ -173,14 +174,12 @@ export class JobController {
   
       res.status(200).json({ job });
     } catch (err) {
-      console.error('Error in getJobById:', err); // Enhanced error logging
       res.status(500).json({
         msg: 'An error occurred while fetching the job information'
       });
     }
   }
   
-
   async updateJob(req: Request, res: Response) {
     try {
       const {

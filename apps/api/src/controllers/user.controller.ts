@@ -113,7 +113,16 @@ export class UserController {
 
   async getUser(req: Request, res: Response) {
     try {
-      const user = await prisma.user.findMany();
+      const user = await prisma.user.findMany({
+        select: {
+            user_id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+            profile_picture: true,
+            role: true,
+        },
+      });
       res.status(200).send({
         status: 'ok',
         msg: 'Account fetched!',
@@ -229,7 +238,6 @@ export class UserController {
         currentPassword,
         Newpassword,
         Confirmpassword,
-        profile_picture,
         website,
         title,
         education,
@@ -240,22 +248,22 @@ export class UserController {
         nationality,
         gender,
         DateOfBirth,
-        resume,
         years_of_experience,
       } = req.body;
 
-      const userId = req.user?.user_id;
+      // Access the uploaded profile picture file path
+      const profilePictureUrl = req.file
+      ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
+      : undefined;
 
+      const userId = req.user?.user_id;
       if (!userId) throw new Error('Account not authenticated');
 
-      // Retrieve the current user data
       const user = await prisma.user.findUnique({ where: { user_id: userId } });
       if (!user) throw new Error('Account not found');
 
-      // Check if the user wants to update the password
       let hashedPassword;
       if (Newpassword) {
-        // Ensure the user provided the current password
         if (!currentPassword) {
           return res.status(400).send({
             status: 'error',
@@ -263,7 +271,6 @@ export class UserController {
           });
         }
 
-        // Verify the current password matches the stored password
         const isPasswordValid = await compare(currentPassword, user.password);
         if (!isPasswordValid) {
           return res.status(400).send({
@@ -272,7 +279,6 @@ export class UserController {
           });
         }
 
-        // Ensure the new password and confirmation match
         if (Newpassword !== Confirmpassword) {
           return res.status(400).send({
             status: 'error',
@@ -280,7 +286,6 @@ export class UserController {
           });
         }
 
-        // If the current password is correct, hash the new password
         hashedPassword = await hash(Newpassword, await genSalt(10));
       }
 
@@ -291,7 +296,7 @@ export class UserController {
           last_name,
           phone,
           email,
-          profile_picture,
+          profile_picture: profilePictureUrl, // Save profile picture path
           website,
           title,
           education,
@@ -302,9 +307,8 @@ export class UserController {
           nationality,
           gender,
           DateOfBirth,
-          resume,
           years_of_experience,
-          ...(hashedPassword && { password: hashedPassword }), // Update the password if provided
+          ...(hashedPassword && { password: hashedPassword }),
         },
       });
 
@@ -320,9 +324,9 @@ export class UserController {
         msg: 'An error occurred while updating user information',
       });
     }
-   }
+  }
 
-   async resendVerificationLink(req: Request, res: Response) {
+  async resendVerificationLink(req: Request, res: Response) {
     try {
       const { email } = req.body;
 
@@ -349,7 +353,11 @@ export class UserController {
         expiresIn: '60m',
       });
 
-      const templatePath = path.join(__dirname, '../templates', 'verification.hbs');
+      const templatePath = path.join(
+        __dirname,
+        '../templates',
+        'verification.hbs',
+      );
       const templateSource = fs.readFileSync(templatePath, 'utf-8');
       const compiledTemplate = handlebars.compile(templateSource);
 
@@ -378,4 +386,80 @@ export class UserController {
     }
   }
 
+  async requestPasswordReset(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+  
+      // Check if user exists
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        return res.status(404).json({ status: 'error', msg: 'User not found!' });
+      }
+  
+      // Generate a reset token that expires in 15 minutes
+      const payload = { id: user.user_id };
+      const resetToken = sign(payload, process.env.SECRET_JWT!, { expiresIn: '15m' });
+  
+      // Create reset link
+      const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+  
+
+      const templatePath = path.join(__dirname, '../templates', 'resetPassword.hbs');
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+      const compiledTemplate = handlebars.compile(templateSource);
+  
+      const emailHtml = compiledTemplate({
+        name: user.first_name + ' ' + user.last_name,
+        link: resetLink,
+      });
+  
+      // Send email
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: email,
+        subject: 'Password Reset Request',
+        html: emailHtml,
+      });
+  
+      res.status(200).json({ status: 'ok', msg: 'Password reset link sent!' });
+    } catch (err) {
+      console.error('Password Reset Request Error:', err);
+      res.status(500).json({ status: 'error', msg: 'An error occurred during password reset request.' });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token, newPassword, confirmNewPassword } = req.body;
+  
+      if (newPassword !== confirmNewPassword) {
+        return res.status(400).json({ status: 'error', msg: 'Passwords do not match' });
+      }
+  
+      // Verify the token
+      const decoded = verify(token, process.env.SECRET_JWT!) as { id: number };
+  
+      // Fetch the user using decoded token data
+      const user = await prisma.user.findUnique({ where: { user_id: decoded.id } });
+      if (!user) {
+        return res.status(404).json({ status: 'error', msg: 'User not found!' });
+      }
+  
+      // Hash the new password
+      const salt = await genSalt(10);
+      const hashedPassword = await hash(newPassword, salt);
+  
+      // Update user password and respond
+      await prisma.user.update({
+        where: { user_id: user.user_id },
+        data: { password: hashedPassword },
+      });
+  
+      res.status(200).json({ status: 'ok', msg: 'Password has been reset successfully!' });
+    } catch (err) {
+      console.error('Password Reset Error:', err);
+      res.status(400).json({ status: 'error', msg: 'Invalid or expired token' });
+    }
+  }
+  
 }

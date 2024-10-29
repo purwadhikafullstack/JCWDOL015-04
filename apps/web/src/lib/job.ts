@@ -11,6 +11,7 @@ export const getJobs = async (
     jobType?: string;
     salary?: string;
     jobCategory?: string;
+    jobExpired_at?: string;
     jobEducationLevel?: string;
     jobExperience?: string;
     dateRange?: string;
@@ -36,7 +37,6 @@ export const getJobs = async (
     const result = await res.json();
     return { jobs: result.jobs, ok: res.ok };
   } catch (error) {
-    console.error('Error fetching jobs:', error);
     return { jobs: [], ok: false };
   }
 };
@@ -51,7 +51,6 @@ export const getJobById = async (jobId: string): Promise<{ job: Job | null; ok: 
     const result = await res.json();
     return { job: result.job, ok: true };
   } catch (error) {
-    console.error('Error fetching job by ID:', error);
     return { job: null, ok: false };
   }
 };

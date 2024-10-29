@@ -12,10 +12,10 @@ export const uploader = (
 ) => {
   // Define default directories for each file type
   const directories = {
-    resume: path.join(__dirname, '../../uploads/resumes'),
-    profile_picture: path.join(__dirname, '../../uploads/profile_pictures'),
-    company_logo: path.join(__dirname, '../../uploads/company_logos'),
-    company_banner: path.join(__dirname, '../../uploads/company_banners'),
+    resume: path.join(__dirname, '../../public/resumes'),
+    profile_picture: path.join(__dirname, '../../public/profile_pictures'),
+    company_logo: path.join(__dirname, '../../public/company_logos'),
+    company_banner: path.join(__dirname, '../../public/company_banners'),
   };
 
   // Get the directory based on the fileType
@@ -66,14 +66,14 @@ export const uploader = (
       (fileType === 'profile_picture' || fileType === 'company_logo' || fileType === 'company_banner') &&
       allowedImageTypes.includes(fileExtension)
     ) {
-      cb(null, true); // Allow images for profile picture, logo, and banner
+      cb(null, true);
     } else {
-      cb(null, false); // Reject invalid files
+      cb(null, false);
     }
   };
 
   // Define max file size (e.g., 5 MB for images and resume)
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const maxSize = fileType === 'profile_picture' ? 1 * 1024 * 1024 : 5 * 1024 * 1024; // 1MB for profile pictures, 5MB for others
 
   return multer({
     storage,

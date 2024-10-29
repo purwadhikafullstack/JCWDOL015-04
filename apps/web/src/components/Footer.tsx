@@ -48,11 +48,6 @@ export const Footer = () => {
                   Pricing
                 </Link>
               </li>
-              <li>
-                <Link href="#" className="hover:text-white">
-                  Blog
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -125,7 +120,7 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/terms-and-conditions" className="hover:text-white">
                   Terms & Conditions
                 </Link>
               </li>

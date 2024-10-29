@@ -7,12 +7,14 @@ import {
   FiDollarSign,
   FiMapPin,
   FiBriefcase,
+  FiGrid,
 } from 'react-icons/fi';
 import { getLabel } from '@/utils/getLabel';
 import {
   getJobTypeName,
   jobEducationLevels,
   jobExperienceLevels,
+  jobCategories,
 } from '@/utils/format';
 
 const JobOverview = ({ job }: any) => (
@@ -27,7 +29,12 @@ const JobOverview = ({ job }: any) => (
       <OverviewItem
         icon={<FiCalendar />}
         label="Job Expire In"
-        value={moment(job.updated_at).format('DD MMMM, YYYY')}
+        value={moment(job.jobExpired_at).format('DD MMMM, YYYY')}
+      />
+      <OverviewItem
+        icon={<FiGrid />}
+        label="Job Function"
+        value={getLabel(jobCategories, job.jobCategory)}
       />
       <OverviewItem
         icon={<FiBook />}

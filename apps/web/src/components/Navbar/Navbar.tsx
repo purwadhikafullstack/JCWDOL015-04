@@ -23,6 +23,7 @@ const Navbar = () => {
   
   // Use Redux user state
   const user = useAppSelector((state) => state.user);
+  console.log("User state in Redux:", user);
   const isLoggedIn = !!user.user_id;
 
   const onLogout = async () => {

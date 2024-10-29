@@ -4,6 +4,10 @@ export interface Company {
   email: string;
   phone?: string;
   aboutUs?: string;
+  linkedin: string;
+  instagram: string;
+  twitter: string;
+  facebook: string;
   yearOfEstablish?: Date;
   IndustryType?: string;
   TeamSize?: number;
@@ -30,6 +34,7 @@ export interface Job {
   jobType: string;
   jobEducationLevel: string;
   jobExperience: string;
+  jobExpired_at: Date;
   created_at: Date;
   updated_at: Date;
   company: Company;
@@ -39,10 +44,10 @@ export interface JobFilterBarProps {
   onSearch: (filters: {
     search: string;
     country: string;
-    jobType: string[]; 
-    salary: string[]; 
-    jobCategory: string[]; 
-    jobEducationLevel: string[]; 
+    jobType: string[];
+    salary: string[];
+    jobCategory: string[];
+    jobEducationLevel: string[];
     jobExperience: string[];
   }) => void;
   manualLocation: boolean;

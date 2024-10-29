@@ -7,6 +7,7 @@ import {
   FaGlobe,
 } from 'react-icons/fa';
 import moment from 'moment';
+import Link from 'next/link';
 
 const CompanyInfo = ({ job }: any) => (
   <div className="bg-white shadow-lg rounded-lg p-6">
@@ -58,26 +59,32 @@ const CompanyInfo = ({ job }: any) => (
       </li>
     </ul>
     <div className="flex justify-center space-x-4 mt-4 text-gray-600">
-      <FaFacebook
-        size={20}
-        className="cursor-pointer hover:scale-105 transition-transform"
-      />
-      <FaTwitter
-        size={20}
-        className="cursor-pointer hover:scale-105 transition-transform"
-      />
-      <FaInstagram
-        size={20}
-        className="cursor-pointer hover:scale-105 transition-transform"
-      />
-      <FaLinkedin
-        size={20}
-        className="cursor-pointer hover:scale-105 transition-transform"
-      />
-      <FaGlobe
-        size={20}
-        className="cursor-pointer hover:scale-105 transition-transform"
-      />
+      <a href={job.company.facebook} target="_blank" rel="noopener noreferrer">
+        <FaFacebook
+          size={20}
+          className="cursor-pointer hover:scale-105 transition-transform"
+        />
+      </a>
+      <a href={job.company.twitter} target="_blank" rel="noopener noreferrer">
+        <FaTwitter
+          size={20}
+          className="cursor-pointer hover:scale-105 transition-transform"
+        />
+      </a>
+
+      <a href={job.company.instagram} target="_blank" rel="noopener noreferrer">
+        <FaInstagram
+          size={20}
+          className="cursor-pointer hover:scale-105 transition-transform"
+        />
+      </a>
+
+      <a href={job.company.linkedin} target="_blank" rel="noopener noreferrer">
+        <FaLinkedin
+          size={20}
+          className="cursor-pointer hover:scale-105 transition-transform"
+        />
+      </a>
     </div>
   </div>
 );

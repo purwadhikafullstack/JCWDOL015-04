@@ -295,6 +295,7 @@ model Job {
   jobCategory       JobCategory?
   jobEducationLevel JobEducationLevel?
   jobExperience     JobExperience?
+  jobExpired_at     DateTime?
   created_at        DateTime           @default(now())
   updated_at        DateTime           @updatedAt
   is_active         Boolean

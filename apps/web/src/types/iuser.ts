@@ -18,8 +18,7 @@ export interface IUserVerify {
 
 export interface DecodedToken {
   user_id: string;
-  application_id: string;
-  role: string;
+  userProfile: IUserProfile;
 }
 
 export interface JwtPayload {
@@ -34,3 +33,33 @@ export interface IUserState {
   role: string;
 }
 
+export interface IUserProfile {
+  user_id: number;
+  email: string;
+  password: string;
+  role: string;
+  first_name: string;
+  last_name: string;
+  profile_picture: string;
+  phone: string;
+  website: string;
+  linkedin: string;
+  github: string;
+  twitter: string;
+  facebook: string;
+  instagram: string;
+  title: string;
+  education: string;
+  biography?: string;
+  location?: string;
+  skills?: string;
+  languages?: string;
+  nationality?: string;
+  gender: string;
+  DateOfBirth: Date;
+  resume: string;
+  years_of_experience: number;
+  created_at: Date;
+  updated_at: Date;
+  is_verified: boolean;
+}

@@ -1,5 +1,6 @@
 import { JobController } from '@/controllers/job.controller';
-import { checkAdminDev, verifyToken } from '@/middlewares/token';
+import { verifyToken } from '@/middlewares/token';
+import { checkAdminDev, checkRole, checkCandidate} from '@/middlewares/checkRole';
 import { Router } from 'express';
 
 export class JobRouter {
@@ -13,10 +14,12 @@ export class JobRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/', this.jobController.createJob);
     this.router.get('/', this.jobController.getJobs);
     this.router.get('/:id', this.jobController.getJobById);
-    this.router.put('/:id', this.jobController.updateJob);
+    
+    //Protected for AdminDev
+    this.router.post('/', verifyToken, checkAdminDev, this.jobController.createJob);
+    this.router.put('/:id',verifyToken,checkAdminDev ,this.jobController.updateJob);
   }
 
   getRouter(): Router {

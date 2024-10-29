@@ -2,12 +2,17 @@
 import { IUserState } from "@/types/iuser";
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState: IUserState = {
+interface AuthState extends IUserState {
+    isAuthenticated: boolean;
+}
+
+const initialState: AuthState = {
     user_id: 0,
     first_name: "",
     last_name: "",
     role: "",
     profile_picture: "",
+    isAuthenticated: false,
 };
 
 export const userSlice = createSlice({
@@ -21,6 +26,7 @@ export const userSlice = createSlice({
             state.last_name = last_name;
             state.role = role;
             state.profile_picture = profile_picture;
+            state.isAuthenticated = true;
         },
         logoutAction: (state) => {
             state.user_id = 0;
@@ -28,6 +34,7 @@ export const userSlice = createSlice({
             state.last_name = "";
             state.role = "";
             state.profile_picture = "";
+            state.isAuthenticated = false;
         }
     }
 });

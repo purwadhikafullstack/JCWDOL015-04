@@ -13,7 +13,8 @@ const ResetPassword = () => {
         {/* Header */}
         <h2 className="text-3xl font-semibold mb-4">Reset Password</h2>
         <p className="text-gray-600 mb-8">
-          Duis luctus interdum metus, ut consectetur ante consectetur sed. Suspendisse euismod viverra massa sit amet mollis.
+          Enter and confirm your new password below to securely update your
+          account. Make sure your new password is strong and unique.
         </p>
 
         {/* Input Fields */}

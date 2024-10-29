@@ -29,37 +29,3 @@ export const verifyToken = async (
     });
   }
 };
-
-export const checkAdminDev = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    if (req.user?.role !== 'admin' && req.user?.role !== 'developer') throw new Error('Unauthorized');
-
-    next();
-  } catch (err) {
-    res.status(400).send({
-      status: 'error',
-      msg: 'Unauthorized',
-    });
-  }
-};
-
-export const checkCandidate = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    if (req.user?.role !== 'Candidate') throw new Error('Unauthorized');
-
-    next();
-  } catch (err) {
-    res.status(400).send({
-      status: 'error',
-      msg: 'Unauthorized',
-    });
-  }
-};

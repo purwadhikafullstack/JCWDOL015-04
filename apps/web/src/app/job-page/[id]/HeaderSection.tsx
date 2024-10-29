@@ -6,6 +6,7 @@ import SavedButton from '@/assets/saved-button.svg';
 const HeaderSection = ({ job, isSaved, handleSaveClick }: any) => (
   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
     <div className="flex items-center gap-4 w-full md:w-auto">
+      {/* Company Logo */}
       {job.company.logo ? (
         <Image
           src={job.company.logo}
@@ -20,39 +21,56 @@ const HeaderSection = ({ job, isSaved, handleSaveClick }: any) => (
         </div>
       )}
 
-      {/* Job Title and Save Button in the same row on small screens */}
-      <div className="flex-1 flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg md:text-2xl font-bold">{job.job_title}</h1>
-          <p className="text-gray-500 text-sm md:text-base">
-            {job.company.company_name}
-          </p>
-        </div>
-        {/* Save Button next to Job Title on small screens */}
-        <button
-          onClick={handleSaveClick}
-          className={`p-2 rounded-lg transition-all ${
-            isSaved
-              ? 'bg-blue-100 hover:bg-blue-200'
-              : 'bg-gray-100 hover:bg-gray-200'
-          } flex items-center justify-center`}
-        >
-          <Image
-            src={isSaved ? SavedButton : SaveButton}
-            alt={isSaved ? 'Saved' : 'Save job'}
-            width={28}
-            height={28}
-            className="transition-transform transform hover:scale-105"
-          />
-        </button>
+      {/* Job Title */}
+      <div className="flex-1 min-w-0">
+        <h1 className="text-lg md:text-2xl font-bold">{job.job_title}</h1>
+        <p className="text-gray-500 text-sm md:text-base">
+          {job.company.company_name}
+        </p>
       </div>
+      {/* Mobile-only Save Button (visible only on mobile) */}
+      <button
+        onClick={handleSaveClick}
+        className={`flex md:hidden p-2 mr-4 rounded-lg transition-all mt-4 ${
+          isSaved
+            ? 'bg-blue-100 hover:bg-blue-200'
+            : 'bg-gray-100 hover:bg-gray-200'
+        } items-center justify-center`}
+      >
+        <Image
+          src={isSaved ? SavedButton : SaveButton}
+          alt={isSaved ? 'Saved' : 'Save job'}
+          width={24}
+          height={24}
+          className="transition-transform transform hover:scale-105"
+        />
+      </button>
     </div>
 
-    {/* Apply Button */}
-    <div className="flex items-center justify-center w-full lg:pl-1.5 md:w-auto mt-4 md:mt-0">
+    {/* Save and Apply Button Section */}
+    <div className="flex flex-col md:flex-row items-center md:items-center md:space-x-2 w-full md:w-auto">
+      {/* Save Button (hidden on mobile) */}
+      <button
+        onClick={handleSaveClick}
+        className={`hidden md:flex w-10 h-10 rounded-lg transition-all mb-2 md:mb-0 ${
+          isSaved
+            ? 'bg-blue-100 hover:bg-blue-200'
+            : 'bg-gray-100 hover:bg-gray-200'
+        } items-center justify-center`}
+      >
+        <Image
+          src={isSaved ? SavedButton : SaveButton}
+          alt={isSaved ? 'Saved' : 'Save job'}
+          width={24}
+          height={24}
+          className="transition-transform transform hover:scale-105"
+        />
+      </button>
+
+      {/* Apply Button */}
       <a
         href="#my_modal_8"
-        className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all text-sm font-semibold whitespace-nowrap md:px-5 md:py-2"
+        className="bg-blue-600 text-white w-full md:w-auto px-5 py-3 rounded-lg hover:bg-blue-700 transition-all text-sm font-semibold text-center md:text-left whitespace-nowrap"
       >
         Apply Now →
       </a>

@@ -7,7 +7,7 @@ import { Job } from '@/types/job';
 import SaveButton from '../assets/save-button.svg';
 import SavedButton from '../assets/saved-button.svg';
 import { JobCardProps } from '@/types/job';
-import ApplyModal from '@/app/job-page/[id]/ApplyModal';
+import { FiImage } from 'react-icons/fi';
 
 const FeatureJob = () => {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
@@ -79,17 +79,26 @@ const JobCard = ({ job }: JobCardComponentProps) => {
   return (
     <div className="relative p-4 sm:p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border hover:border-blue-500 flex flex-col sm:flex-row items-end sm:items-center justify-between space-y-4 sm:space-y-0">
       <div className="flex items-center space-x-4 w-full">
-        <Image
-          src={job.company.logo || '/default-logo.png'}
-          alt={job.company.company_name}
-          width={80}
-          height={80}
-          className="object-contain"
-        />
+        {/* Company Logo */}
+        {job.company.logo ? (
+          <Image
+            src={job.company.logo}
+            alt={`${job.company.company_name} Logo`}
+            width={80}
+            height={80}
+            className="rounded-sm flex-shrink-0"
+          />
+        ) : (
+          <div className="w-20 h-20 bg-gray-300 flex items-center justify-center rounded-md text-gray-400 flex-shrink-0">
+            <FiImage size={60} />
+          </div>
+        )}
         <div className="flex-1">
           <h3 className="text-lg sm:text-xl font-semibold">{job.job_title}</h3>
+          <p className="text-sm sm:text-base text-gray-500">
+            {job.company.company_name}
+          </p>
           <p className="text-sm text-gray-600">{job.location}</p>
-          <p className="text-sm text-gray-600">{job.salary}</p>
         </div>
       </div>
 
@@ -97,7 +106,7 @@ const JobCard = ({ job }: JobCardComponentProps) => {
         {/* Save Button */}
         <button
           onClick={handleSaveClick}
-          className={`lg:p-2 p-3 rounded-lg ${
+          className={`lg:p-1 p-1 rounded-md ${
             isSaved ? 'bg-blue-100' : 'bg-gray-100'
           } hover:bg-blue-200 transition-all`}
         >
