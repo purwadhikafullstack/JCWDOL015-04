@@ -4,13 +4,9 @@ import CardSubs from '@/components/card';
 import {
   FaCircleCheck,
   FaCirclePlus,
-  FaCreditCard,
-  FaGear,
-  FaLayerGroup,
-  FaPencil,
   FaPenToSquare,
 } from 'react-icons/fa6';
-import { FaSignOutAlt } from 'react-icons/fa';
+import SideBar from '@/components/sidebar';
 
 interface Plan {
   id: number;
@@ -109,60 +105,9 @@ const Dashboard: React.FC = () => {
     setPlans(plans.filter((plan) => plan.id !== id));
   };
 
-  const [activeLink, setActiveLink] = useState<string | null>(null);
-
-  const handleClick = (linkId: string) => {
-    setActiveLink(linkId);
-  };
-
   return (
     <div className="flex flex-col md:flex-row">
-      <aside className="w-full md:w-1/4 bg-white h-auto md:h-screen py-6 pl-6 flex flex-col justify-between border-r-2">
-        <div>
-          <h2 className="text-gray-500 text-sm font-semibold mb-6">
-            DEVELOPER DASHBOARD
-          </h2>
-          <nav>
-            <a
-              href="#"
-              onClick={() => handleClick('overview')}
-              className={`flex items-center text-gray-500 hover:text-blue-500 hover:bg-[#F1F2F4] h-11 ${activeLink === 'overview' ? 'bg-[#E7F0FA] text-[#0A65CC]' : ''}`}
-            >
-              <FaLayerGroup className="mr-3" />
-              Overview
-            </a>
-            <a
-              href="#"
-              onClick={() => handleClick('payment')}
-              className={`flex items-center text-gray-500 hover:text-blue-500 hover:bg-[#F1F2F4] h-11 ${activeLink === 'payment' ? 'bg-[#E7F0FA] text-[#0A65CC]' : ''}`}
-            >
-              <FaCreditCard className="mr-3" /> Payment Control
-            </a>
-            <a
-              href="#"
-              onClick={() => handleClick('assessment')}
-              className={`flex items-center text-gray-500 hover:text-blue-500 hover:bg-[#F1F2F4] h-11 ${activeLink === 'assessment' ? 'bg-[#E7F0FA] text-[#0A65CC]' : ''}`}
-            >
-              <FaPencil className="mr-3" />
-              Create Assessment
-            </a>
-            <a
-              href="#"
-              onClick={() => handleClick('settings')}
-              className={`flex items-center text-gray-500 hover:text-blue-500 hover:bg-[#F1F2F4] h-11 ${activeLink === 'settings' ? 'bg-[#E7F0FA] text-[#0A65CC]' : ''}`}
-            >
-              <FaGear className="mr-3" /> Subs Setting
-            </a>
-          </nav>
-        </div>
-        <a
-          href="#"
-          className="flex items-center text-gray-500 hover:text-blue-500 mt-6"
-        >
-          <FaSignOutAlt className="mr-3" />
-          Log-out
-        </a>
-      </aside>
+      <SideBar />
       <main className="flex-1 p-6 md:p-10">
         <h1 className="text-2xl font-semibold mb-4">
           Dev Subscription Setting
@@ -188,7 +133,7 @@ const Dashboard: React.FC = () => {
             )}
           </button>
 
-          {isEditing && ( // Menampilkan tombol "Add New Plan" hanya ketika isEditing true
+          {isEditing && ( 
             <button
               onClick={handleAddPlan}
               className="bg-green-500 text-white py-2 px-4 rounded-lg flex items-center"

@@ -23,7 +23,6 @@ export default function ShareButton({
   return (
     <div className={`${className}`}>˜
       <div className="flex flex-col">
- 
         <div className="flex items-center">
           <p className="text-base text-black pr-5">Share this job:</p>
           <div className="flex gap-1">
