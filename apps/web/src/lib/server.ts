@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 
 export async function createToken(token: string) {
     const oneDay = 24 * 60 * 60 * 1000
-    cookies().set('token', token, { expires: Date.now() + oneDay })
+    cookies().set('token', token, { expires: Date.now() + oneDay, secure: true, sameSite: 'strict' })
 }
 
 export async function getToken() {

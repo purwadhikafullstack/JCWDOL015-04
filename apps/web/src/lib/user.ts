@@ -1,7 +1,7 @@
 // lib/user.ts
 import { IUserLogin, IUserReg, IUserVerify, IUserState } from '@/types/iuser';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+export const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
 
 export const regUser = async (data: IUserReg) => {
   try {
@@ -100,8 +100,6 @@ export const getUserInfo = async (user_Id: string) => {
 
   return { result, user: result.user, ok: res.ok }
 }
-
-
 
 
 export default base_url;

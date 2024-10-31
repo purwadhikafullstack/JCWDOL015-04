@@ -115,12 +115,12 @@ export class UserController {
     try {
       const user = await prisma.user.findMany({
         select: {
-            user_id: true,
-            first_name: true,
-            last_name: true,
-            email: true,
-            profile_picture: true,
-            role: true,
+          user_id: true,
+          first_name: true,
+          last_name: true,
+          email: true,
+          profile_picture: true,
+          role: true,
         },
       });
       res.status(200).send({
@@ -253,8 +253,8 @@ export class UserController {
 
       // Access the uploaded profile picture file path
       const profilePictureUrl = req.file
-      ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
-      : undefined;
+        ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
+        : undefined;
 
       const userId = req.user?.user_id;
       if (!userId) throw new Error('Account not authenticated');
@@ -389,30 +389,37 @@ export class UserController {
   async requestPasswordReset(req: Request, res: Response) {
     try {
       const { email } = req.body;
-  
+
       // Check if user exists
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
-        return res.status(404).json({ status: 'error', msg: 'User not found!' });
+        return res
+          .status(404)
+          .json({ status: 'error', msg: 'User not found!' });
       }
-  
+
       // Generate a reset token that expires in 15 minutes
       const payload = { id: user.user_id };
-      const resetToken = sign(payload, process.env.SECRET_JWT!, { expiresIn: '15m' });
-  
+      const resetToken = sign(payload, process.env.SECRET_JWT!, {
+        expiresIn: '15m',
+      });
+
       // Create reset link
       const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
-  
 
-      const templatePath = path.join(__dirname, '../templates', 'resetPassword.hbs');
+      const templatePath = path.join(
+        __dirname,
+        '../templates',
+        'resetPassword.hbs',
+      );
       const templateSource = fs.readFileSync(templatePath, 'utf-8');
       const compiledTemplate = handlebars.compile(templateSource);
-  
+
       const emailHtml = compiledTemplate({
         name: user.first_name + ' ' + user.last_name,
         link: resetLink,
       });
-  
+
       // Send email
       await transporter.sendMail({
         from: process.env.MAIL_USER,
@@ -420,46 +427,102 @@ export class UserController {
         subject: 'Password Reset Request',
         html: emailHtml,
       });
-  
+
       res.status(200).json({ status: 'ok', msg: 'Password reset link sent!' });
     } catch (err) {
       console.error('Password Reset Request Error:', err);
-      res.status(500).json({ status: 'error', msg: 'An error occurred during password reset request.' });
+      res.status(500).json({
+        status: 'error',
+        msg: 'An error occurred during password reset request.',
+      });
     }
   }
 
   async resetPassword(req: Request, res: Response) {
     try {
       const { token, newPassword, confirmNewPassword } = req.body;
-  
+
       if (newPassword !== confirmNewPassword) {
-        return res.status(400).json({ status: 'error', msg: 'Passwords do not match' });
+        return res
+          .status(400)
+          .json({ status: 'error', msg: 'Passwords do not match' });
       }
-  
+
       // Verify the token
       const decoded = verify(token, process.env.SECRET_JWT!) as { id: number };
-  
+
       // Fetch the user using decoded token data
-      const user = await prisma.user.findUnique({ where: { user_id: decoded.id } });
+      const user = await prisma.user.findUnique({
+        where: { user_id: decoded.id },
+      });
       if (!user) {
-        return res.status(404).json({ status: 'error', msg: 'User not found!' });
+        return res
+          .status(404)
+          .json({ status: 'error', msg: 'User not found!' });
       }
-  
+
       // Hash the new password
       const salt = await genSalt(10);
       const hashedPassword = await hash(newPassword, salt);
-  
+
       // Update user password and respond
       await prisma.user.update({
         where: { user_id: user.user_id },
         data: { password: hashedPassword },
       });
-  
-      res.status(200).json({ status: 'ok', msg: 'Password has been reset successfully!' });
+
+      res
+        .status(200)
+        .json({ status: 'ok', msg: 'Password has been reset successfully!' });
     } catch (err) {
       console.error('Password Reset Error:', err);
-      res.status(400).json({ status: 'error', msg: 'Invalid or expired token' });
+      res
+        .status(400)
+        .json({ status: 'error', msg: 'Invalid or expired token' });
     }
   }
-  
+
+  async socialLogin(req: Request, res: Response) {
+    const { email, first_name, last_name, profile_picture } = req.body;
+
+    try {
+      // Check if the user already exists in the MySQL database
+      let user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      // If the user does not exist, create a new one
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email,
+            first_name,
+            last_name,
+            profile_picture,
+            is_verified: true,
+            password: '', // Social login users won't have a password set
+            role: 'candidate', // Assign default role or customize as needed
+          },
+        });
+      }
+
+      // Generate JWT token for the session
+      const payload = { user_id: user.user_id, role: user.role };
+      const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '1d' });
+
+      // Return the user data and token
+      res.status(200).json({
+        status: 'ok',
+        msg: 'Social login successful',
+        token,
+        user,
+      });
+    } catch (error) {
+      console.error('Error in social login:', error);
+      res.status(500).json({
+        status: 'error',
+        msg: 'Internal server error during social login',
+      });
+    }
+  }
 }

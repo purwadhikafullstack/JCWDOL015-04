@@ -52,7 +52,6 @@ const Navbar = () => {
 
         {/* Search Bar */}
         <div className="hidden lg:flex flex-grow mx-6 items-center">
-          <SearchBar />
         </div>
 
         {/* Desktop Navigation Links and Auth Buttons */}

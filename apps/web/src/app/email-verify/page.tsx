@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { resendVerificationEmail } from '@/lib/user';
+import { useRouter } from 'next/navigation';
 
 const EmailVerification = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [counter, setCounter] = useState(0); // Countdown for enabling resend link
+  const [counter, setCounter] = useState(0);
+  const router = useRouter();
 
   const handleVerifyClick = async () => {
     if (!email) {
@@ -28,6 +30,7 @@ const EmailVerification = () => {
       } else if (ok) {
         toast.success('Verification email resent successfully!');
         setCounter(60); // Start countdown after resending
+        router.push('/sign-in');
       } else {
         toast.error(message || 'Failed to resend verification link.');
       }

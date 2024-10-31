@@ -25,9 +25,9 @@ export class JobController {
         companyId,
         is_active,
       } = req.body;
-
+      
       const userId = req.user?.user_id; // Assuming you have user information in `req.user`
-
+      
       if (!job_title || !description || !companyId || !userId) {
         throw new Error(
           'Job title, description, company ID, and user ID are required',
