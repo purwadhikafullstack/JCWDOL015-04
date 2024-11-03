@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { UserRole } from '@/types/role';
 import AvatarMenu from './AvatarMenu';
+import Notification from './Notification/notification';
 
 interface AuthButtonsProps {
   isLoggedIn: boolean;
@@ -9,7 +10,11 @@ interface AuthButtonsProps {
   onLogout: () => void;
 }
 
-const AuthButtons: React.FC<AuthButtonsProps> = ({ isLoggedIn, userRole, onLogout }) => (
+const AuthButtons: React.FC<AuthButtonsProps> = ({
+  isLoggedIn,
+  userRole,
+  onLogout,
+}) => (
   <div className="flex items-center space-x-2">
     {isLoggedIn ? (
       <>
@@ -21,7 +26,10 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ isLoggedIn, userRole, onLogou
           </Link>
         )}
         {userRole && (
-          <AvatarMenu onLogout={onLogout} userRole={userRole} />
+          <>
+            <Notification />
+            <AvatarMenu onLogout={onLogout} userRole={userRole} />
+          </>
         )}
       </>
     ) : (

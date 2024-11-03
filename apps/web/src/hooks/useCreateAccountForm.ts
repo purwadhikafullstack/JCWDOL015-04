@@ -39,7 +39,9 @@ export const useCreateAccountForm = () => {
         toast.success(
           'Account created successfully! Please verify your email!',
         );
-        router.push('/sign-in');
+        setTimeout(() => {
+          router.push('/sign-in');
+        }, 2000);
       } else {
         toast.error(result?.msg || 'Registration failed');
       }

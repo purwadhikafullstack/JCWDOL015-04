@@ -1,17 +1,26 @@
-// job-page.tsx
-'use client';
-
+"use client"
 import { useEffect, useState } from 'react';
 import JobFilterBar from './JobFilterBar';
 import { fetchJobs } from '@/services/jobService';
 import Card from '@/components/Card';
 import { JobCardProps } from '@/types/job';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { fetchUserLocation } from '@/services/locationService'; // --- IMPORTED LOCATION SERVICE ---
+
+// Define a type for the location structure
+type Location = { latitude: number; longitude: number } | null;
 
 export default function JobListingsPage() {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
   const [sortOrder, setSortOrder] = useState('latest');
   const [locationAccessDenied, setLocationAccessDenied] = useState(false);
+
+  // Update location state with the correct type
+  const [location, setLocation] = useState<Location>(null);
+
+  useEffect(() => {
+    fetchUserLocation(setLocation, setLocationAccessDenied); // --- USING LOCATION SERVICE FUNCTION ---
+  }, []);
 
   const loadJobs = async (
     filters = {},
@@ -35,7 +44,7 @@ export default function JobListingsPage() {
         job_id: job.job_id,
         job_title: job.job_title,
         location: job.location,
-        salary: job.salary ? `$${job.salary}K` : null,
+        salary: job.salary ? `$${Number(job.salary).toLocaleString()}` : null,
         company: {
           company_name: job.company.company_name,
           logo: job.company.logo || null,
@@ -49,14 +58,20 @@ export default function JobListingsPage() {
     }
   };
 
-  // Load jobs on component mount and when sortOrder changes
   useEffect(() => {
-    console.log('asc');
-    loadJobs();
-  }, [sortOrder]);
+    if (location) {
+      loadJobs({}, location.latitude, location.longitude); // --- UPDATED LOADJOBS CALL WITH LOCATION ---
+    } else {
+      loadJobs(); // Load jobs normally if location is not available
+    }
+  }, [sortOrder, location]);
 
   const handleSearch = (filters: any) => {
-    loadJobs(filters);
+    if (location) {
+      loadJobs(filters, location.latitude, location.longitude); // --- PASS LOCATION IN SEARCH ---
+    } else {
+      loadJobs(filters);
+    }
   };
 
   return (

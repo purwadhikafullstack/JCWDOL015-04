@@ -5,12 +5,12 @@ import express, {
   Request,
   Response,
   NextFunction,
-  Router,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
 import { UserRouter } from './routers/user.router';
 import { JobRouter } from './routers/job.router';
+import { NotificationRouter } from './routers/notification.router';
 
 export default class App {
   private app: Express;
@@ -55,6 +55,7 @@ export default class App {
   private routes(): void {
     const userRouter = new UserRouter();
     const jobRouter = new JobRouter();
+    const notificationRouter = new NotificationRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -62,6 +63,7 @@ export default class App {
 
     this.app.use('/api/user', userRouter.getRouter());
     this.app.use('/api/jobs', jobRouter.getRouter());
+    this.app.use('/api/notifications', notificationRouter.getRouter());
   }
 
   public start(): void {

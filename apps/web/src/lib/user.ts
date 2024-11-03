@@ -72,24 +72,18 @@ export const verifyUser = async (token: string) => {
 
 export const resendVerificationEmail = async (email: string): Promise<{ message: string; ok: boolean; is_verified: boolean }> => {
   try {
-    console.log('Calling resendVerificationEmail with email:', email);
     const response = await fetch(`${base_url}/user/resend-verification`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
-
-    console.log('Response status:', response.status);
     const data: IUserVerify & { message?: string } = await response.json();
-    console.log('Response data:', data);
-
     return { 
       message: data.message || 'Verification email resent successfully!', 
       ok: response.ok,
       is_verified: data.is_verified 
     };
   } catch (error: any) {
-    console.error('Error in resendVerificationEmail:', error.message);
     return { message: error.message || 'An error occurred. Please try again.', ok: false, is_verified: false };
   }
 };
@@ -100,6 +94,5 @@ export const getUserInfo = async (user_Id: string) => {
 
   return { result, user: result.user, ok: res.ok }
 }
-
 
 export default base_url;

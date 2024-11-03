@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { loginUser } from '@/lib/user';
 import { loginAction } from '@/redux/slice/authorSlice';
+import { createToken } from '@/lib/server';
 
 export const useSignIn = () => {
   const [email, setEmail] = useState('');
@@ -28,6 +29,7 @@ export const useSignIn = () => {
       if (ok) {
         toast.success('Login successful!');
         dispatch(loginAction(result.user));
+        createToken(result.token);
         router.push('/');
       } else {
         toast.error(result.msg || 'Login failed. Please try again.');

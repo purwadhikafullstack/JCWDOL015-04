@@ -225,6 +225,7 @@ model User {
   languages           String?
   nationality         String?
   gender              Gender?
+  tempat_lahir        String?
   DateOfBirth         DateTime?
   resume              String?
   years_of_experience Int?
@@ -258,6 +259,7 @@ model Company {
   email           String      @unique
   phone           String?
   aboutUs         String?     @db.Text()
+  website         String?
   linkedin        String?
   instagram       String?
   twitter         String?
@@ -267,7 +269,6 @@ model Company {
   TeamSize        Int?
   country         CountryCode
   address         String?
-  website         String?
   created_at      DateTime    @default(now())
   updated_at      DateTime    @updatedAt
   description     String?     @db.Text()
@@ -463,6 +464,7 @@ model Notification {
   notification_id Int              @id @default(autoincrement())
   user            User             @relation(fields: [user_id], references: [user_id])
   user_id         Int
+  subject         String?
   message         String
   is_read         Boolean
   type            NotificationType

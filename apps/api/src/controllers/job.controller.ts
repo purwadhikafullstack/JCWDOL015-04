@@ -27,7 +27,7 @@ export class JobController {
       } = req.body;
       
       const userId = req.user?.user_id; // Assuming you have user information in `req.user`
-      
+
       if (!job_title || !description || !companyId || !userId) {
         throw new Error(
           'Job title, description, company ID, and user ID are required',
@@ -128,7 +128,6 @@ export class JobController {
           }),
         } as Prisma.IntFilter;
       }
-      console.log('asd',dateRange)
 
       // Order jobs by date
       const orderBy = {
@@ -144,7 +143,6 @@ export class JobController {
 
       res.status(200).json({ status: 'ok', jobs });
     } catch (error) {
-      console.error('Error fetching jobs:', error);
       res.status(500).json({ status: 'error', message: 'Failed to fetch jobs' });
     }
   }

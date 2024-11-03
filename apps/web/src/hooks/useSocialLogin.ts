@@ -5,6 +5,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { loginAction } from '@/redux/slice/authorSlice';
 import { useRouter } from 'next/navigation';
 import { base_url } from '@/lib/user';
+import { createToken } from '@/lib/server';
 
 export const useSocialLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -53,6 +54,7 @@ export const useSocialLogin = () => {
         toast.dismiss();
         toast.success('Login successful!');
         dispatch(loginAction(result.user));
+        createToken(result.token);
         router.push('/');
       } else {
         toast.error(result.msg || 'Social login failed.');

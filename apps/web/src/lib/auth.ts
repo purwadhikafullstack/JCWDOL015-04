@@ -1,7 +1,5 @@
 // src/lib/auth.ts
 import { supabase } from './supabaseClient';
-import { loginAction } from '@/redux/slice/authorSlice'; // Make sure this import points to your slice file
-import { useAppDispatch } from '@/redux/hooks';
 
 export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({

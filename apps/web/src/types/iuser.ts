@@ -1,3 +1,5 @@
+import { UserRole, EducationLevel, Gender } from '@/types/role';
+
 export interface IUserReg {
   first_name: string;
   last_name: string;
@@ -37,28 +39,29 @@ export interface IUserProfile {
   user_id: number;
   email: string;
   password: string;
-  role: string;
+  role: UserRole;  // Enum for role
   first_name: string;
   last_name: string;
-  profile_picture: string;
-  phone: string;
-  website: string;
-  linkedin: string;
-  github: string;
-  twitter: string;
-  facebook: string;
-  instagram: string;
-  title: string;
-  education: string;
+  profile_picture?: string;
+  phone?: string;
+  website?: string;
+  linkedin?: string;
+  github?: string;
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  title?: string;
+  education?: EducationLevel;
   biography?: string;
   location?: string;
   skills?: string;
   languages?: string;
   nationality?: string;
-  gender: string;
-  DateOfBirth: Date;
-  resume: string;
-  years_of_experience: number;
+  gender?: Gender;
+  tempat_lahir?: string;
+  DateOfBirth?: Date;
+  resume?: string;
+  years_of_experience?: number;
   created_at: Date;
   updated_at: Date;
   is_verified: boolean;

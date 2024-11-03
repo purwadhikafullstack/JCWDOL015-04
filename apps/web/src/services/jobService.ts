@@ -13,7 +13,6 @@ export const fetchJobs = async (
       params.append(key, value);
     }
   }
-  console.log(params.toString());
   const url = `http://localhost:8000/api/jobs?${params.toString()}`;
   try {
     const response = await fetch(url);

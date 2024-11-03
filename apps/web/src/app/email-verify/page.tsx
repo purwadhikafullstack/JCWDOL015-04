@@ -22,7 +22,6 @@ const EmailVerification = () => {
 
     try {
       const { message, ok, is_verified: verifiedStatus } = await resendVerificationEmail(email);
-      console.log('Response from resendVerificationEmail:', { message, ok, verifiedStatus });
 
       if (verifiedStatus) {
         setIsVerified(true);

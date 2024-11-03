@@ -9,7 +9,6 @@ import IconCompany from '../../assets/Icon-Company-Trans.png';
 import IconJob from '../../assets/Icon-Job-Trans.png';
 import IconFacebook from '../../assets/category/Icon-Facebook.png';
 import IconGoogle from '../../assets/category/Icon-Google.png';
-import { toProperCase } from '@/utils/format';
 import { useCreateAccountForm } from '@/hooks/useCreateAccountForm';
 
 const CreateAccount: React.FC = () => {

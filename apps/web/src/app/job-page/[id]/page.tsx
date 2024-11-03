@@ -8,7 +8,6 @@ import JobOverview from './JobOverview';
 import CompanyInfo from './CompanyInfo';
 import ApplyModal from './ApplyModal';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 const JobPage = () => {
