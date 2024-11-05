@@ -1,7 +1,8 @@
-"use client";
+'use client';
 import React from 'react';
 import { UserRole } from '@/types/role';
-import { useAppSelector } from '@/redux/hooks'; // Import useAppSelector to access Redux state
+import { useAppSelector } from '@/redux/hooks';
+import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 
 interface AvatarMenuProps {
   onLogout: () => void;
@@ -10,6 +11,20 @@ interface AvatarMenuProps {
 
 const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
   const profilePicture = useAppSelector((state) => state.user.profile_picture);
+  const router = useRouter();
+
+  const handleProfileClick = () => {
+    if (userRole === UserRole.Candidate) {
+      router.push('/dashboard-candidate');
+    } else if (userRole === UserRole.Admin || userRole === UserRole.Developer) {
+      router.push('/dashboard-admin-developer');
+    }
+  };
+
+  const handleLogout = () => {
+    onLogout();
+    router.push('/');
+  };
 
   return (
     <div className="dropdown dropdown-end">
@@ -21,7 +36,10 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         <div className="w-10 rounded-full">
           <img
             alt="Avatar"
-            src={profilePicture || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+            src={
+              profilePicture ||
+              'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
+            }
           />
         </div>
       </div>
@@ -29,14 +47,20 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
       >
-        <li><a>Profile</a></li>
-        <li><button>Setting</button></li>
+        <li>
+          <button onClick={handleProfileClick}>Profile</button>
+        </li>
+        <li>
+          <button>Setting</button>
+        </li>
         {userRole === UserRole.Developer && (
-          <li><button>Assessments</button></li>
+          <li>
+            <button>Assessments</button>
+          </li>
         )}
         <li>
           <button
-            onClick={onLogout}
+            onClick={handleLogout}
             className="rounded-lg hover:text-white hover:bg-red-600"
           >
             Logout

@@ -14,7 +14,7 @@ export const getCountryName = (code: string): string => {
     JP: 'Japan',
     CN: 'China',
   };
-  return countryNames[code] || code; 
+  return countryNames[code] || code;
 };
 
 // Job category names mapping for display
@@ -95,3 +95,17 @@ export const jobExperienceLevels = [
   { value: 'senior_level', label: 'Senior Level' },
   { value: 'expert', label: 'Expert' },
 ];
+
+export const getStatusLabel = (status: string): string => {
+  const statusLabels: { [key: string]: string } = {
+    active: 'Application Received',
+    under_review: 'Under Review',
+    interview: 'Interview In Progress',
+    pending: 'Next Steps Pending',
+    accepted: 'Offer Extended',
+    hired: 'Welcome Aboard!',
+    rejected: 'Thanks for Applying',
+  };
+
+  return statusLabels[status] || status;
+};

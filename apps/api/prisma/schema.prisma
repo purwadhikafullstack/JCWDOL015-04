@@ -20,8 +20,12 @@ enum UserRole {
 
 // Enum for Application Status
 enum ApplicationStatus {
+  active
+  under_review
+  interview
   pending
   accepted
+  hired
   rejected
 }
 
@@ -248,6 +252,7 @@ model User {
   paymentTransactions     PaymentTransaction[]
   userAssessmentResponses UserAssessmentResponse[]
   jobs                    Job[]
+  Favorite                Favorite[]
 
   @@index([email])
 }
@@ -310,9 +315,22 @@ model Job {
   jobSaves     JobSave[]
   User         User?         @relation(fields: [userUser_id], references: [user_id])
   userUser_id  Int?
+  Favorite     Favorite[]
 
   @@index([company_id])
   @@index([is_active, jobCategory])
+}
+
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  job_id     Int
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+  job  Job  @relation(fields: [job_id], references: [job_id])
+
+  @@unique([user_id, job_id])
 }
 
 // Application model

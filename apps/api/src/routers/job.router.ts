@@ -20,6 +20,9 @@ export class JobRouter {
     //Protected for AdminDev
     this.router.post('/', verifyToken, checkAdminDev, this.jobController.createJob);
     this.router.put('/:id',verifyToken,checkAdminDev ,this.jobController.updateJob);
+    this.router.get('/applied/count', verifyToken, checkCandidate, this.jobController.getAppliedJobCount);
+    this.router.get('/favorites/count', verifyToken, checkCandidate, this.jobController.getFavoriteJobCount);
+    this.router.post('/favorites/toggle', verifyToken, checkCandidate, this.jobController.toggleSaveJob);
   }
 
   getRouter(): Router {

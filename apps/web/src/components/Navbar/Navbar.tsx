@@ -1,4 +1,3 @@
-// Navbar.tsx
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -21,7 +20,6 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  // Use Redux user state
   const user = useAppSelector((state) => state.user);
   const isLoggedIn = !!user.user_id;
 

@@ -1,3 +1,29 @@
+export interface RecentlyAppliedJob {
+  application_id: number;
+  job_title: string;
+  company_name: string;
+  logo: string;
+  location: string;
+  date_applied: string;
+  status: string;
+}
+
+export interface FavoriteJob {
+  id: number;
+  job: {
+    job_id: number;
+    job_title: string;
+    location: string;
+    company: {
+      company_name: string;
+      logo: string | null;
+    };
+  };
+  created_at: string;
+}
+
+
+// Existing interfaces for reference
 export interface Company {
   company_id: number;
   company_name: string;

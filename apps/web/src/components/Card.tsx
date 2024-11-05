@@ -1,4 +1,3 @@
-// components/Card.tsx
 import { JobCardProps } from '@/types/job';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,16 +5,24 @@ import SaveButton from '../assets/save-button.svg';
 import SavedButton from '../assets/saved-button.svg';
 import { useState } from 'react';
 import { FiImage } from 'react-icons/fi';
+import { toggleSaveJob } from '@/lib/job';
 
 interface CardProps {
   job: JobCardProps;
+  isFavorited?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ job }) => {
-  const [isSaved, setIsSaved] = useState(false);
+const Card: React.FC<CardProps> = ({ job, isFavorited = false }) => {
+  const [isSaved, setIsSaved] = useState(isFavorited);
 
-  const handleSaveClick = () => {
-    setIsSaved(!isSaved);
+  const handleSaveClick = async () => {
+    const response = await toggleSaveJob(job.job_id);
+    console.log(response); // Log the response to verify
+    if (response.ok) {
+      setIsSaved((prev) => !prev); // Toggle the saved state if successful
+    } else {
+      console.error(response.msg);
+    }
   };
 
   return (
@@ -27,7 +34,7 @@ const Card: React.FC<CardProps> = ({ job }) => {
           <Image
             src={job.company.logo}
             alt={`${job.company.company_name} Logo`}
-            width={80} 
+            width={80}
             height={80}
             className="rounded-full flex-shrink-0"
           />

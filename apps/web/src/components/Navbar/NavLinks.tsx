@@ -14,7 +14,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
     return (
       <>
         <li><Link href="/find-candidate" className="hover:text-Primary-blue">Find Candidate</Link></li>
-        <li><Link href="/dashboard" className="hover:text-Primary-blue">Dashboard</Link></li>
+        <li><Link href="/dashboard-admin-developer" className="hover:text-Primary-blue">Dashboard</Link></li>
         <li><Link href="/my-jobs" className="hover:text-Primary-blue">My Jobs</Link></li>
         <li><Link href="/applications" className="hover:text-Primary-blue">Applications</Link></li>
         <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
@@ -26,7 +26,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
       <>
         <li><Link href="/job-page" className="hover:text-Primary-blue">Find Job</Link></li>
         <li><Link href="/company-page" className="hover:text-Primary-blue">Find Employers</Link></li>
-        <li><Link href="/dashboard" className="hover:text-Primary-blue">Dashboard</Link></li>
+        <li><Link href="/dashboard-candidate" className="hover:text-Primary-blue">Dashboard</Link></li>
         <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );

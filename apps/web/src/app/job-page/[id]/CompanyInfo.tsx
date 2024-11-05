@@ -45,7 +45,7 @@ const CompanyInfo = ({ job }: any) => (
         <strong>Phone:</strong> {job.company.phone || 'N/A'}
       </li>
       <li>
-        <strong>Email:</strong> {job.company.email}
+        <strong>Email:</strong> {job.company.email || 'N/A'}
       </li>
       <li>
         <strong>Website:</strong>{' '}

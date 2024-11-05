@@ -8,14 +8,14 @@ type FileNameCallback = (error: Error | null, filename: string) => void;
 
 export const uploader = (
   filePrefix: string,
-  fileType: 'resume' | 'profile_picture' | 'company_logo' | 'company_banner'
+  fileType: 'resume' | 'profile_picture' | 'logo' | 'banner'
 ) => {
   // Define default directories for each file type
   const directories = {
     resume: path.join(__dirname, '../../public/resumes'),
     profile_picture: path.join(__dirname, '../../public/profile_pictures'),
-    company_logo: path.join(__dirname, '../../public/company_logos'),
-    company_banner: path.join(__dirname, '../../public/company_banners'),
+    logo: path.join(__dirname, '../../public/company_logos'),
+    banner: path.join(__dirname, '../../public/company_banners'),
   };
 
   // Get the directory based on the fileType
@@ -60,19 +60,15 @@ export const uploader = (
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     const fileExtension = file.mimetype;
 
-    if (fileType === 'resume' && fileExtension === 'application/pdf') {
-      cb(null, true); // Allow PDF for resume
-    } else if (
-      (fileType === 'profile_picture' || fileType === 'company_logo' || fileType === 'company_banner') &&
-      allowedImageTypes.includes(fileExtension)
-    ) {
-      cb(null, true);
+    if ((fileType === 'logo' || fileType === 'banner') && allowedImageTypes.includes(fileExtension)) {
+      cb(null, true); // Allow the file
     } else {
-      cb(null, false);
+      cb(null, false); // Reject the file
+      console.error('Unexpected file type:', file.mimetype); // Log for debugging
     }
   };
 
-  // Define max file size (e.g., 5 MB for images and resume)
+  // Define max file size
   const maxSize = fileType === 'profile_picture' ? 1 * 1024 * 1024 : 5 * 1024 * 1024; // 1MB for profile pictures, 5MB for others
 
   return multer({

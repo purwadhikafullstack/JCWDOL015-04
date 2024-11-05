@@ -1,5 +1,7 @@
-// lib/user.ts
+
+import { jwtDecode } from 'jwt-decode';
 import { IUserLogin, IUserReg, IUserVerify, IUserState } from '@/types/iuser';
+import { getToken } from './server';
 
 export const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
 
@@ -88,11 +90,32 @@ export const resendVerificationEmail = async (email: string): Promise<{ message:
   }
 };
 
-export const getUserInfo = async (user_Id: string) => {
-  const res = await fetch(`${base_url}/user/${user_Id}`, { cache: 'no-cache' })
-  const result = await res.json()
+export const getUserInfo = async () => {
+  try {
+    // Get token from cookies
+    const token = await getToken();
+    if (!token) {
+      console.error('No token found');
+      return { user: null, ok: false };
+    }
 
-  return { result, user: result.user, ok: res.ok }
-}
+    // Decode the token to get user ID
+    const decoded: any = jwtDecode(token);
+    const userId = decoded?.user_id;
+
+    if (!userId) {
+      console.error('Invalid token');
+      return { user: null, ok: false };
+    }
+
+    // Fetch user info using the decoded user ID
+    const res = await fetch(`${base_url}/user/${userId}`, { cache: 'no-cache' });
+    const result = await res.json();
+    return { result, user: result.user, ok: res.ok };
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    return { user: null, ok: false };
+  }
+};
 
 export default base_url;

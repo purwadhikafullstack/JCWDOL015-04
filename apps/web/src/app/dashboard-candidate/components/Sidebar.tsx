@@ -14,11 +14,11 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
       <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'appliedJobs' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('appliedJobs')}>
         <FiFileText size={20} className="mr-2" /> Applied Jobs
       </li>
-      <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'subscription' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('subscription')}>
-        <FiBriefcase size={20} className="mr-2" /> Subscription
-      </li>
       <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'favoriteJobs' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('favoriteJobs')}>
         <FiHeart size={20} className="mr-2" /> Favorite Jobs
+      </li>
+      <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'subscription' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('subscription')}>
+        <FiBriefcase size={20} className="mr-2" /> Subscription
       </li>
       <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'plansBilling' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('plansBilling')}>
         <FiCreditCard size={20} className="mr-2" /> Plans & Billing

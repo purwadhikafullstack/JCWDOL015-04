@@ -26,7 +26,7 @@ export class JobController {
         is_active,
       } = req.body;
       
-      const userId = req.user?.user_id; // Assuming you have user information in `req.user`
+      const userId = req.user?.user_id;
 
       if (!job_title || !description || !companyId || !userId) {
         throw new Error(
@@ -232,4 +232,107 @@ export class JobController {
       });
     }
   }
+
+  async getAppliedJobCount(req: Request, res: Response) {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        return res.status(400).json({ msg: 'User ID is required' });
+      }
+
+      const count = await prisma.application.count({
+        where: { user_id: userId },
+      });
+
+      res.status(200).json({ count });
+    } catch (error) {
+      console.error('Error fetching applied job count:', error);
+      res.status(500).json({ msg: 'Failed to fetch applied job count' });
+    }
+  }
+
+  async getFavoriteJobCount(req: Request, res: Response) {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        return res.status(400).json({ msg: 'User ID is required' });
+      }
+
+      const count = await prisma.favorite.count({
+        where: { user_id: userId },
+      });
+
+      res.status(200).json({ count });
+    } catch (error) {
+      console.error('Error fetching favorite job count:', error);
+      res.status(500).json({ msg: 'Failed to fetch favorite job count' });
+    }
+  }
+
+  async toggleSaveJob(req: Request, res: Response) {
+    try {
+      const userId = req.user?.user_id;
+      const { jobId } = req.body;
+
+      if (!userId || !jobId) {
+        return res.status(400).json({ msg: 'User ID and Job ID are required' });
+      }
+
+      // Check if job is already saved
+      const existingFavorite = await prisma.favorite.findFirst({
+        where: { user_id: userId, job_id: jobId },
+      });
+
+      if (existingFavorite) {
+        // Remove from favorites if already saved
+        await prisma.favorite.delete({
+          where: { id: existingFavorite.id },
+        });
+        res.status(200).json({ msg: 'Job removed from favorites' });
+      } else {
+        // Save job if not already saved
+        await prisma.favorite.create({
+          data: {
+            user_id: userId,
+            job_id: jobId,
+          },
+        });
+        res.status(200).json({ msg: 'Job saved to favorites' });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite job:', error);
+      res.status(500).json({ msg: 'Failed to save job' });
+    }
+  }
+
+  async getFavoriteJobs(req: Request, res: Response) {
+    try {
+      const userId = req.user?.user_id;
+      console.log('User ID in getFavoriteJobs:', userId);
+      if (!userId) {
+        return res.status(400).json({ msg: 'User ID is required' });
+      }
+      
+      const favorites = await prisma.favorite.findMany({
+        where: { user_id: userId },
+        include: {
+          job: {
+            include: { company: true }, 
+          },
+        },
+      });
+  
+      console.log('Favorites found:', favorites); // Log the retrieved favorites
+  
+      res.status(200).json({
+        status: 'ok',
+        favorites,
+      });
+    } catch (error) {
+      console.error('Error fetching favorite jobs:', error);
+      res.status(500).json({ msg: 'Failed to fetch favorite jobs' });
+    }
+  }
+  
+
 }

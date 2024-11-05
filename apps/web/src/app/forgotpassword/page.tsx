@@ -9,8 +9,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { requestPasswordReset } from '@/services/passwordService';
 import Background from '../../assets/BG-CreateAccount.png';
-import IconCompany from '../../assets/Icon-Company-Trans.png';
-import IconJob from '../../assets/Icon-Job-Trans.png';
 import IconFacebook from '../../assets/category/Icon-Facebook.png';
 import IconGoogle from '../../assets/category/Icon-Google.png';
 

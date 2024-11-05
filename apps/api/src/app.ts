@@ -11,6 +11,9 @@ import { PORT } from './config';
 import { UserRouter } from './routers/user.router';
 import { JobRouter } from './routers/job.router';
 import { NotificationRouter } from './routers/notification.router';
+import { ApplicationRouter } from './routers/application.router';
+import { FavoriteJobRouter } from './routers/favoriteJob.router';
+import { CompanyRouter } from './routers/company.router';
 
 export default class App {
   private app: Express;
@@ -56,6 +59,9 @@ export default class App {
     const userRouter = new UserRouter();
     const jobRouter = new JobRouter();
     const notificationRouter = new NotificationRouter();
+    const applicationRouter = new ApplicationRouter();
+    const favoriteJobRouter = new FavoriteJobRouter();
+    const companyRouter = new CompanyRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -64,6 +70,9 @@ export default class App {
     this.app.use('/api/user', userRouter.getRouter());
     this.app.use('/api/jobs', jobRouter.getRouter());
     this.app.use('/api/notifications', notificationRouter.getRouter());
+    this.app.use('/api/applications', applicationRouter.getRouter());
+    this.app.use('/api/favorite-job', favoriteJobRouter.getRouter());
+    this.app.use('/api/companies', companyRouter.getRouter());
   }
 
   public start(): void {

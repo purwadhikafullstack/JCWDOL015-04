@@ -1,4 +1,5 @@
 // src/app/dashboard-candidate/page.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -64,19 +65,19 @@ const CandidateDashboard = () => {
   const renderTabContent = () => {
     switch (selectedTab) {
       case 'overview':
-        return <OverviewTab />;
+        return <OverviewTab setSelectedTab={setSelectedTab} />;
       case 'appliedJobs':
         return <AppliedJobsTab />;
-      case 'subscription':
-        return <SubscriptionTab />;
       case 'favoriteJobs':
         return <FavoriteJobsTab />;
+      case 'subscription':
+        return <SubscriptionTab />;
       case 'plansBilling':
         return <PlansBillingTab />;
       case 'settings':
         return <SettingsTab />;
       default:
-        return <OverviewTab />;
+        return <OverviewTab setSelectedTab={setSelectedTab} />;
     }
   };
 
