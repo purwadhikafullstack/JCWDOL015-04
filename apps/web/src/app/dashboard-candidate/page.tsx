@@ -15,9 +15,13 @@ import SubscriptionTab from './components/SubscriptionTab';
 import FavoriteJobsTab from './components/FavoriteJobsTab';
 import PlansBillingTab from './components/PlansBillingTab';
 import SettingsTab from './components/SettingsTab';
+import { useSearchParams } from 'next/navigation';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const CandidateDashboard = () => {
-  const [selectedTab, setSelectedTab] = useState('overview');
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'overview';
+  const [selectedTab, setSelectedTab] = useState(initialTab);
   const [userUniqueCode, setUserUniqueCode] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -82,12 +86,14 @@ const CandidateDashboard = () => {
   };
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
       <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       <main className="p-4">
         {renderTabContent()}
       </main>
     </div>
+    </ProtectedRoute>
   );
 };
 

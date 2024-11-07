@@ -224,10 +224,11 @@ model User {
   title               String?
   education           EducationLevel?
   biography           String?         @db.Text()
-  location            String?
   skills              String?
   languages           String?
   nationality         String?
+  country             CountryCode?
+  location            String?
   gender              Gender?
   tempat_lahir        String?
   DateOfBirth         DateTime?
@@ -313,8 +314,8 @@ model Job {
   jobReports   JobReport[]
   jobViews     JobView[]
   jobSaves     JobSave[]
-  User         User?         @relation(fields: [userUser_id], references: [user_id])
-  userUser_id  Int?
+  User         User?         @relation(fields: [User_id], references: [user_id])
+  User_id      Int?
   Favorite     Favorite[]
 
   @@index([company_id])

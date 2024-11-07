@@ -1,10 +1,8 @@
 import { CompanyController } from '@/controllers/company.controller';
 import { verifyToken } from '@/middlewares/token';
-import { uploader } from '@/middlewares/uploader';
+import { logoBannerUploader } from '@/middlewares/logoBannerUploader';
 import { Router } from 'express';
 
-const logoUploader = uploader('logo', 'logo');
-const bannerUploader = uploader('banner', 'banner');
 
 export class CompanyRouter {
   private router: Router;
@@ -18,9 +16,20 @@ export class CompanyRouter {
 
   private initializeRoutes(): void {
     // Protected routes (need verifyToken to set req.user)
-    this.router.post('/', verifyToken, logoUploader.single('logo'), bannerUploader.single('banner'), this.companyController.createCompany.bind(this.companyController));
+    this.router.post(
+        '/',
+        verifyToken,
+        logoBannerUploader,
+        this.companyController.createCompany.bind(this.companyController)
+      );  
+
     
-    this.router.put('/:id', verifyToken, logoUploader.single('logo'), bannerUploader.single('banner'), this.companyController.updateCompany.bind(this.companyController));
+      this.router.put(
+        '/:id',
+        verifyToken,
+        logoBannerUploader,
+        this.companyController.updateCompany.bind(this.companyController)
+      );
     
     this.router.get('/', this.companyController.getAllCompanies.bind(this.companyController));
     this.router.get('/:id', this.companyController.getCompanyById.bind(this.companyController));

@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   }, [isAuthenticated, role, router, requiredRole, isClient]);
 
   if (!isClient || !isAuthenticated || (requiredRole && role !== requiredRole)) {
-    return null; // Prevents flashing protected content before redirect
+    return null;
   }
 
   return <>{children}</>;

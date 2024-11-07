@@ -34,6 +34,8 @@ export class UserRouter {
 
     // Social login route
     this.router.post('/social-login', this.userController.socialLogin.bind(this.userController));
+
+    this.router.delete('/delete', verifyToken, this.userController.deleteUser.bind(this.userController));
     
   }
 

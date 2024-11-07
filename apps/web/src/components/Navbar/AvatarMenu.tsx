@@ -2,7 +2,7 @@
 import React from 'react';
 import { UserRole } from '@/types/role';
 import { useAppSelector } from '@/redux/hooks';
-import { useRouter } from 'next/navigation'; // Import useRouter for navigation
+import { useRouter } from 'next/navigation';
 
 interface AvatarMenuProps {
   onLogout: () => void;
@@ -19,6 +19,10 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
     } else if (userRole === UserRole.Admin || userRole === UserRole.Developer) {
       router.push('/dashboard-admin-developer');
     }
+  };
+
+  const handleSettingClick = () => {
+    router.push('/dashboard-candidate?tab=account-setting'); // Directly navigate to account-setting section
   };
 
   const handleLogout = () => {
@@ -51,7 +55,7 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
           <button onClick={handleProfileClick}>Profile</button>
         </li>
         <li>
-          <button>Setting</button>
+          <button onClick={handleSettingClick}>Setting</button>
         </li>
         {userRole === UserRole.Developer && (
           <li>

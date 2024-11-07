@@ -23,6 +23,23 @@ export class CompanyController {
         description,
       } = req.body;
 
+      const logoUrl = req.files?.logo?.[0]
+        ? `http://localhost:8000/api/public/company_logos/${req.files.logo[0].filename}`
+        : null;
+
+      const bannerUrl = req.files?.banner?.[0]
+        ? `http://localhost:8000/api/public/company_banners/${req.files.banner[0].filename}`
+        : null;
+
+      const userId = req.user?.user_id;
+
+      if (!company_name || !email || !userId) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'company name, email, and user ID are required',
+        });
+      }
+
       const companyData: Prisma.CompanyCreateInput = {
         company_name,
         email,
@@ -39,12 +56,9 @@ export class CompanyController {
         country,
         address,
         description,
-        logo: req.file?.filename
-          ? `http://localhost:8000/api/public/company_logos/${req.file.filename}`
-          : null,
-        banner: req.file?.filename
-          ? `http://localhost:8000/api/public/company_banners/${req.file.filename}`
-          : null,
+        logo: logoUrl,
+        banner: bannerUrl,
+        users: { connect: { user_id: userId } },
       };
 
       const company = await prisma.company.create({ data: companyData });
@@ -54,12 +68,10 @@ export class CompanyController {
         .json({ status: 'ok', msg: 'Company created successfully!', company });
     } catch (err) {
       console.error('Error creating company:', err);
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          msg: 'An error occurred while creating the company.',
-        });
+      res.status(500).json({
+        status: 'error',
+        msg: 'An error occurred while creating the company.',
+      });
     }
   }
 
@@ -83,16 +95,13 @@ export class CompanyController {
         description,
       } = req.body;
 
-      // Access the uploaded files
-      const logoUrl =
-        req.file && req.file.fieldname === 'logo'
-          ? `http://localhost:8000/api/public/company_logos/${req.file.filename}`
-          : undefined;
+      const logoUrl = req.files?.logo?.[0]
+        ? `http://localhost:8000/api/public/company_logos/${req.files.logo[0].filename}`
+        : undefined;
 
-      const bannerUrl =
-        req.file && req.file.fieldname === 'banner'
-          ? `http://localhost:8000/api/public/company_banners/${req.file.filename}`
-          : undefined;
+      const bannerUrl = req.files?.banner?.[0]
+        ? `http://localhost:8000/api/public/company_banners/${req.files.banner[0].filename}`
+        : undefined;
 
       const updatedCompany = await prisma.company.update({
         where: { company_id: parseInt(req.params.id) },
@@ -106,9 +115,9 @@ export class CompanyController {
           instagram,
           twitter,
           facebook,
-          yearOfEstablish,
+          yearOfEstablish: yearOfEstablish ? new Date(yearOfEstablish) : null,
           IndustryType,
-          TeamSize,
+          TeamSize: TeamSize ? parseInt(TeamSize, 10) : null,
           country,
           address,
           description,
@@ -137,12 +146,10 @@ export class CompanyController {
       res.status(200).json({ status: 'ok', companies });
     } catch (err) {
       console.error('Error fetching companies:', err);
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          msg: 'An error occurred while fetching companies.',
-        });
+      res.status(400).json({
+        status: 'error',
+        msg: 'An error occurred while fetching companies.',
+      });
     }
   }
 
@@ -162,12 +169,10 @@ export class CompanyController {
       res.status(200).json({ status: 'ok', company });
     } catch (err) {
       console.error('Error fetching company:', err);
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          msg: 'An error occurred while fetching the company.',
-        });
+      res.status(400).json({
+        status: 'error',
+        msg: 'An error occurred while fetching the company.',
+      });
     }
   }
 
@@ -180,12 +185,10 @@ export class CompanyController {
         .json({ status: 'ok', msg: 'Company deleted successfully!' });
     } catch (err) {
       console.error('Error deleting company:', err);
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          msg: 'An error occurred while deleting the company.',
-        });
+      res.status(400).json({
+        status: 'error',
+        msg: 'An error occurred while deleting the company.',
+      });
     }
   }
 }

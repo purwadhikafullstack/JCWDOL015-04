@@ -7,18 +7,20 @@ export enum UserRole {
   }
   
   export enum EducationLevel {
-    HighSchool = 'HighSchool',
-    Associate = 'Associate',
-    Bachelor = 'Bachelor',
-    Master = 'Master',
-    Doctorate = 'Doctorate',
-    // Add other levels if necessary
+    HIGH_SCHOOL = 'High School',
+    ASSOCIATES = 'Associate',
+    BACHELORS = 'Bachelor',
+    MASTERS = 'Master',
+    DOCTORATE = 'Doctorate',
+    DIPLOMA = 'Diploma',
+    VOCATIONAL = 'Vocational',
+    CERTIFICATION = 'Certification',
+    SOME_COLLEGE = 'Some College',
   }
   
   export enum Gender {
-    Male = 'Male',
-    Female = 'Female',
-    Other = 'Other',
-    // Include any other options if applicable
+    MALE = 'Male',
+    FEMALE = 'Female',
+    OTHER = 'Other',
   }
   

@@ -1,7 +1,8 @@
 
 import { jwtDecode } from 'jwt-decode';
-import { IUserLogin, IUserReg, IUserVerify, IUserState } from '@/types/iuser';
+import { IUserLogin, IUserReg, IUserVerify } from '@/types/iuser';
 import { getToken } from './server';
+import axios from 'axios';
 
 export const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
 
@@ -117,5 +118,45 @@ export const getUserInfo = async () => {
     return { user: null, ok: false };
   }
 };
+
+export const updateUserInfo = async (data: FormData): Promise<{ result: any; ok: boolean }> => {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${base_url}/user/update`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: data,
+    });
+
+    const result = await res.json();
+    return { result, ok: res.ok };
+  } catch (error) {
+    console.error('Error updating user info:', error);
+    return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
+  }
+};
+
+export const deleteUserAccount = async (email: string, password: string) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${base_url}/user/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+    return { ok: response.ok, result };
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    return { ok: false, result: { status: 'error', msg: 'An error occurred while deleting the account' } };
+  }
+};
+
 
 export default base_url;

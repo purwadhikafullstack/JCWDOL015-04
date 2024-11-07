@@ -6,6 +6,7 @@ import { transporter } from '@/helpers/notmailer';
 import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
+import { EducationLevel, Gender } from '@prisma/client';
 
 export class UserController {
   async createUser(req: Request, res: Response) {
@@ -239,6 +240,11 @@ export class UserController {
         Newpassword,
         Confirmpassword,
         website,
+        linkedin,
+        github,
+        twitter,
+        facebook,
+        instagram,
         title,
         education,
         biography,
@@ -247,6 +253,8 @@ export class UserController {
         languages,
         nationality,
         gender,
+        country,
+        tempat_lahir,
         DateOfBirth,
         years_of_experience,
       } = req.body;
@@ -289,6 +297,12 @@ export class UserController {
         hashedPassword = await hash(Newpassword, await genSalt(10));
       }
 
+      const yearsOfExperienceInt = years_of_experience
+        ? parseInt(years_of_experience, 10)
+        : undefined;
+
+      const parsedDateOfBirth = DateOfBirth ? new Date(DateOfBirth) : undefined;
+
       const updatedUser = await prisma.user.update({
         where: { user_id: userId },
         data: {
@@ -296,8 +310,13 @@ export class UserController {
           last_name,
           phone,
           email,
-          profile_picture: profilePictureUrl, // Save profile picture path
+          profile_picture: profilePictureUrl,
           website,
+          linkedin,
+          github,
+          twitter,
+          facebook,
+          instagram,
           title,
           education,
           biography,
@@ -306,8 +325,10 @@ export class UserController {
           languages,
           nationality,
           gender,
-          DateOfBirth,
-          years_of_experience,
+          country,
+          tempat_lahir,
+          DateOfBirth: parsedDateOfBirth,
+          years_of_experience: yearsOfExperienceInt,
           ...(hashedPassword && { password: hashedPassword }),
         },
       });
@@ -522,6 +543,46 @@ export class UserController {
       res.status(500).json({
         status: 'error',
         msg: 'Internal server error during social login',
+      });
+    }
+  }
+
+  async deleteUser(req: Request, res: Response) {
+    const { email, password } = req.body;
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          status: 'error',
+          msg: 'User not found!',
+        });
+      }
+
+      const isPasswordValid = await compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Incorrect password provided!',
+        });
+      }
+
+      await prisma.user.delete({
+        where: { user_id: user.user_id },
+      });
+
+      res.status(200).json({
+        status: 'ok',
+        msg: 'Account deleted successfully!',
+      });
+    } catch (err) {
+      console.error('Delete Account Error:', err);
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to delete account. Please try again.',
       });
     }
   }

@@ -29,27 +29,18 @@ export const uploader = (
   };
 
   const storage = multer.diskStorage({
-    destination: (
-      req: Request,
-      file: Express.Multer.File,
-      cb: DestinationCallback,
-    ) => {
-      // Ensure the appropriate folder exists
+    destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
       ensureFolderExists(defaultDir);
       cb(null, defaultDir);
     },
-    filename: (
-      req: Request,
-      file: Express.Multer.File,
-      cb: FileNameCallback,
-    ) => {
+    filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
       const originalNameParts = file.originalname.split('.');
-      const fileExtension =
-        originalNameParts[originalNameParts.length - 1].toLowerCase();
+      const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
       const newFileName = `${filePrefix}_${Date.now()}.${fileExtension}`;
       cb(null, newFileName);
     },
   });
+  
 
   // File filter for validation based on the type
   const fileFilter = (
@@ -59,14 +50,17 @@ export const uploader = (
   ) => {
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     const fileExtension = file.mimetype;
-
-    if ((fileType === 'logo' || fileType === 'banner') && allowedImageTypes.includes(fileExtension)) {
-      cb(null, true); // Allow the file
+  
+    // Allow profile_picture, logo, and banner with valid image types
+    if (
+      (fileType === 'profile_picture' || fileType === 'logo' || fileType === 'banner') &&
+      allowedImageTypes.includes(fileExtension)
+    ) {
+      cb(null, true);
     } else {
-      cb(null, false); // Reject the file
-      console.error('Unexpected file type:', file.mimetype); // Log for debugging
+      cb(null, false);
     }
-  };
+  };  
 
   // Define max file size
   const maxSize = fileType === 'profile_picture' ? 1 * 1024 * 1024 : 5 * 1024 * 1024; // 1MB for profile pictures, 5MB for others
