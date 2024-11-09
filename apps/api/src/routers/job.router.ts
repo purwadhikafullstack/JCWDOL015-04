@@ -16,6 +16,7 @@ export class JobRouter {
   private initializeRoutes(): void {
     this.router.get('/', this.jobController.getJobs);
     this.router.get('/:id', this.jobController.getJobById);
+    this.router.get('/company/:companyId', this.jobController.getJobsByCompanyId);
     
     //Protected for AdminDev
     this.router.post('/', verifyToken, checkAdminDev, this.jobController.createJob);

@@ -177,6 +177,25 @@ export class JobController {
       });
     }
   }
+
+  async getJobsByCompanyId(req: Request, res: Response) {
+    try {
+      const { companyId } = req.params;
+  
+      if (!companyId || isNaN(Number(companyId))) {
+        return res.status(400).json({ msg: 'Invalid company ID' });
+      }
+  
+      const jobs = await prisma.job.findMany({
+        where: { company_id: Number(companyId), is_active: true },
+        include: { company: true },
+      });
+  
+      res.status(200).json({ status: 'ok', jobs });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Failed to fetch jobs by company ID' });
+    }
+  }
   
   async updateJob(req: Request, res: Response) {
     try {

@@ -1,50 +1,39 @@
 'use client';
-import Image, { StaticImageData } from 'next/image';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { GoLocation } from 'react-icons/go';
-import LogoDribbble from '../assets/company-logo/Logo-Dribbble.svg';
-import LogoFreepik from '../assets/company-logo/Logo-Freepik.svg';
-import LogoUpwork from '../assets/company-logo/Logo-Upwork.svg';
-import LogoSlack from '../assets/company-logo/Logo-Slack.svg';
+import { CompanyCardProps } from '@/types/company';
+import { fetchCompanies } from '@/lib/company';
+import { getCountryLabel, getLabel } from '@/utils/getLabel';
+import { countryOptions, industryOptions } from '@/utils/format';
 
-interface CompanyCardProps {
-  company_id: number;
-  company_name: string;
-  location: string;
-  logo: string | StaticImageData;
-}
+const FeaturedCompany = () => {
+  const [companies, setCompanies] = useState<CompanyCardProps[]>([]);
 
-interface FeaturedCompanyProps {
-  companies?: CompanyCardProps[];
-}
+  const loadCompany = async () => {
+    try {
+      const filters = { dateRange: 'latest' };
+      const companyData = await fetchCompanies(filters);
 
-const FeaturedCompany = ({ companies = [] }: FeaturedCompanyProps) => {
-  const staticCompanies = [
-    {
-      company_id: 1,
-      company_name: 'Dribbble',
-      location: 'United States',
-      logo: LogoDribbble,
-    },
-    {
-      company_id: 2,
-      company_name: 'Upwork',
-      location: 'United States',
-      logo: LogoUpwork,
-    },
-    {
-      company_id: 3,
-      company_name: 'Slack',
-      location: 'China',
-      logo: LogoSlack,
-    },
-    {
-      company_id: 4,
-      company_name: 'Freepik',
-      location: 'United States',
-      logo: LogoFreepik,
-    },
-  ];
+      const formattedCompanies: CompanyCardProps[] = companyData.map((company: CompanyCardProps) => ({
+        company_id: company.company_id,
+        company_name: company.company_name,
+        logo: company.logo,
+        IndustryType: company.IndustryType,
+        country: company.country,
+      }));
+
+      setCompanies(formattedCompanies);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      setCompanies([]);
+    }
+  };
+
+  useEffect(() => {
+    loadCompany();
+  }, []);
 
   return (
     <div className="bg-white py-16">
@@ -52,7 +41,7 @@ const FeaturedCompany = ({ companies = [] }: FeaturedCompanyProps) => {
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold">Top Companies</h2>
           <Link
-            href="/view-all-companies"
+            href="/company-page"
             className="text-blue-600 font-semibold flex items-center hover:text-blue-700 transition-colors"
           >
             View All
@@ -61,11 +50,9 @@ const FeaturedCompany = ({ companies = [] }: FeaturedCompanyProps) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(companies.length > 0 ? companies : staticCompanies).map(
-            (company: CompanyCardProps) => (
-              <CompanyCard key={company.company_id} company={company} />
-            ),
-          )}
+          {companies.map((company: CompanyCardProps) => (
+            <CompanyCard key={company.company_id} company={company} />
+          ))}
         </div>
       </div>
     </div>
@@ -80,22 +67,25 @@ const CompanyCard = ({ company }: CompanyCardComponentProps) => {
   return (
     <div className="relative p-4 sm:p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border hover:border-blue-500 flex flex-col justify-between items-center">
       <div className="flex flex-col items-center space-y-4 w-full">
-        <Image
-          src={
-            typeof company.logo === 'string' ? company.logo : company.logo.src
-          }
-          alt={company.company_name}
-          width={80}
-          height={80}
-          className="object-contain"
-        />
+        {company.logo ? (
+          <Image
+            src={company.logo}
+            alt={`${company.company_name} Logo`}
+            width={80}
+            height={80}
+            className="object-contain"
+          />
+        ) : (
+          <div className="w-20 h-20 bg-gray-300 flex items-center justify-center rounded-full text-gray-400">
+            No Logo
+          </div>
+        )}
         <div className="text-center">
-          <h3 className="text-lg sm:text-xl font-semibold">
-            {company.company_name}
-          </h3>
+          <h3 className="text-lg sm:text-xl font-semibold">{company.company_name}</h3>
+          <p className="text-sm text-gray-600">{getLabel(industryOptions, company.IndustryType as string)}</p>
           <div className="flex items-center justify-center text-sm text-gray-600">
             <GoLocation className="mr-1" />
-            <span>{company.location}</span>
+            <span>{getCountryLabel(countryOptions, company.country as string)}</span>
           </div>
         </div>
       </div>

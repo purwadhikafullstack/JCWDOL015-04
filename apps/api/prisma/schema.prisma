@@ -205,6 +205,34 @@ enum JobCategory {
   public_relations
 }
 
+enum IndustryType {
+  TECHNOLOGY
+  FINANCE
+  HEALTHCARE
+  EDUCATION
+  RETAIL
+  HOSPITALITY
+  TRANSPORTATION
+  CONSTRUCTION
+  REAL_ESTATE
+  CONSULTING
+  GOVERNMENT
+  ENERGY
+  TELECOMMUNICATIONS
+  ENTERTAINMENT
+  AGRICULTURE
+  MANUFACTURING
+  INSURANCE
+  LEGAL
+  MARKETING
+  ADVERTISING
+  MEDIA
+  NON_PROFIT
+  RESEARCH
+  AUTOMOTIVE
+  PHARMACEUTICALS
+}
+
 // User model
 model User {
   user_id             Int             @id @default(autoincrement())
@@ -271,7 +299,7 @@ model Company {
   twitter         String?
   facebook        String?
   yearOfEstablish DateTime?
-  IndustryType    String?
+  IndustryType    IndustryType?
   TeamSize        Int?
   country         CountryCode
   address         String?

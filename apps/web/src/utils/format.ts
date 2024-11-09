@@ -96,6 +96,35 @@ export const jobExperienceLevels = [
   { value: 'expert', label: 'Expert' },
 ];
 
+// Industry options for dropdowns
+export const industryOptions = [
+  { value: 'TECHNOLOGY', label: 'Technology' },
+  { value: 'FINANCE', label: 'Finance' },
+  { value: 'HEALTHCARE', label: 'Healthcare' },
+  { value: 'EDUCATION', label: 'Education' },
+  { value: 'RETAIL', label: 'Retail' },
+  { value: 'HOSPITALITY', label: 'Hospitality' },
+  { value: 'TRANSPORTATION', label: 'Transportation' },
+  { value: 'CONSTRUCTION', label: 'Construction' },
+  { value: 'REAL_ESTATE', label: 'Real Estate' },
+  { value: 'CONSULTING', label: 'Consulting' },
+  { value: 'GOVERNMENT', label: 'Government' },
+  { value: 'ENERGY', label: 'Energy' },
+  { value: 'TELECOMMUNICATIONS', label: 'Telecommunications' },
+  { value: 'ENTERTAINMENT', label: 'Entertainment' },
+  { value: 'AGRICULTURE', label: 'Agriculture' },
+  { value: 'MANUFACTURING', label: 'Manufacturing' },
+  { value: 'INSURANCE', label: 'Insurance' },
+  { value: 'LEGAL', label: 'Legal' },
+  { value: 'MARKETING', label: 'Marketing' },
+  { value: 'ADVERTISING', label: 'Advertising' },
+  { value: 'MEDIA', label: 'Media' },
+  { value: 'NON_PROFIT', label: 'Non-Profit' },
+  { value: 'RESEARCH', label: 'Research' },
+  { value: 'AUTOMOTIVE', label: 'Automotive' },
+  { value: 'PHARMACEUTICALS', label: 'Pharmaceuticals' },
+];
+
 export const getStatusLabel = (status: string): string => {
   const statusLabels: { [key: string]: string } = {
     active: 'Application Received',

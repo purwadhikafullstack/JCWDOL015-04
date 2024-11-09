@@ -56,23 +56,18 @@ export const Footer = () => {
             <h3 className="text-white text-md font-semibold mb-4">Candidate</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/job-page" className="hover:text-white">
                   Browse Jobs
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/company-page" className="hover:text-white">
                   Browse Employers
                 </Link>
               </li>
               <li>
                 <Link href="#" className="hover:text-white">
                   Candidate Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white">
-                  Saved Jobs
                 </Link>
               </li>
             </ul>
@@ -112,11 +107,6 @@ export const Footer = () => {
               <li>
                 <Link href="#" className="hover:text-white">
                   FAQs
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white">
-                  Privacy Policy
                 </Link>
               </li>
               <li>

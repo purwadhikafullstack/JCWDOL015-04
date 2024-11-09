@@ -1,9 +1,11 @@
 import { Job } from '@/types/job';
+import base_url from '../lib/user';
 
 export const fetchJobs = async (
   sortOrder: string,
   filters: Record<string, string | string[]> = {},
 ): Promise<Job[]> => {
+  console.log('Filters:', filters);
   const params = new URLSearchParams();
 
   for (const [key, value] of Object.entries(filters)) {
@@ -13,7 +15,7 @@ export const fetchJobs = async (
       params.append(key, value);
     }
   }
-  const url = `http://localhost:8000/api/jobs?${params.toString()}`;
+  const url = `${base_url}/jobs?${params.toString()}`;
   try {
     const response = await fetch(url);
     if (!response.ok) {

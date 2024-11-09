@@ -2,9 +2,8 @@
 import { jwtDecode } from 'jwt-decode';
 import { IUserLogin, IUserReg, IUserVerify } from '@/types/iuser';
 import { getToken } from './server';
-import axios from 'axios';
 
-export const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+export const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
 export const regUser = async (data: IUserReg) => {
   try {

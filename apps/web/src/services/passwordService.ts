@@ -1,6 +1,7 @@
-// src/services/passwordService.ts
+import base_url from '../lib/user';
+
 export const requestPasswordReset = async (email: string) => {
-    const response = await fetch('http://localhost:8000/api/user/request-password-reset', {
+    const response = await fetch(`${base_url}/user/request-password-reset`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
@@ -9,7 +10,7 @@ export const requestPasswordReset = async (email: string) => {
   };
   
   export const resetPassword = async (token: string, newPassword: string, confirmNewPassword: string) => {
-    const response = await fetch('http://localhost:8000/api/user/reset-password', {
+    const response = await fetch(`${base_url}/user/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, newPassword, confirmNewPassword }),

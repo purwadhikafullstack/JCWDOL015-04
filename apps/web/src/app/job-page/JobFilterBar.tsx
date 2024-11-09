@@ -4,7 +4,6 @@ import { FaSearch, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { GoLocation, GoStack } from 'react-icons/go';
 import {
   jobTypeOptions,
-  salaryRanges,
   jobCategories,
   jobEducationLevels,
   jobExperienceLevels,
@@ -184,31 +183,6 @@ export default function JobFilterBar({
       {/* Advanced Filters Section */}
       {showAdvancedFilters && (
         <div className="w-full mt-10 p-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-          {/* Salary Multi-select Filter */}
-          <div>
-            <h3 className="font-medium text-gray-700 mb-2">Salary Range</h3>
-            <Select
-              options={salaryRanges}
-              isMulti
-              placeholder="Select Salary Range(s)"
-              classNamePrefix="react-select"
-              onChange={(selectedOptions) =>
-                setSalary(
-                  selectedOptions
-                    ? selectedOptions.map((option) => option.value)
-                    : [],
-                )
-              }
-              value={salaryRanges.filter((option) =>
-                salary.includes(option.value),
-              )}
-              isSearchable={false}
-              styles={{
-                container: (base) => ({ ...base, width: '100%' }),
-                control: (base) => ({ ...base, minHeight: '44px' }),
-              }}
-            />
-          </div>
 
           {/* Job Category Multi-select Filter */}
           <div>

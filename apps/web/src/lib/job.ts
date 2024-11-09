@@ -1,7 +1,6 @@
 import { FavoriteJob, Job } from '@/types/job';
 import { getToken } from './server';
-
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+import base_url from './user';
 
 // Function to get all jobs with optional filters
 export const getJobs = async (

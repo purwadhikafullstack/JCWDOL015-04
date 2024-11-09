@@ -1,5 +1,5 @@
 import prisma from '@/prisma';
-import { Prisma } from '@prisma/client';
+import { $Enums, CountryCode, IndustryType, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 
 export class CompanyController {
@@ -153,11 +153,73 @@ export class CompanyController {
     }
   }
 
+  async getCompanies(req: Request, res: Response) {
+    try {
+      const { search, IndustryType, country, TeamSize, dateRange } = req.query;
+  
+      const filter: Prisma.CompanyWhereInput = {};
+  
+      // Search filter across multiple fields, including IndustryType
+      if (typeof search === 'string') {
+        const lowerSearch = search.toLowerCase();
+        filter.OR = [
+          { company_name: { contains: lowerSearch } },
+          { address: { contains: lowerSearch } },
+          { aboutUs: { contains: lowerSearch } },
+          { website: { contains: lowerSearch } },
+          { linkedin: { contains: lowerSearch } },
+          { instagram: { contains: lowerSearch } },
+          { twitter: { contains: lowerSearch } },
+          { facebook: { contains: lowerSearch } },
+          { description: { contains: lowerSearch } },
+        ];
+      }
+  
+      // Industry filter (separate from search)
+      if (IndustryType) {
+        const industryArray = Array.isArray(IndustryType)
+          ? IndustryType
+          : [IndustryType];
+        filter.IndustryType = { in: industryArray as $Enums.IndustryType[] };
+      }
+  
+      // Country filter
+      if (country) {
+        filter.country = country as $Enums.CountryCode;
+      }
+  
+      // Team size filter
+      if (TeamSize) {
+        filter.TeamSize = { equals: parseInt(TeamSize as string, 10) };
+      }
+  
+      // Order companies by creation date
+      const orderBy: Prisma.CompanyOrderByWithRelationInput = {
+        created_at: dateRange === 'latest' ? 'desc' : 'asc',
+      };
+  
+      // Fetch companies with applied filters and ordering
+      const companies = await prisma.company.findMany({
+        where: filter,
+        orderBy,
+      });
+  
+      res.status(200).json({ status: 'ok', companies });
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      res
+        .status(500)
+        .json({ status: 'error', message: 'Failed to fetch companies' });
+    }
+  }
+  
+
   async getCompanyById(req: Request, res: Response) {
     try {
       const companyId = parseInt(req.params.id, 10);
       const company = await prisma.company.findUnique({
         where: { company_id: companyId },
+        include: { jobs: true },
       });
 
       if (!company) {

@@ -86,7 +86,7 @@ const CandidateDashboard = () => {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRole="candidate">
     <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
       <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       <main className="p-4">

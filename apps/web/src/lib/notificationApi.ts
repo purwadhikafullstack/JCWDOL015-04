@@ -1,9 +1,7 @@
 // notificationApi.ts
 import { Notification } from "@/types/notification";
-import Cookies from 'js-cookie';
 import { getToken } from "./server";
-
-const base_url = process.env.NEXT_PUBLIC_BASE_API_URL || 'http://localhost:8000/api';
+import base_url from './user';
 
 export const getUnreadNotifications = async (): Promise<{ notifications: Notification[]; ok: boolean }> => {
   const token = await getToken();
@@ -13,7 +11,7 @@ export const getUnreadNotifications = async (): Promise<{ notifications: Notific
   }
 
   try {
-    const res = await fetch(`${base_url}notifications`, {
+    const res = await fetch(`${base_url}/notifications`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

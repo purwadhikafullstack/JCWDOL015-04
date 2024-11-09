@@ -22,7 +22,11 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
   };
 
   const handleSettingClick = () => {
-    router.push('/dashboard-candidate?tab=account-setting'); // Directly navigate to account-setting section
+    if (userRole === UserRole.Candidate) {
+      router.push('/dashboard-candidate?tab=account-setting');
+    } else if (userRole === UserRole.Admin || userRole === UserRole.Developer) {
+      router.push('/dashboard-admin-developer');
+    }
   };
 
   const handleLogout = () => {
