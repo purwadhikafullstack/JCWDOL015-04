@@ -1,5 +1,3 @@
-// src/app/dashboard-candidate/page.tsx
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,18 +6,18 @@ import { getToken } from '@/lib/server';
 import base_url from '@/lib/user';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/types/iuser';
+import Sidebar from './components/Sidebar';
+import OverviewTab from './components/OverviewTab';
+import CompanySettings from './components/SettingCompany';
 import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import ViewAllJobsPosted from './components/VIewAllJobs';
 
 const AdminDashboard = () => {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'overview';
   const [selectedTab, setSelectedTab] = useState(initialTab);
-  const [userUniqueCode, setUserUniqueCode] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,11 +41,7 @@ const AdminDashboard = () => {
         const data = await response.json();
 
         if (response.ok) {
-          setFirstName(data.user.firstName);
-          setLastName(data.user.lastName);
-          setPhone(data.user.phone);
-          setEmail(data.user.email);
-          setUserUniqueCode(data.user.userUniqueCode);
+          setUserName(`${data.user.firstName} ${data.user.lastName}`);
         } else {
           toast.error(data.msg || 'Failed to fetch user data.');
         }
@@ -63,29 +57,21 @@ const AdminDashboard = () => {
     switch (selectedTab) {
       case 'overview':
         return <OverviewTab setSelectedTab={setSelectedTab} />;
-      case 'appliedJobs':
-        return <PaymentControl />;
-      case 'favoriteJobs':
-        return <CreateAssesment />;
-      case 'subscription':
-        return <SubscriptionSettings />;
-      case 'plansBilling':
-        return <PlansBillingTab />;
-      case 'settings':
-        return <SettingsTab />;
+      case 'ViewAllJobsPosted':
+        return <ViewAllJobsPosted />;
+      case 'SettingCompany':
+        return <CompanySettings />;
       default:
         return <OverviewTab setSelectedTab={setSelectedTab} />;
     }
   };
 
   return (
-    <ProtectedRoute requiredRole="candidate">
-    <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
-      <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-      <main className="p-4">
-        {renderTabContent()}
-      </main>
-    </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
+        <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+        <main className="p-4">{renderTabContent()}</main>
+      </div>
     </ProtectedRoute>
   );
 };

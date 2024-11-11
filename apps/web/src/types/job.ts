@@ -22,7 +22,6 @@ export interface FavoriteJob {
   created_at: string;
 }
 
-
 // Existing interfaces for reference
 export interface Company {
   company_id: number;
@@ -88,4 +87,15 @@ export interface JobCardProps {
     company_name: string;
     logo: string | null;
   };
+}
+
+export interface RecentlyPostedJob {
+  job_id: number;
+  job_title: string;
+  company_name: string;
+  logo: string;
+  location: string;
+  created_at: string;
+  jobExpired_at: string;
+  is_active: boolean;
 }

@@ -137,6 +137,26 @@ export const updateUserInfo = async (data: FormData): Promise<{ result: any; ok:
   }
 };
 
+export const updateUserCredential = async (data: { email?: string; phone?: string; currentPassword?: string; Newpassword?: string; Confirmpassword?: string }) => {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${base_url}/user/update`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data), // Send as JSON
+    });
+
+    const result = await res.json();
+    return { result, ok: res.ok };
+  } catch (error) {
+    console.error('Error updating user credentials:', error);
+    return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
+  }
+};
+
 export const deleteUserAccount = async (email: string, password: string) => {
   try {
     const token = await getToken();
@@ -156,6 +176,5 @@ export const deleteUserAccount = async (email: string, password: string) => {
     return { ok: false, result: { status: 'error', msg: 'An error occurred while deleting the account' } };
   }
 };
-
 
 export default base_url;

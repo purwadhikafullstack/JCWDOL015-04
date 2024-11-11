@@ -109,8 +109,7 @@ export class ApplicationController {
 
   async getApplicationsByUser(req: Request, res: Response) {
     try {
-      const userId = parseInt(req.params.userId, 10); // If you only want the logged-in user to access their applications req.user?.user_id
-      // Alternatively, use `parseInt(req.params.userId, 10)` if you allow admins to specify a `userId`
+      const userId = parseInt(req.params.userId, 10);
 
       if (!userId) return res.status(400).json({ msg: 'Invalid User ID' });
 

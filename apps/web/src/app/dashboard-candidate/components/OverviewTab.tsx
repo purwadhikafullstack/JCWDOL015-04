@@ -12,7 +12,6 @@ import { getStatusLabel } from '@/utils/format';
 import { RecentlyAppliedJob } from '@/types/job';
 import moment from 'moment';
 
-// Define a type for the props
 interface OverviewTabProps {
   setSelectedTab: (tab: string) => void;
 }

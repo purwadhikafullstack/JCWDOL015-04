@@ -159,7 +159,6 @@ export class CompanyController {
   
       const filter: Prisma.CompanyWhereInput = {};
   
-      // Search filter across multiple fields, including IndustryType
       if (typeof search === 'string') {
         const lowerSearch = search.toLowerCase();
         filter.OR = [
@@ -175,7 +174,6 @@ export class CompanyController {
         ];
       }
   
-      // Industry filter (separate from search)
       if (IndustryType) {
         const industryArray = Array.isArray(IndustryType)
           ? IndustryType
@@ -183,22 +181,18 @@ export class CompanyController {
         filter.IndustryType = { in: industryArray as $Enums.IndustryType[] };
       }
   
-      // Country filter
       if (country) {
         filter.country = country as $Enums.CountryCode;
       }
   
-      // Team size filter
       if (TeamSize) {
         filter.TeamSize = { equals: parseInt(TeamSize as string, 10) };
       }
   
-      // Order companies by creation date
       const orderBy: Prisma.CompanyOrderByWithRelationInput = {
         created_at: dateRange === 'latest' ? 'desc' : 'asc',
       };
   
-      // Fetch companies with applied filters and ordering
       const companies = await prisma.company.findMany({
         where: filter,
         orderBy,
@@ -212,7 +206,6 @@ export class CompanyController {
         .json({ status: 'error', message: 'Failed to fetch companies' });
     }
   }
-  
 
   async getCompanyById(req: Request, res: Response) {
     try {
@@ -253,4 +246,51 @@ export class CompanyController {
       });
     }
   }
+
+  async getUserCompany(req: Request, res: Response) {
+    try {
+      const userId = req.user?.user_id;
+
+      if (!userId) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'User ID not found. Please log in.',
+        });
+      }
+
+      // Fetch companies associated with the authenticated user
+      const company = await prisma.company.findFirst({
+        where: {
+          users: {
+            some: {
+              user_id: userId, // User associated with the company
+            },
+          },
+        },
+        include: {
+          users: true,  // You can include more relations if necessary
+        },
+      });
+
+      if (!company) {
+        return res.status(404).json({
+          status: 'error',
+          msg: 'No company found for the authenticated user.',
+        });
+      }
+
+      // Return the company data
+      res.status(200).json({
+        status: 'ok',
+        company,
+      });
+    } catch (err) {
+      console.error('Error fetching company:', err);
+      res.status(500).json({
+        status: 'error',
+        msg: 'An error occurred while fetching company information.',
+      });
+    }
+  }
+  
 }

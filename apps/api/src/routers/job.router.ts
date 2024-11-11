@@ -24,6 +24,9 @@ export class JobRouter {
     this.router.get('/applied/count', verifyToken, checkCandidate, this.jobController.getAppliedJobCount);
     this.router.get('/favorites/count', verifyToken, checkCandidate, this.jobController.getFavoriteJobCount);
     this.router.post('/favorites/toggle', verifyToken, checkCandidate, this.jobController.toggleSaveJob);
+    this.router.get('/recently-posted/:userId', verifyToken, checkAdminDev, this.jobController.getRecentlyPostedJobs);
+    this.router.get('/total-jobs-count/:userId', verifyToken, this.jobController.getTotalJobsCount);
+
   }
 
   getRouter(): Router {

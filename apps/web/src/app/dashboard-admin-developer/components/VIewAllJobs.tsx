@@ -1,18 +1,14 @@
-// src/app/dashboard-candidate/components/AppliedJobsTab.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { FiBriefcase } from 'react-icons/fi';
-import { fetchRecentlyAppliedJobs } from '@/lib/applyJob';
+import { fetchRecentlyPostedJobs } from '@/lib/job'; // Ensure this function is correct
 import { getUserInfo } from '@/lib/user';
-import { RecentlyAppliedJob } from '@/types/job';
+import { RecentlyPostedJob } from '@/types/job';
 import moment from 'moment';
-import { getStatusLabel } from '@/utils/format';
 
-const AppliedJobsTab = () => {
-  const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<
-    RecentlyAppliedJob[]
-  >([]);
+const ViewAllJobsPosted = () => {
+  const [recentlyPostedJobs, setRecentlyPostedJobs] = useState<RecentlyPostedJob[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 8;
 
@@ -22,22 +18,26 @@ const AppliedJobsTab = () => {
       if (userResponse.ok && userResponse.user) {
         const userId = userResponse.user.user_id;
 
-        const recentJobs = await fetchRecentlyAppliedJobs(userId);
-        setRecentlyAppliedJobs(recentJobs);
+        // Fetch recently posted jobs using userId
+        const recentJobs = await fetchRecentlyPostedJobs(userId);
+        setRecentlyPostedJobs(recentJobs.jobs);
       } else {
+        console.error('Failed to fetch user info');
       }
     };
 
     fetchData();
   }, []);
 
+  // Calculate the jobs to display on the current page
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = recentlyAppliedJobs.slice(
-    indexOfFirstJob,
-    indexOfLastJob,
-  );
-  const totalPages = Math.ceil(recentlyAppliedJobs.length / jobsPerPage);
+  const currentJobs = recentlyPostedJobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  // Determine the total number of pages
+  const totalPages = Math.ceil(recentlyPostedJobs.length / jobsPerPage);
+
+  // Handle page navigation
   const handlePreviousPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
@@ -48,8 +48,8 @@ const AppliedJobsTab = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
-      <h2 id="applied-jobs" className="text-2xl font-semibold mb-4">
-        Applied Jobs
+      <h2 id="posted-jobs" className="text-2xl font-semibold mb-4">
+        Posted Jobs
       </h2>
 
       <div className="overflow-x-auto">
@@ -59,18 +59,16 @@ const AppliedJobsTab = () => {
             <tr>
               <th>No.</th>
               <th>Job</th>
-              <th>Date Applied</th>
+              <th>Date Posted</th>
               <th>Status</th>
+              <th>Expiration</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {currentJobs.length > 0 ? (
               currentJobs.map((job, index) => (
-                <tr
-                  key={job.application_id}
-                  className="hover:bg-gray-200"
-                  style={{ cursor: 'pointer' }}
-                >
+                <tr key={job.job_id} className="hover:bg-gray-200">
                   <td>{indexOfFirstJob + index + 1}</td>
                   <td>
                     <div className="flex items-center gap-3">
@@ -97,45 +95,31 @@ const AppliedJobsTab = () => {
                   </td>
                   <td>
                     <span className="block lg:hidden">
-                      {/* Display with line break on small screens */}
-                      {moment(job.date_applied).format('D MMM, YYYY')}
-                      <br />
-                      {moment(job.date_applied).format('h:mm A')}
+                      {moment(job.created_at).format('D MMM, YYYY')}
                     </span>
                     <span className="hidden lg:block">
-                      {/* Display in a single line on larger screens */}
-                      {moment(job.date_applied).format('D MMM, YYYY | h:mm A')}
+                      {moment(job.created_at).format('D MMM, YYYY')}
                     </span>
                   </td>
                   <td>
                     <span
-                      className={`badge text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-1.5 leading-tight whitespace-nowrap ${
-                        job.status === 'active'
-                          ? 'badge-success'
-                          : job.status === 'under_review'
-                            ? 'badge-warning'
-                            : job.status === 'interview'
-                              ? 'badge-warning'
-                              : job.status === 'pending'
-                                ? 'badge-warning'
-                                : job.status === 'accepted'
-                                  ? 'badge-warning'
-                                  : job.status === 'rejected'
-                                    ? 'badge-error'
-                                    : job.status === 'hired'
-                                      ? 'badge-primary'
-                                      : 'badge-neutral'
-                      }`}
+                      className={`badge ${job.is_active ? 'badge-success' : 'badge-neutral'}`}
                     >
-                      {getStatusLabel(job.status)}
+                      {job.is_active ? 'Active' : 'Inactive'}
                     </span>
+                  </td>
+                  <td>
+                    <span>{moment(job.jobExpired_at).format('D MMM, YYYY')}</span>
+                  </td>
+                  <td>
+                    <button className="btn btn-sm btn-primary">View Details</button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center">
-                  No recently applied jobs found
+                <td colSpan={6} className="text-center">
+                  No recently posted jobs found
                 </td>
               </tr>
             )}
@@ -167,4 +151,4 @@ const AppliedJobsTab = () => {
   );
 };
 
-export default AppliedJobsTab;
+export default ViewAllJobsPosted;

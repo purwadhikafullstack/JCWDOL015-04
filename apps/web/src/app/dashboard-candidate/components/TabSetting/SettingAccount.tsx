@@ -1,5 +1,4 @@
-// src/app/dashboard-candidate/components/tabs/SettingAccount.tsx
-
+'use client';
 import { useState, useEffect } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { getUserInfo, updateUserInfo, deleteUserAccount } from '@/lib/user';
@@ -72,6 +71,7 @@ const SettingAccount = () => {
   };
 
   const handleSaveChanges = async () => {
+    // Validate password fields
     if (passwordFields.newPassword) {
       if (!passwordFields.currentPassword) {
         toast.error('Current password is required to change the password.');
@@ -86,6 +86,7 @@ const SettingAccount = () => {
     setShowSaveConfirm(false);
     setIsEditing(false);
 
+    // Create a FormData object to send data
     const formData = new FormData();
     formData.append('email', email);
     formData.append('phone', phone);
@@ -93,7 +94,8 @@ const SettingAccount = () => {
     formData.append('Newpassword', passwordFields.newPassword);
     formData.append('Confirmpassword', passwordFields.confirmPassword);
 
-    const { result, ok } = await updateUserInfo(formData);
+    const { result, ok } = await updateUserInfo(formData); // Send data as FormData
+
     if (ok) {
       toast.success('Account updated successfully!');
       setInitialEmail(email);
@@ -121,15 +123,12 @@ const SettingAccount = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-6">
-      <h3 id="account-setting" className="text-xl font-semibold">Contact Info</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+      <h3 id="account-setting" className="text-xl font-semibold">
+        Contact Info
+      </h3>
+      <div>
+        <div className="col-span-1 md:col-span-2">
           <label className="block text-gray-600">Phone</label>
-          <div className="flex items-center mt-1">
-            <select className="select select-bordered w-1/3" disabled={!isEditing}>
-              <option>+880</option>
-              {/* Add other country codes as necessary */}
-            </select>
             <input
               type="text"
               className="input input-bordered w-full ml-2"
@@ -138,7 +137,6 @@ const SettingAccount = () => {
               onChange={(e) => setPhone(e.target.value)}
               disabled={!isEditing}
             />
-          </div>
         </div>
         <div className="col-span-1 md:col-span-2">
           <label className="block text-gray-600">Email</label>
@@ -157,7 +155,9 @@ const SettingAccount = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {['Current Password', 'New Password', 'Confirm Password'].map(
           (label, index) => {
-            const field = label.toLowerCase().replace(' ', '') as keyof typeof showPassword;
+            const field = label
+              .toLowerCase()
+              .replace(' ', '') as keyof typeof showPassword;
             return (
               <div key={index}>
                 <label className="block text-gray-600">{label}</label>
@@ -184,33 +184,60 @@ const SettingAccount = () => {
                 </div>
               </div>
             );
-          }
+          },
         )}
       </div>
 
       {showSaveConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
           <div className="bg-white rounded-md shadow-lg p-6 border border-gray-300 max-w-sm text-center mx-auto">
-            <span className="block mb-4">Are you sure you want to save changes to your account information?</span>
+            <span className="block mb-4">
+              Are you sure you want to save changes to your account information?
+            </span>
             <div className="flex justify-center gap-4">
-              <button onClick={() => setShowSaveConfirm(false)} className="btn btn-sm">Cancel</button>
-              <button onClick={handleSaveChanges} className="btn btn-sm btn-primary">Save</button>
+              <button
+                onClick={() => setShowSaveConfirm(false)}
+                className="btn btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveChanges}
+                className="btn btn-sm btn-primary"
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      <button onClick={toggleEdit} className={`btn w-full md:w-auto mt-6 ${isEditing ? 'btn-primary' : 'btn-primary'}`}>
+      <button
+        onClick={toggleEdit}
+        className={`btn w-full md:w-auto mt-6 ${isEditing ? 'btn-primary' : 'btn-primary'}`}
+      >
         {isEditing ? 'Save Changes' : 'Change Data'}
       </button>
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
           <div className="bg-white rounded-md shadow-lg p-6 border border-gray-300 max-w-sm text-center mx-auto">
-            <span className="block mb-4">Are you sure you want to delete your account?</span>
+            <span className="block mb-4">
+              Are you sure you want to delete your account?
+            </span>
             <div className="flex justify-center gap-4">
-              <button onClick={() => setShowDeleteConfirm(false)} className="btn btn-sm">Cancel</button>
-              <button onClick={handleDeleteAccount} className="btn btn-sm btn-error">Confirm</button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="btn btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="btn btn-sm btn-error"
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>
@@ -219,7 +246,9 @@ const SettingAccount = () => {
       {showFinalDeleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
           <div className="bg-white rounded-md shadow-lg p-6 border border-gray-300 max-w-sm text-center mx-auto">
-            <span className="block mb-4">Enter your email and password to confirm account deletion.</span>
+            <span className="block mb-4">
+              Enter your email and password to confirm account deletion.
+            </span>
             <input
               type="email"
               className="input input-bordered w-full mt-2"
@@ -235,8 +264,18 @@ const SettingAccount = () => {
               onChange={(e) => setDeletePassword(e.target.value)}
             />
             <div className="flex justify-center gap-4 mt-4">
-              <button onClick={() => setShowFinalDeleteConfirm(false)} className="btn btn-sm">Cancel</button>
-              <button onClick={handleFinalDeleteAccount} className="btn btn-sm btn-error">Delete</button>
+              <button
+                onClick={() => setShowFinalDeleteConfirm(false)}
+                className="btn btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFinalDeleteAccount}
+                className="btn btn-sm btn-error"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -245,9 +284,17 @@ const SettingAccount = () => {
       <div className="mt-8">
         <h3 className="text-xl font-semibold">Delete Your Account</h3>
         <p className="text-gray-600 text-sm mt-2">
-          If you delete your HireMe account, you will no longer be able to get information about the matched jobs, following employers, and job alerts, shortlisted jobs and more. You will be abandoned from all the services of HireMe.com.
+          If you delete your HireMe account, you will no longer be able to get
+          information about the matched jobs, following employers, and job
+          alerts, shortlisted jobs and more. You will be abandoned from all the
+          services of HireMe.com.
         </p>
-        <button onClick={() => setShowDeleteConfirm(true)} className="btn btn-error mt-4">Close Account</button>
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="btn btn-error mt-4"
+        >
+          Close Account
+        </button>
       </div>
     </div>
   );

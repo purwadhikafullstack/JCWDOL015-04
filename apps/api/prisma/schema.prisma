@@ -312,7 +312,7 @@ model Company {
   // Relations
   jobs    Job[]
   reviews Review[]
-  users   User[]   @relation("UserCompanies") // Back-reference to User with the same relation name
+  users   User[]   @relation("UserCompanies")
 
   @@index([email])
 }
@@ -342,8 +342,8 @@ model Job {
   jobReports   JobReport[]
   jobViews     JobView[]
   jobSaves     JobSave[]
-  User         User?         @relation(fields: [User_id], references: [user_id])
-  User_id      Int?
+  user         User?         @relation(fields: [user_id], references: [user_id])
+  user_id      Int?
   Favorite     Favorite[]
 
   @@index([company_id])

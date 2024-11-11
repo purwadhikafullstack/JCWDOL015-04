@@ -32,9 +32,11 @@ export class CompanyRouter {
     );
     
     this.router.get('/', this.companyController.getAllCompanies.bind(this.companyController));
-    this.router.get('/search', this.companyController.getCompanies.bind(this.companyController));
+    this.router.get('/search', verifyToken, this.companyController.getCompanies.bind(this.companyController));
+
+     this.router.get('/user', verifyToken, this.companyController.getUserCompany.bind(this.companyController));
     
-    this.router.get('/:id', this.companyController.getCompanyById.bind(this.companyController));
+    this.router.get('/:id', verifyToken, this.companyController.getCompanyById.bind(this.companyController));
     
     this.router.delete('/:id', verifyToken, this.companyController.deleteCompany.bind(this.companyController));
   }

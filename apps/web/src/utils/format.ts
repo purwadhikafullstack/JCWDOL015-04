@@ -138,3 +138,8 @@ export const getStatusLabel = (status: string): string => {
 
   return statusLabels[status] || status;
 };
+
+export const formatNumberWithCommas = (num: number | string): string => {
+  if (num === '') return '';
+  return Number(num).toLocaleString();
+};

@@ -17,9 +17,9 @@ const Card: React.FC<CardProps> = ({ job, isFavorited = false }) => {
 
   const handleSaveClick = async () => {
     const response = await toggleSaveJob(job.job_id);
-    console.log(response); // Log the response to verify
+    console.log(response);
     if (response.ok) {
-      setIsSaved((prev) => !prev); // Toggle the saved state if successful
+      setIsSaved((prev) => !prev);
     } else {
       console.error(response.msg);
     }

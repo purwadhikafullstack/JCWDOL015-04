@@ -54,7 +54,6 @@ const CandidateDashboard = () => {
           setLastName(data.user.lastName);
           setPhone(data.user.phone);
           setEmail(data.user.email);
-          setUserUniqueCode(data.user.userUniqueCode);
         } else {
           toast.error(data.msg || 'Failed to fetch user data.');
         }

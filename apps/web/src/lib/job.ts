@@ -61,7 +61,6 @@ export const toggleSaveJob = async (jobId: number) => {
   const token = await getToken();
 
   if (!token) {
-    console.error('No token found');
     return { msg: 'Unauthorized', ok: false };
   }
 
@@ -112,5 +111,52 @@ export const fetchFavoriteJobs = async (
   } catch (error) {
     console.error('Error fetching favorite jobs:', error);
     return [];
+  }
+};
+
+export const fetchTotalJobsCount = async (userId: number) => {
+  const token = await getToken();  // Retrieve the token
+  if (!token) {
+    console.error('No token found');
+    return { totalJobsCount: 0, ok: false }; // Early return if no token
+  }
+
+  try {
+    const res = await fetch(`${base_url}/jobs/total-jobs-count/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,  // Pass token in the Authorization header
+        'Content-Type': 'application/json',   // Ensure correct content type
+      },
+    });
+    const result = await res.json();
+    return { totalJobsCount: result.totalJobsCount, ok: res.ok };
+  } catch (error) {
+    console.error('Error fetching total jobs count:', error);
+    return { totalJobsCount: 0, ok: false };
+  }
+};
+
+export const fetchRecentlyPostedJobs = async (userId: number) => {
+  const token = await getToken();
+  if (!token) {
+    console.error('No token found');
+    return { jobs: [], ok: false };
+  }
+
+  try {
+    const res = await fetch(`${base_url}/jobs/recently-posted/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    const result = await res.json();
+    console.log(result);
+    return { jobs: result.jobs, ok: res.ok };
+  } catch (error) {
+    console.error('Error fetching recently posted jobs:', error);
+    return { jobs: [], ok: false };
   }
 };
