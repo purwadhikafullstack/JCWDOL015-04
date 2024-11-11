@@ -28,12 +28,6 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
         <FiCreditCard size={20} className="mr-2" /> Payment Control
       </li>
       <li
-        className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'createAssessment' ? 'text-blue-500 font-semibold' : ''}`}
-        onClick={() => setSelectedTab('createAssessment')}
-      >
-        <FiFileText size={20} className="mr-2" /> Create Assessment
-      </li>
-      <li
         className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'subscriptionSettings' ? 'text-blue-500 font-semibold' : ''}`}
         onClick={() => setSelectedTab('subscriptionSettings')}
       >

@@ -240,11 +240,6 @@ export class UserController {
         Newpassword,
         Confirmpassword,
         website,
-        linkedin,
-        github,
-        twitter,
-        facebook,
-        instagram,
         title,
         education,
         biography,
@@ -253,31 +248,30 @@ export class UserController {
         languages,
         nationality,
         gender,
-        country,
-        tempat_lahir,
         DateOfBirth,
         years_of_experience,
       } = req.body;
-
-      const userId = req.user?.user_id; // Get the user ID from the authenticated request
+  
+      // Access the uploaded profile picture file path
+      const profilePictureUrl = req.file
+        ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
+        : undefined;
+  
+      const userId = req.user?.user_id;
       if (!userId) throw new Error('Account not authenticated');
-
-      // Retrieve the current user data
+  
       const user = await prisma.user.findUnique({ where: { user_id: userId } });
       if (!user) throw new Error('Account not found');
-
+  
       let hashedPassword;
-      // Handle password update separately
       if (Newpassword) {
-        // Ensure current password is provided
         if (!currentPassword) {
           return res.status(400).send({
             status: 'error',
             msg: 'Current password is required to update the password.',
           });
         }
-
-        // Verify that the provided current password matches the stored password
+  
         const isPasswordValid = await compare(currentPassword, user.password);
         if (!isPasswordValid) {
           return res.status(400).send({
@@ -285,33 +279,28 @@ export class UserController {
             msg: 'Current password is incorrect.',
           });
         }
-
-        // Ensure the new password matches the confirmation password
+  
         if (Newpassword !== Confirmpassword) {
           return res.status(400).send({
             status: 'error',
             msg: 'New password and confirmation password do not match.',
           });
         }
-
-        // Hash the new password
+  
         hashedPassword = await hash(Newpassword, await genSalt(10));
       }
-
-      // Prepare data for update
+  
+      // Prepare the data for update, including the profile picture
       const updateData: any = {};
-
-      // Only include fields that were passed in the request
       if (first_name) updateData.first_name = first_name;
       if (last_name) updateData.last_name = last_name;
       if (phone) updateData.phone = phone;
-      if (email) updateData.email = email;
+      if (email) {
+        // If the email is being updated, mark `is_verified` as false
+        updateData.email = email;
+        updateData.is_verified = false;  // Set is_verified to false when email is updated
+      }
       if (website) updateData.website = website;
-      if (linkedin) updateData.linkedin = linkedin;
-      if (github) updateData.github = github;
-      if (twitter) updateData.twitter = twitter;
-      if (facebook) updateData.facebook = facebook;
-      if (instagram) updateData.instagram = instagram;
       if (title) updateData.title = title;
       if (education) updateData.education = education;
       if (biography) updateData.biography = biography;
@@ -320,46 +309,34 @@ export class UserController {
       if (languages) updateData.languages = languages;
       if (nationality) updateData.nationality = nationality;
       if (gender) updateData.gender = gender;
-      if (country) updateData.country = country;
-      if (tempat_lahir) updateData.tempat_lahir = tempat_lahir;
       if (DateOfBirth) updateData.DateOfBirth = new Date(DateOfBirth);
-      if (years_of_experience)
-        updateData.years_of_experience = years_of_experience;
-
-      // Add the hashed password to the update data, if provided
-      if (hashedPassword) {
-        updateData.password = hashedPassword;
+      if (years_of_experience) {
+        updateData.years_of_experience = parseInt(String(years_of_experience), 10);
       }
-
-      // If the email has changed, set is_verified to false and send verification email
-      let updatedUser;
-      if (email !== user.email) {
-        // Set is_verified to false
-        updateData.is_verified = false;
-        updatedUser = await prisma.user.update({
-          where: { user_id: userId },
-          data: updateData,
-        });
-
-        // Send the verification email to the new email address
+      if (profilePictureUrl) updateData.profile_picture = profilePictureUrl;
+      if (hashedPassword) updateData.password = hashedPassword;
+  
+      const updatedUser = await prisma.user.update({
+        where: { user_id: userId },
+        data: updateData,
+      });
+  
+      // Send a verification email if the email was updated
+      if (email && email !== user.email) {
         const payload = { id: updatedUser.user_id };
         const token = sign(payload, process.env.SECRET_JWT!, {
           expiresIn: '60m',
         });
-
-        const templatePath = path.join(
-          __dirname,
-          '../templates',
-          'verification.hbs',
-        );
+  
+        const templatePath = path.join(__dirname, '../templates', 'reVerification.hbs');
         const templateSource = fs.readFileSync(templatePath, 'utf-8');
         const compiledTemplate = handlebars.compile(templateSource);
-
+  
         const emailHtml = compiledTemplate({
           name: updatedUser.first_name + ' ' + updatedUser.last_name,
           link: `http://localhost:3000/verify/${token}`,
         });
-
+  
         // Send the verification email
         await transporter.sendMail({
           from: process.env.MAIL_USER,
@@ -367,24 +344,11 @@ export class UserController {
           subject: 'Verify Your HireMe Account',
           html: emailHtml,
         });
-      } else {
-        updatedUser = await prisma.user.update({
-          where: { user_id: userId },
-          data: updateData,
-        });
       }
-
-      // Success response
-      const successMessages = [];
-      if (first_name) successMessages.push('First name');
-      if (last_name) successMessages.push('Last name');
-      if (phone) successMessages.push('Phone');
-      if (email) successMessages.push('Email');
-      if (Newpassword) successMessages.push('Password');
-
+  
       res.status(200).send({
         status: 'ok',
-        msg: `${successMessages.join(', ')} updated successfully!`,
+        msg: 'Account information updated successfully!',
         user: updatedUser,
       });
     } catch (err) {
@@ -395,6 +359,7 @@ export class UserController {
       });
     }
   }
+  
 
   async resendVerificationLink(req: Request, res: Response) {
     try {
@@ -636,7 +601,6 @@ export class UserController {
     }
   }
 
-  // Method to get total user subscribe count
   async getTotalUserSubscribe(req: Request, res: Response) {
     try {
       const userCount = await prisma.user.count({

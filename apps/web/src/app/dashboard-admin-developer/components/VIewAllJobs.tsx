@@ -20,7 +20,7 @@ const ViewAllJobsPosted = () => {
 
         // Fetch recently posted jobs using userId
         const recentJobs = await fetchRecentlyPostedJobs(userId);
-        setRecentlyPostedJobs(recentJobs.jobs);
+        setRecentlyPostedJobs(recentJobs.jobs || []); // Ensure it's an empty array if no jobs are found
       } else {
         console.error('Failed to fetch user info');
       }
@@ -32,7 +32,7 @@ const ViewAllJobsPosted = () => {
   // Calculate the jobs to display on the current page
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = recentlyPostedJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const currentJobs = recentlyPostedJobs.slice(indexOfFirstJob, indexOfLastJob); // Safely using slice
 
   // Determine the total number of pages
   const totalPages = Math.ceil(recentlyPostedJobs.length / jobsPerPage);

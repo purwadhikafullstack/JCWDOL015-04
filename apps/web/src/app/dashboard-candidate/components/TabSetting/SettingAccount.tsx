@@ -114,7 +114,6 @@ const SettingAccount = () => {
     const { result, ok } = await deleteUserAccount(deleteEmail, deletePassword);
     if (ok) {
       toast.success('Account deleted successfully!');
-      // Redirect or handle account removal actions here
     } else {
       toast.error(result.msg || 'Failed to delete account');
     }

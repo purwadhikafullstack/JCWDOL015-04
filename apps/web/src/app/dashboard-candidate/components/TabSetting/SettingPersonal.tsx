@@ -30,7 +30,7 @@ const SettingPersonal = () => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setSelectedImage(file); // Store the selected file
+      setSelectedImage(file);
       const reader = new FileReader();
       reader.onload = () => setProfileImage(reader.result as string);
       reader.readAsDataURL(file);
@@ -49,14 +49,14 @@ const SettingPersonal = () => {
     formData.append('years_of_experience', String(yearsOfExperience || ''));
 
     if (selectedImage) {
-      formData.append('profile_picture', selectedImage); // Add the profile image if selected
+      formData.append('profile_picture', selectedImage);
     }
 
     const { result, ok } = await updateUserInfo(formData);
 
     if (ok) {
       toast.success('Profile updated successfully!');
-      setIsEditing(false); // Exit edit mode on success
+      setIsEditing(false);
     } else {
       toast.error(result.msg || 'Failed to update profile');
     }
