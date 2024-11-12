@@ -8,6 +8,7 @@ import { getLabel } from '@/utils/getLabel';
 import CompanyOverview from './CompanyOverview';
 import CompanyJobListings from './CompanyJobListings';
 import { industryOptions } from '@/utils/format';
+import DOMPurify from 'dompurify';
 
 const CompanyPage = () => {
   const { id } = useParams();
@@ -18,7 +19,8 @@ const CompanyPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { company, ok } = await getCompanyById(id as string);
+        const { company, ok } = await getCompanyById(id as string)
+        console.log("data", company?.aboutUs)
         if (ok && company) {
           setCompany(company);
         } else {
@@ -74,7 +76,9 @@ const CompanyPage = () => {
               />
               <div className="ml-4">
                 <h1 className="text-3xl font-bold">{company.company_name}</h1>
-                <p className="text-lg text-gray-500">{getLabel(industryOptions, company.IndustryType as string)}</p>
+                <p className="text-lg text-gray-500">
+                  {getLabel(industryOptions, company.IndustryType as string)}
+                </p>
               </div>
             </div>
           </div>
@@ -82,8 +86,13 @@ const CompanyPage = () => {
           {/* Company Details Section */}
           <div className="flex flex-col lg:flex-row gap-8 mt-6">
             <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-6">
-              <h2 className="text-lg font-bold">Description</h2>
-              <p>{company.aboutUs || 'No description available.'}</p>
+              <h2 className="text-lg font-bold">About Us</h2>
+              {/* Render company.aboutUs as HTML */}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: company.aboutUs || 'No description available.',
+                }}
+              />
             </div>
 
             {/* Sidebar with Company Information */}

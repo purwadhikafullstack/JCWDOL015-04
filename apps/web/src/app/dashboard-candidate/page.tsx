@@ -17,6 +17,7 @@ import PlansBillingTab from './components/PlansBillingTab';
 import SettingsTab from './components/SettingsTab';
 import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import CVGeneratorTab from './components/CVGenerator';
 
 const CandidateDashboard = () => {
   const searchParams = useSearchParams();
@@ -73,6 +74,8 @@ const CandidateDashboard = () => {
         return <AppliedJobsTab />;
       case 'favoriteJobs':
         return <FavoriteJobsTab />;
+        case 'CVGenerator':
+          return <CVGeneratorTab />;
       case 'subscription':
         return <SubscriptionTab />;
       case 'plansBilling':

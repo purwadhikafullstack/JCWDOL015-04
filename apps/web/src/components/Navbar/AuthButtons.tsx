@@ -18,10 +18,10 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
   <div className="flex items-center space-x-2">
     {isLoggedIn ? (
       <>
-        {(userRole === UserRole.Admin || userRole === UserRole.Developer) && (
-          <Link href="/post-jobs">
+        {(userRole === UserRole.Admin) && (
+          <Link href="/ ISI DISINI ">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-              Post A Job
+              Manage Jobs
             </button>
           </Link>
         )}
@@ -34,7 +34,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
       </>
     ) : (
       <>
-        <Link href="/post-job">
+        <Link href="/sign-in">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Post A Job
           </button>

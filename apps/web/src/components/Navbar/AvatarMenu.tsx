@@ -55,15 +55,19 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
       >
-        <li>
-          <button onClick={handleProfileClick}>Profile</button>
-        </li>
-        <li>
-          <button onClick={handleSettingClick}>Setting</button>
-        </li>
+        {userRole === UserRole.Candidate && UserRole.Admin && (
+          <li>
+            <button onClick={handleProfileClick}>Profile</button>
+          </li>
+        )}
         {userRole === UserRole.Developer && (
           <li>
             <button>Assessments</button>
+          </li>
+        )}
+        {userRole === UserRole.Developer && (
+          <li>
+            <button>Subscription</button>
           </li>
         )}
         <li>

@@ -91,7 +91,7 @@ const CompanyCard = ({ company }: CompanyCardComponentProps) => {
       </div>
 
       <div className="mt-4 flex justify-center w-full">
-        <Link href={`/company/${company.company_id}`}>
+        <Link href={`/company-page/${company.company_id}`}>
           <button className="bg-blue-50 text-blue-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg hover:bg-blue-600 hover:text-white transition-all w-full sm:w-auto">
             Open Position →
           </button>

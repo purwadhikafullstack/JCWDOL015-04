@@ -6,41 +6,47 @@ import { transporter } from '@/helpers/notmailer';
 import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
-import { EducationLevel, Gender } from '@prisma/client';
 
 export class UserController {
   async createUser(req: Request, res: Response) {
     try {
-      const { first_name, last_name, email, password, role } = req.body;
-
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
-
+      const { first_name, last_name, email, password, role, company_name, company_email, country } = req.body;
+      console.log('Request body:', req.body);
+      
+      const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        return res
-          .status(400)
-          .json({ status: 'error', msg: 'Email already in use!' });
+        return res.status(400).json({ status: 'error', msg: 'Email already in use!' });
       }
 
       const salt = await genSalt(10);
       const hashedPassword = await hash(password, salt);
 
-      const newUser = await prisma.user.create({
-        data: {
-          first_name,
-          last_name,
-          email,
-          password: hashedPassword,
-          role,
-          is_verified: false,
-        },
+      const createdData = await prisma.$transaction(async (prisma) => {
+        const newUser = await prisma.user.create({
+          data: { first_name, last_name, email, password: hashedPassword, role, is_verified: false },
+        });
+
+
+        let newCompany = null;
+        if (role === 'admin' && company_name && company_email) {
+          newCompany = await prisma.company.create({
+            data: {
+              company_name,
+              email: company_email,
+              country,
+              users: { connect: { user_id: newUser.user_id } },
+            },
+          });
+        }
+
+        return { newUser, newCompany };
       });
 
+      const { newUser, newCompany } = createdData;
+
+      // Generate a verification token
       const payload = { id: newUser.user_id };
-      const token = sign(payload, process.env.SECRET_JWT!, {
-        expiresIn: '60m',
-      });
+      const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '60m' });
 
       const templatePath = path.join(
         __dirname,
@@ -62,18 +68,16 @@ export class UserController {
         html: emailHtml,
       });
 
-      // Respond with success
+      // Response to client
       res.status(201).json({
         status: 'ok',
         msg: 'Account created successfully! Please verify your email!',
         user: newUser,
+        company: newCompany,
       });
     } catch (err) {
       console.error('Error during registration:', err);
-      res.status(400).json({
-        status: 'error',
-        msg: 'An error occurred during user registration.',
-      });
+      res.status(400).json({ status: 'error', msg: 'An error occurred during user registration.' });
     }
   }
 
@@ -251,18 +255,18 @@ export class UserController {
         DateOfBirth,
         years_of_experience,
       } = req.body;
-  
+
       // Access the uploaded profile picture file path
       const profilePictureUrl = req.file
         ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
         : undefined;
-  
+
       const userId = req.user?.user_id;
       if (!userId) throw new Error('Account not authenticated');
-  
+
       const user = await prisma.user.findUnique({ where: { user_id: userId } });
       if (!user) throw new Error('Account not found');
-  
+
       let hashedPassword;
       if (Newpassword) {
         if (!currentPassword) {
@@ -271,7 +275,7 @@ export class UserController {
             msg: 'Current password is required to update the password.',
           });
         }
-  
+
         const isPasswordValid = await compare(currentPassword, user.password);
         if (!isPasswordValid) {
           return res.status(400).send({
@@ -279,17 +283,17 @@ export class UserController {
             msg: 'Current password is incorrect.',
           });
         }
-  
+
         if (Newpassword !== Confirmpassword) {
           return res.status(400).send({
             status: 'error',
             msg: 'New password and confirmation password do not match.',
           });
         }
-  
+
         hashedPassword = await hash(Newpassword, await genSalt(10));
       }
-  
+
       // Prepare the data for update, including the profile picture
       const updateData: any = {};
       if (first_name) updateData.first_name = first_name;
@@ -298,7 +302,7 @@ export class UserController {
       if (email) {
         // If the email is being updated, mark `is_verified` as false
         updateData.email = email;
-        updateData.is_verified = false;  // Set is_verified to false when email is updated
+        updateData.is_verified = false; // Set is_verified to false when email is updated
       }
       if (website) updateData.website = website;
       if (title) updateData.title = title;
@@ -311,32 +315,39 @@ export class UserController {
       if (gender) updateData.gender = gender;
       if (DateOfBirth) updateData.DateOfBirth = new Date(DateOfBirth);
       if (years_of_experience) {
-        updateData.years_of_experience = parseInt(String(years_of_experience), 10);
+        updateData.years_of_experience = parseInt(
+          String(years_of_experience),
+          10,
+        );
       }
       if (profilePictureUrl) updateData.profile_picture = profilePictureUrl;
       if (hashedPassword) updateData.password = hashedPassword;
-  
+
       const updatedUser = await prisma.user.update({
         where: { user_id: userId },
         data: updateData,
       });
-  
+
       // Send a verification email if the email was updated
       if (email && email !== user.email) {
         const payload = { id: updatedUser.user_id };
         const token = sign(payload, process.env.SECRET_JWT!, {
           expiresIn: '60m',
         });
-  
-        const templatePath = path.join(__dirname, '../templates', 'reVerification.hbs');
+
+        const templatePath = path.join(
+          __dirname,
+          '../templates',
+          'reVerification.hbs',
+        );
         const templateSource = fs.readFileSync(templatePath, 'utf-8');
         const compiledTemplate = handlebars.compile(templateSource);
-  
+
         const emailHtml = compiledTemplate({
           name: updatedUser.first_name + ' ' + updatedUser.last_name,
           link: `http://localhost:3000/verify/${token}`,
         });
-  
+
         // Send the verification email
         await transporter.sendMail({
           from: process.env.MAIL_USER,
@@ -345,7 +356,7 @@ export class UserController {
           html: emailHtml,
         });
       }
-  
+
       res.status(200).send({
         status: 'ok',
         msg: 'Account information updated successfully!',
@@ -359,7 +370,6 @@ export class UserController {
       });
     }
   }
-  
 
   async resendVerificationLink(req: Request, res: Response) {
     try {
@@ -610,12 +620,10 @@ export class UserController {
       });
       res.status(200).json({ status: 'ok', userCount });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          status: 'error',
-          message: 'Failed to fetch total user subscribe count',
-        });
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch total user subscribe count',
+      });
     }
   }
 }

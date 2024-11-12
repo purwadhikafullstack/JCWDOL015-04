@@ -1,9 +1,41 @@
 // src/app/dashboard-admin-developer/components/TabCompanySettings/Contact.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchUserCompany } from '@/lib/company';
 
 const Contact = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCompanyData = async () => {
+      setLoading(true);
+      try {
+        const { company, ok } = await fetchUserCompany();
+        if (ok && company) {
+          setPhone(company.phone || '');
+          setEmail(company.email || '');
+        } else {
+          setError('Failed to load company contact information.');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching company contact information.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCompanyData();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
     <div className="p-6 space-y-6">

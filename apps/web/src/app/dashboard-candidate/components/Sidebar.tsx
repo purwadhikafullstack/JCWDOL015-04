@@ -1,4 +1,4 @@
-import { FiHome, FiHeart, FiBriefcase, FiSettings, FiCreditCard, FiFileText } from 'react-icons/fi';
+import { FiHome, FiHeart, FiBriefcase, FiPrinter, FiSettings, FiCreditCard, FiFileText } from 'react-icons/fi';
 
 interface SidebarProps {
   selectedTab: string;
@@ -16,6 +16,9 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
       </li>
       <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'favoriteJobs' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('favoriteJobs')}>
         <FiHeart size={20} className="mr-2" /> Favorite Jobs
+      </li>
+      <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'CVGenerator' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('CVGenerator')}>
+        <FiPrinter size={20} className="mr-2" /> CV Generator
       </li>
       <li className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'subscription' ? 'text-blue-500 font-semibold' : ''}`} onClick={() => setSelectedTab('subscription')}>
         <FiBriefcase size={20} className="mr-2" /> Subscription

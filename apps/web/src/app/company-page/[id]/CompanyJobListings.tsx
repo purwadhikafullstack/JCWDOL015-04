@@ -36,12 +36,10 @@ const CompanyJobListings = ({ companyId }: CompanyJobListingsProps) => {
 
   if (loading) return <div>Loading jobs...</div>;
 
-  // Calculate the current jobs to be shown based on the current page
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
 
-  // Pagination logic
   const totalPages = Math.ceil(jobs.length / jobsPerPage);
   const handlePageChange = (page: number) => setCurrentPage(page);
 
@@ -55,8 +53,6 @@ const CompanyJobListings = ({ companyId }: CompanyJobListingsProps) => {
           <p className="text-gray-500">No job listings available for this company.</p>
         )}
       </div>
-
-
       {/* Pagination Section */}
       <div className="mt-4 flex justify-center">
         <button

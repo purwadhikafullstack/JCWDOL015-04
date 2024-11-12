@@ -13,6 +13,7 @@ export const verifyToken = async (
 ) => {
   try {
     const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+    console.log('Token received in middleware:', token); // Log to check token
 
     if (!token) throw new Error('Token is missing');
 

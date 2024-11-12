@@ -1,7 +1,9 @@
+// hooks/useCreateAccountForm.ts
 import { useState } from 'react';
 import { regUser } from '@/lib/user';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { IUserReg } from '@/types/iuser';
 
 export const useCreateAccountForm = () => {
   const [role, setRole] = useState('');
@@ -12,36 +14,39 @@ export const useCreateAccountForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isValid, setIsValid] = useState(true);
+  const [companyName, setCompanyName] = useState('');
+  const [companyEmail, setCompanyEmail] = useState('');
+  const [companyCountry, setCompanyCountry] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    if (
-      !email ||
-      !password ||
-      !confirmPassword ||
-      !first_name ||
-      !last_name ||
-      !role ||
-      password !== confirmPassword
-    ) {
-      setIsValid(false);
+  
+    if (!email || !password || !confirmPassword || !first_name || !last_name || !role || password !== confirmPassword) {
+      toast.error('Please fill out all required fields and ensure passwords match.');
       return;
     }
-
-    const userData = { first_name, last_name, email, password, role };
-
+  
+    const data: IUserReg = {
+      first_name,
+      last_name,
+      email,
+      password,
+      role,
+    };
+  
+    // Add company data only if role is 'admin'
+    if (role === 'admin') {
+      data.company_name = companyName;
+      data.company_email = companyEmail;
+      data.country = companyCountry;
+    }
+  
     try {
-      const { result, ok } = await regUser(userData);
+      const { result, ok } = await regUser(data);
       if (ok) {
-        toast.success(
-          'Account created successfully! Please verify your email!',
-        );
-        setTimeout(() => {
-          router.push('/sign-in');
-        }, 2000);
+        toast.success('Account created successfully! Please verify your email!');
+        setTimeout(() => router.push('/sign-in'), 2000);
       } else {
         toast.error(result?.msg || 'Registration failed');
       }
@@ -67,7 +72,12 @@ export const useCreateAccountForm = () => {
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
-    isValid,
-    handleSubmit,
+    companyName,
+    setCompanyName,
+    companyEmail,
+    setCompanyEmail,
+    companyCountry,
+    setCompanyCountry,
+    handleFormSubmit,
   };
 };

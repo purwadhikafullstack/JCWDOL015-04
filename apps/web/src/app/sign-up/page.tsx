@@ -1,15 +1,15 @@
 'use client';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useCreateAccountForm } from '@/hooks/useCreateAccountForm';
+import { countryOptions } from '@/utils/format';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
+import Image from 'next/image';
 import Background from '../../assets/BG-CreateAccount.png';
 import IconCompany from '../../assets/Icon-Company-Trans.png';
 import IconJob from '../../assets/Icon-Job-Trans.png';
 import IconFacebook from '../../assets/category/Icon-Facebook.png';
 import IconGoogle from '../../assets/category/Icon-Google.png';
-import { useCreateAccountForm } from '@/hooks/useCreateAccountForm';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateAccount: React.FC = () => {
   const {
@@ -25,41 +25,25 @@ const CreateAccount: React.FC = () => {
     setPassword,
     confirmPassword,
     setConfirmPassword,
+    companyName,
+    setCompanyName,
+    companyEmail,
+    setCompanyEmail,
+    companyCountry,
+    setCompanyCountry,
     showPassword,
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
-    isValid,
-    handleSubmit,
+    handleFormSubmit,
   } = useCreateAccountForm();
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!role) {
-      toast.error('Please select a category.');
-      return;
-    }
-
-    if (!first_name || !last_name || !email) {
-      toast.error('First Name, Last Name, and Email are required.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match.');
-      return;
-    }
-
-    handleSubmit(e);
-  };
 
   return (
     <div className="min-h-screen flex bg-white">
       <div className="w-full lg:w-1/2 bg-white py-12 lg:py-20 px-6 sm:px-12 flex flex-col justify-center relative">
         <form
           onSubmit={handleFormSubmit}
-          className="max-w-md mx-auto m-6 mt-[50px] lg:mt-[-100px] md:mt-[-100px]"
+          className="max-w-md mx-auto m-6 mt-[50px] lg:mt-[-55px] md:mt-[-100px]"
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-3xl font-semibold">Create account.</h2>
@@ -69,7 +53,7 @@ const CreateAccount: React.FC = () => {
               onChange={(e) => setRole(e.target.value)}
               required
             >
-              <option value="">Select Category</option>{' '}
+              <option value="">Select Category</option>
               <option value="candidate">Candidate</option>
               <option value="admin">Employers</option>
               <option value="developer">Developer</option>
@@ -110,6 +94,41 @@ const CreateAccount: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+
+            {/* Conditionally render company fields if admin role is selected */}
+            {role === 'admin' && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Company Name"
+                  className="w-full p-3 border rounded-md"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Company Email Address"
+                  className="w-full p-3 border rounded-md"
+                  value={companyEmail}
+                  onChange={(e) => setCompanyEmail(e.target.value)}
+                  required
+                />
+                <select
+                  className="w-full p-3 border rounded-md"
+                  value={companyCountry}
+                  onChange={(e) => setCompanyCountry(e.target.value)}
+                  required
+                >
+                  <option value="">Select Country</option>
+                  {countryOptions.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
 
             <div className="relative">
               <input

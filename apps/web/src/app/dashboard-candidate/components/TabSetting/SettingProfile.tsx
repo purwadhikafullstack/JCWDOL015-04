@@ -31,7 +31,7 @@ const SettingProfile = () => {
         setBiography(user.biography || '');
         setLanguages(user.languages || '');
         setTempatLahir(user.tempat_lahir || '');
-        setSkills(user.skills || ''); // Added skills field
+        setSkills(user.skills || '');
       } else {
         toast.error('Failed to load profile data');
       }
@@ -59,7 +59,7 @@ const SettingProfile = () => {
     formData.append('biography', biography);
     formData.append('languages', languages);
     formData.append('tempat_lahir', tempatLahir);
-    formData.append('skills', skills); // Added skills field
+    formData.append('skills', skills);
 
     const { result, ok } = await updateUserInfo(formData);
     if (ok) {
@@ -105,7 +105,7 @@ const SettingProfile = () => {
             <option value="">Select...</option>
             {Object.entries(Gender).map(([key, value]) => (
               <option key={key} value={key}>
-                {value} {/* display value */}
+                {value}
               </option>
             ))}
           </select>
@@ -121,7 +121,7 @@ const SettingProfile = () => {
             <option value="">Select...</option>
             {Object.entries(EducationLevel).map(([key, value]) => (
               <option key={key} value={key}>
-                {value} {/* display value */}
+                {value}
               </option>
             ))}
           </select>

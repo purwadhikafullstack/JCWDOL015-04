@@ -21,11 +21,9 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   useEffect(() => {
     if (isClient) {
       if (!isAuthenticated) {
-        // Redirect to the authentication page if user is not authenticated
-        toast.info('Register or login to apply for this job!');
+        toast.info('Register or login to view all features!');
         router.push('/auth');
       } else if (requiredRole && role !== requiredRole) {
-        // Redirect if user does not have the required role
         router.push('/');
       }
     }

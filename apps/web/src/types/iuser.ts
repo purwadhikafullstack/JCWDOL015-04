@@ -6,7 +6,11 @@ export interface IUserReg {
   email: string;
   password: string;
   role: string;
+  company_name?: string; // Optional, only needed for admin
+  company_email?: string; // Optional, only needed for admin
+  country?: string; // Optional, only needed for admin
 }
+
 
 export interface IUserLogin {
   email: string;

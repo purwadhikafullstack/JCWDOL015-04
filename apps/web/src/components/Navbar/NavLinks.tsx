@@ -10,13 +10,22 @@ interface NavLinksProps {
 const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
   const checkRole = (role: UserRole) => userRole === role;
 
-  if (checkRole(UserRole.Admin) || checkRole(UserRole.Developer)) {
+  if (checkRole(UserRole.Admin)) {
     return (
       <>
         <li><Link href="/find-candidate" className="hover:text-Primary-blue">Find Candidate</Link></li>
         <li><Link href="/dashboard-admin-developer" className="hover:text-Primary-blue">Dashboard</Link></li>
         <li><Link href="/my-jobs" className="hover:text-Primary-blue">My Jobs</Link></li>
         <li><Link href="/applications" className="hover:text-Primary-blue">Applications</Link></li>
+        <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
+      </>
+    );
+  }
+  if (checkRole(UserRole.Developer)) {
+    return (
+      <>
+        <li><Link href="/assessment-page" className="hover:text-Primary-blue">Dashboard Assessments</Link></li>
+        <li><Link href="/Subscription" className="hover:text-Primary-blue">Subscription</Link></li>
         <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );

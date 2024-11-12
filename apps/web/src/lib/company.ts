@@ -3,7 +3,6 @@ import { Company } from '@/types/company';
 import { Job } from '@/types/job';
 import base_url from './user';
 import { getToken } from './server';
-import { jwtDecode } from 'jwt-decode';
 
 export const fetchCompanies = async (
   filters: {
@@ -39,12 +38,23 @@ export const getCompanyById = async (
   companyId: string,
 ): Promise<{ company: Company | null; ok: boolean }> => {
   try {
+    const token = getToken();
+    console.log(`Fetching company with ID: ${companyId}`);
+    console.log(`Authorization token: ${token}`);
+
     const res = await fetch(`${base_url}/companies/${companyId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
       cache: 'no-cache',
     });
+
     if (!res.ok) {
-      throw new Error(`Failed to fetch company with ID: ${companyId}`);
+      throw new Error(`Failed to fetch company with ID: ${companyId}, Status: ${res.status}`);
     }
+
     const result = await res.json();
     return { company: result.company, ok: true };
   } catch (error) {
@@ -70,20 +80,12 @@ export const fetchUserCompany = async (): Promise<{ company: Company | null; ok:
   const token = await getToken();
 
   if (!token) {
-    console.error('No token found');
-    return { company: null, ok: false };
-  }
-
-  const decoded: any = jwtDecode(token);
-  const userId = decoded?.user_id;
-
-  if (!userId) {
-    console.error('Invalid token: user ID not found');
     return { company: null, ok: false };
   }
 
   try {
-    const res = await fetch(`${base_url}/companies/user?id=${userId}`, {
+
+    const res = await fetch(`${base_url}/companies/user`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -98,9 +100,28 @@ export const fetchUserCompany = async (): Promise<{ company: Company | null; ok:
     const result = await res.json();
     return { company: result.company, ok: true };
   } catch (error) {
-    console.error('Error fetching user’s company:', error);
     return { company: null, ok: false };
   }
 };
 
+export const updateCompany = async (companyId: string, data: FormData): Promise<{ company: Company | null; ok: boolean }> => {
+  try {
+    const res = await fetch(`${base_url}/companies/${companyId}`, {
+      method: 'PUT',
+      headers: {
+      },
+      credentials: 'include',
+      body: data,
+    });
 
+    if (!res.ok) {
+      throw new Error(`Failed to update company with ID: ${companyId}`);
+    }
+
+    const result = await res.json();
+    return { company: result.company, ok: true };
+  } catch (error) {
+    console.error('Error updating company:', error);
+    return { company: null, ok: false };
+  }
+};

@@ -17,8 +17,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isLoggedIn, userRole, onLogout 
       <NavLinks userRole={userRole} />
       {isLoggedIn ? (
         <>
-          <Link href="/profile"><button className="hover:text-Primary-blue">Profile</button></Link>
-          <Link href="/settings"><button className="hover:text-Primary-blue">Setting</button></Link>
+         {userRole === UserRole.Candidate && UserRole.Admin && (
+            <Link href="/profile"><button className="hover:text-Primary-blue">Profile</button></Link>
+          )}
+          {userRole === UserRole.Candidate && UserRole.Admin && (
+            <Link href="/settings"><button className="hover:text-Primary-blue">Setting</button></Link>
+          )}
           {userRole === UserRole.Developer && (
             <Link href="/assessments"><button className="hover:text-Primary-blue">Assessments</button></Link>
           )}
