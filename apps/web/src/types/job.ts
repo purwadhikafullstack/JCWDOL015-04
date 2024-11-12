@@ -22,7 +22,6 @@ export interface FavoriteJob {
   created_at: string;
 }
 
-// Existing interfaces for reference
 export interface Company {
   company_id: number;
   company_name: string;

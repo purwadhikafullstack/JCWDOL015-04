@@ -5,7 +5,6 @@ import { FiUpload } from 'react-icons/fi';
 import { fetchUserCompany, updateCompany } from '@/lib/company';
 import { toast } from 'react-toastify';
 
-// Dynamically import ReactQuill on the client side
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 const CompanyInfo = () => {
@@ -20,7 +19,6 @@ const CompanyInfo = () => {
   const [isEditing, setIsEditing] = useState(false);
   const quillEditorContent = useRef<string>('');
 
-  // Fetch company data on mount
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
@@ -91,7 +89,7 @@ const CompanyInfo = () => {
   
       if (ok) {
         setCompanyName(company?.company_name || '');
-        setAboutUs(company?.aboutUs || ''); // Set the updated HTML content
+        setAboutUs(company?.aboutUs || '');
         setLogo(company?.logo || null);
         setBanner(company?.banner || null);
         toast.success('Company information updated successfully');

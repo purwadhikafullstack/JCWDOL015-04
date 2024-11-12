@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { getJobById } from '@/lib/job';
-import { checkApplicationStatus } from '@/lib/applyJob'; // Import the application status checker
+import { checkApplicationStatus } from '@/lib/applyJob';
 import { Job } from '@/types/job';
 import HeaderSection from './HeaderSection';
 import JobOverview from './JobOverview';
@@ -17,7 +17,7 @@ const JobPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false); // Track application status
+  const [hasApplied, setHasApplied] = useState(false); 
   const router = useRouter();
 
   useEffect(() => {
@@ -27,7 +27,6 @@ const JobPage = () => {
         if (ok && job) {
           setJob(job);
 
-          // Check if the user has already applied
           const appliedStatus = await checkApplicationStatus(job.job_id);
           setHasApplied(appliedStatus);
         } else {
@@ -73,7 +72,7 @@ const JobPage = () => {
                 job={job}
                 isSaved={isSaved}
                 handleSaveClick={handleSaveClick}
-                hasApplied={hasApplied} // Pass hasApplied to HeaderSection
+                hasApplied={hasApplied}
               />
 
               {/* Job Description Section */}

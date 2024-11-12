@@ -1,6 +1,3 @@
-// /src/types/company.ts
-
-// Interface for jobs associated with a company, with relevant details
 export interface CompanyJob {
   job_id: number;
   job_title: string;
@@ -24,9 +21,6 @@ export interface CompanyCardProps {
   IndustryType?: string;
 }
 
-
-
-// Main company interface to include detailed information for individual pages
 export interface Company {
   company_id: number;
   company_name: string;
@@ -38,9 +32,9 @@ export interface Company {
   instagram?: string;
   twitter?: string;
   facebook?: string;
-  yearOfEstablish?: Date;
+  yearOfEstablish?: string;
   IndustryType?: string;
-  TeamSize?: number;
+  TeamSize?: string;
   country: string;
   address?: string;
   description?: string;
@@ -49,18 +43,14 @@ export interface Company {
   created_at: Date;
   updated_at: Date;
 
-  // Relations
   jobs?: CompanyJob[]; 
   reviews?: CompanyReview[];
 }
 
-// Interface for filters applied in the company search/filter component
 export interface CompanyFilterBarProps {
   onSearch: (filters: { search: string; country: string; industry?: string[]; year?: number | null }) => void;
 }
 
-
-// Interface for a favorite or followed company
 export interface FavoriteCompany {
   id: number;
   company: {
@@ -71,7 +61,6 @@ export interface FavoriteCompany {
   created_at: string;
 }
 
-// Optional: Interface for a company review, if reviews are part of the company data
 export interface CompanyReview {
   review_id: number;
   rating: number;

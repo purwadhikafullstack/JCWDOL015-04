@@ -1,5 +1,11 @@
-// src/app/dashboard-admin-developer/components/Sidebar.tsx
-import { FiHome, FiFileText, FiBriefcase, FiSettings, FiCreditCard, FiUser } from 'react-icons/fi';
+import {
+  FiHome,
+  FiFileText,
+  FiBriefcase,
+  FiSettings,
+  FiCreditCard,
+  FiUser,
+} from 'react-icons/fi';
 
 interface SidebarProps {
   selectedTab: string;
@@ -16,12 +22,6 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
         <FiHome size={20} className="mr-2" /> Overview
       </li>
       <li
-        className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'ViewAllJobsPosted' ? 'text-blue-500 font-semibold' : ''}`}
-        onClick={() => setSelectedTab('ViewAllJobsPosted')}
-      >
-        <FiBriefcase size={20} className="mr-2" /> All Jobs
-      </li>
-      <li
         className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'paymentControl' ? 'text-blue-500 font-semibold' : ''}`}
         onClick={() => setSelectedTab('paymentControl')}
       >
@@ -32,12 +32,6 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
         onClick={() => setSelectedTab('subscriptionSettings')}
       >
         <FiBriefcase size={20} className="mr-2" /> Subscription Settings
-      </li>
-      <li
-        className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'SettingCompany' ? 'text-blue-500 font-semibold' : ''}`}
-        onClick={() => setSelectedTab('SettingCompany')}
-      >
-        <FiSettings size={20} className="mr-2" /> Company Settings
       </li>
       <li
         className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'accountSettings' ? 'text-blue-500 font-semibold' : ''}`}

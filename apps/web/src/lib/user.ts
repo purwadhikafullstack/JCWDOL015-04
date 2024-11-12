@@ -92,14 +92,12 @@ export const resendVerificationEmail = async (email: string): Promise<{ message:
 
 export const getUserInfo = async () => {
   try {
-    // Get token from cookies
     const token = await getToken();
     if (!token) {
       console.error('No token found');
       return { user: null, ok: false };
     }
 
-    // Decode the token to get user ID
     const decoded: any = jwtDecode(token);
     const userId = decoded?.user_id;
 
@@ -108,7 +106,6 @@ export const getUserInfo = async () => {
       return { user: null, ok: false };
     }
 
-    // Fetch user info using the decoded user ID
     const res = await fetch(`${base_url}/user/${userId}`, { cache: 'no-cache' });
     const result = await res.json();
     return { result, user: result.user, ok: res.ok };
@@ -146,7 +143,7 @@ export const updateUserCredential = async (data: { email?: string; phone?: strin
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data), // Send as JSON
+      body: JSON.stringify(data),
     });
 
     const result = await res.json();

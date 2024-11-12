@@ -1,4 +1,3 @@
-// /src/app/company-page/page.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import CompanyFilterBar from './CompanyFilterBar';
@@ -8,7 +7,6 @@ import { Company } from '@/types/company';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { fetchUserLocation } from '@/services/locationService';
 
-// Define a type for the location structure
 type Location = { latitude: number; longitude: number } | null;
 
 export default function CompanyPage() {

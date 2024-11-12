@@ -64,7 +64,6 @@ export const checkApplicationStatus = async (
   }
 };
 
-// Fetch applied job count
 export const fetchAppliedJobCount = async (userId: number) => {
   const token = await getToken();
   if (!token) {
@@ -81,7 +80,6 @@ export const fetchAppliedJobCount = async (userId: number) => {
   return data.count || 0;
 };
 
-// Fetch favorite job count
 export const fetchFavoriteJobCount = async (userId: number) => {
   const token = await getToken();
   if (!token) {
@@ -98,7 +96,6 @@ export const fetchFavoriteJobCount = async (userId: number) => {
   return data.count || 0;
 };
 
-// Fetch recently applied jobs with specified type
 export const fetchRecentlyAppliedJobs = async (
   userId: number,
 ): Promise<RecentlyAppliedJob[]> => {

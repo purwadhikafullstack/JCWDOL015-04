@@ -19,7 +19,7 @@ export class FavoriteJobController {
         },
       });
   
-      console.log('Favorites found:', favorites); // Log the retrieved favorites
+      console.log('Favorites found:', favorites);
   
       res.status(200).json({
         status: 'ok',

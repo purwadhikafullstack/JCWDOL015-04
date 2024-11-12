@@ -1,4 +1,3 @@
-// notificationApi.ts
 import { Notification } from "@/types/notification";
 import { getToken } from "./server";
 import base_url from './user';

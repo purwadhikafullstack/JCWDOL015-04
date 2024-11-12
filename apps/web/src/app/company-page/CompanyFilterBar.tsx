@@ -26,7 +26,6 @@ const CompanyFilterBar: React.FC<CompanyFilterBarProps> = ({ onSearch }) => {
         onSearch({ search: '', industry: [], country: '' });
     };
 
-    // Map countries to options with flags
     const mappedCountryOptions = countryOptions.map((country) => ({
         value: country.code,
         label: (
@@ -37,7 +36,6 @@ const CompanyFilterBar: React.FC<CompanyFilterBarProps> = ({ onSearch }) => {
         ),
     }));
 
-    // Map industry options with icons
     const mappedIndustryOptions = industryOptions.map((industry) => ({
         value: industry.value,
         label: (

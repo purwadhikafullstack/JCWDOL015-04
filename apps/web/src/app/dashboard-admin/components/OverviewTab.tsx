@@ -1,5 +1,5 @@
 import { useState, useEffect, ReactNode } from 'react';
-import { FiBriefcase, FiBookmark, FiDollarSign } from 'react-icons/fi';
+import { FiBriefcase, FiBookmark } from 'react-icons/fi';
 import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import { fetchRecentlyPostedJobs, fetchTotalJobsCount } from '@/lib/job';
@@ -12,7 +12,7 @@ interface OverviewProps {
 const Overview = ({ setSelectedTab }: OverviewProps) => {
   const [userName, setUserName] = useState('');
   const [totalJobPostCount, setTotalJobPostCount] = useState(0);
-  const [totalUserSubscribe, setTotalUserSubscribe] = useState(0);
+  const [totalUserApplied, setTotalUserApplied] = useState(0);
   const [totalRevenueSubscription, setTotalRevenueSubscription] = useState(0);
   const [recentlyPostedJobs, setRecentlyPostedJobs] = useState<
     RecentlyPostedJob[]
@@ -36,7 +36,7 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
           setTotalJobPostCount(jobCountResponse.totalJobsCount);
         }
 
-        setTotalUserSubscribe(238);
+        setTotalUserApplied(238);
         setTotalRevenueSubscription(574000000);
 
         const recentJobsResponse = await fetchRecentlyPostedJobs(userId);
@@ -60,7 +60,7 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
         <p className="text-gray-600">Welcome to your dashboard</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 justify-center">
         <SummaryCard
           color="bg-blue-50"
           icon={<FiBriefcase className="text-blue-500 text-3xl" />}
@@ -70,14 +70,8 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
         <SummaryCard
           color="bg-yellow-50"
           icon={<FiBookmark className="text-yellow-500 text-3xl" />}
-          count={totalUserSubscribe}
-          label="User Subscribe"
-        />
-        <SummaryCard
-          color="bg-green-50"
-          icon={<FiDollarSign className="text-green-500 text-3xl" />}
-          count={totalRevenueSubscription}
-          label="Revenue Subscription"
+          count={totalUserApplied}
+          label="User Applied to Jobs"
         />
       </div>
 
@@ -194,9 +188,8 @@ const SummaryCard = ({
   count: number;
   label: string;
 }) => {
-  // Format the count value with commas
   const formatNumber = (number: number) => {
-    return number.toLocaleString(); // Formats the number with commas
+    return number.toLocaleString();
   };
 
   return (

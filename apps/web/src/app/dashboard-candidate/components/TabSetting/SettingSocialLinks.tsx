@@ -27,7 +27,6 @@ const SettingSocialLinks = () => {
     { platform: 'Website', url: '' },
   ]);
 
-  // Fetch user social links
   useEffect(() => {
     const fetchUserData = async () => {
       const { user, ok } = await getUserInfo();

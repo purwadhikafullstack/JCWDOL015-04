@@ -1,8 +1,9 @@
-// src/app/dashboard-admin-developer/components/TabCompanySettings/SocialMediaLink.tsx
 import { useState, useEffect } from 'react';
-import { fetchUserCompany } from '@/lib/company';
+import { fetchUserCompany, updateCompany } from '@/lib/company';
+import { toast } from 'react-toastify';
 
 const SocialMediaLink = () => {
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const [facebook, setFacebook] = useState('');
   const [twitter, setTwitter] = useState('');
   const [instagram, setInstagram] = useState('');
@@ -10,6 +11,7 @@ const SocialMediaLink = () => {
   const [website, setWebsite] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const loadCompanyData = async () => {
@@ -17,6 +19,7 @@ const SocialMediaLink = () => {
       try {
         const { company, ok } = await fetchUserCompany();
         if (ok && company) {
+          setCompanyId(company.company_id.toString());
           setFacebook(company.facebook || '');
           setTwitter(company.twitter || '');
           setInstagram(company.instagram || '');
@@ -34,6 +37,45 @@ const SocialMediaLink = () => {
 
     loadCompanyData();
   }, []);
+
+  const handleEditToggle = () => setIsEditing(!isEditing);
+
+  const handleSaveChanges = async () => {
+    if (!isEditing || !companyId) return;
+
+    // Ensure that no required fields are empty before submitting
+    if (!facebook || !twitter || !instagram || !linkedin || !website) {
+      toast.error('Please fill all the social media fields.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('facebook', facebook);
+    formData.append('twitter', twitter);
+    formData.append('instagram', instagram);
+    formData.append('linkedin', linkedin);
+    formData.append('website', website);
+
+    try {
+      const { company, ok } = await updateCompany(companyId, formData);
+
+      if (ok && company) {
+        // Update state after successful update
+        setFacebook(company?.facebook || '');
+        setTwitter(company?.twitter || '');
+        setInstagram(company?.instagram || '');
+        setLinkedin(company?.linkedin || '');
+        setWebsite(company?.website || '');
+
+        toast.success('Social media links updated successfully');
+        setIsEditing(false);
+      } else {
+        toast.error('Failed to update social media links');
+      }
+    } catch (error) {
+      toast.error('An error occurred while updating social media links');
+    }
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -55,6 +97,7 @@ const SocialMediaLink = () => {
             placeholder="Enter Facebook URL"
             value={facebook}
             onChange={(e) => setFacebook(e.target.value)}
+            disabled={!isEditing}
           />
         </div>
 
@@ -66,6 +109,7 @@ const SocialMediaLink = () => {
             placeholder="Enter Twitter URL"
             value={twitter}
             onChange={(e) => setTwitter(e.target.value)}
+            disabled={!isEditing}
           />
         </div>
 
@@ -77,6 +121,7 @@ const SocialMediaLink = () => {
             placeholder="Enter Instagram URL"
             value={instagram}
             onChange={(e) => setInstagram(e.target.value)}
+            disabled={!isEditing}
           />
         </div>
 
@@ -88,6 +133,7 @@ const SocialMediaLink = () => {
             placeholder="Enter LinkedIn URL"
             value={linkedin}
             onChange={(e) => setLinkedin(e.target.value)}
+            disabled={!isEditing}
           />
         </div>
 
@@ -99,10 +145,16 @@ const SocialMediaLink = () => {
             placeholder="Enter Website URL"
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
+            disabled={!isEditing}
           />
         </div>
       </div>
-      <button className="btn btn-primary mt-6">Save Changes</button>
+      <button
+        onClick={isEditing ? handleSaveChanges : handleEditToggle}
+        className="btn btn-primary mt-6"
+      >
+        {isEditing ? 'Save Changes' : 'Edit'}
+      </button>
     </div>
   );
 };

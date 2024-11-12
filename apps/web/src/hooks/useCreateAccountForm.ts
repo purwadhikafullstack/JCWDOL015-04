@@ -1,4 +1,3 @@
-// hooks/useCreateAccountForm.ts
 import { useState } from 'react';
 import { regUser } from '@/lib/user';
 import { useRouter } from 'next/navigation';
@@ -35,7 +34,6 @@ export const useCreateAccountForm = () => {
       role,
     };
   
-    // Add company data only if role is 'admin'
     if (role === 'admin') {
       data.company_name = companyName;
       data.company_email = companyEmail;

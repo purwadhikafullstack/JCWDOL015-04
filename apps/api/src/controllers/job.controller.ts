@@ -313,19 +313,16 @@ export class JobController {
         return res.status(400).json({ msg: 'User ID and Job ID are required' });
       }
 
-      // Check if job is already saved
       const existingFavorite = await prisma.favorite.findFirst({
         where: { user_id: userId, job_id: jobId },
       });
 
       if (existingFavorite) {
-        // Remove from favorites if already saved
         await prisma.favorite.delete({
           where: { id: existingFavorite.id },
         });
         res.status(200).json({ msg: 'Job removed from favorites' });
       } else {
-        // Save job if not already saved
         await prisma.favorite.create({
           data: {
             user_id: userId,
@@ -356,7 +353,7 @@ export class JobController {
         },
       });
 
-      console.log('Favorites found:', favorites); // Log the retrieved favorites
+      console.log('Favorites found:', favorites);
 
       res.status(200).json({
         status: 'ok',
@@ -414,22 +411,22 @@ export class JobController {
 
   async getTotalJobsCount(req: Request, res: Response) {
     try {
-      const userId = req.user?.user_id; // Get the userId from the token
-      console.log("User ID from token:", userId);  // Log user_id for debugging
+      const userId = req.user?.user_id;
+      console.log("User ID from token:", userId);
   
       if (!userId) {
         return res.status(400).json({ msg: 'User ID is required' });
       }
   
-      // Fetch the total job count for the specific user
+
       const totalJobsCount = await prisma.job.count({
         where: {
-          user_id: userId,  // Correct filter by user_id
+          user_id: userId,
         },
       });
   
       res.status(200).json({
-        totalJobsCount, // Return the total job count
+        totalJobsCount,
       });
     } catch (error) {
       console.error('Error fetching total jobs count:', error);

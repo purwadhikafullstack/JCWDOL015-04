@@ -1,4 +1,3 @@
-// src/app/dashboard-admin-developer/components/SettingCompany.tsx
 import { useState } from 'react';
 import CompanyInfo from './TabCompanySettings/CompanyInfo';
 import FoundingInfo from './TabCompanySettings/FoundingInfo';

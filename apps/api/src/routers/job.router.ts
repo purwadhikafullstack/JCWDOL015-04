@@ -14,7 +14,6 @@ export class JobRouter {
   }
 
   private initializeRoutes(): void {
-    // Specific routes should come before dynamic `/:id` to avoid conflicts
   this.router.get('/company/:companyId', this.jobController.getJobsByCompanyId);
   this.router.get('/applied/count', verifyToken, checkCandidate, this.jobController.getAppliedJobCount);
   this.router.get('/favorites/count', verifyToken, checkCandidate, this.jobController.getFavoriteJobCount);
@@ -22,11 +21,9 @@ export class JobRouter {
   this.router.get('/recently-posted/:userId', verifyToken, checkAdminDev, this.jobController.getRecentlyPostedJobs);
   this.router.get('/total-jobs-count/:userId', verifyToken, this.jobController.getTotalJobsCount);
   
-  // Main job listing and detail routes
   this.router.get('/', this.jobController.getJobs);
   this.router.get('/:id', this.jobController.getJobById);
 
-  // Protected routes for creating and updating jobs (AdminDev access only)
   this.router.post('/', verifyToken, checkAdminDev, this.jobController.createJob);
   this.router.put('/:id', verifyToken, checkAdminDev, this.jobController.updateJob);
 

@@ -12,7 +12,6 @@ export const useSocialLogin = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  // Handle Facebook login
   const handleFacebookLogin = async () => {
     try {
       await supabase.auth.signInWithOAuth({ provider: 'facebook' });
@@ -21,17 +20,14 @@ export const useSocialLogin = () => {
     }
   };
 
-  // Handle Google login (can be implemented if needed)
   const handleGoogleLogin = async () => {
-    // Placeholder for Google login logic
     toast.info('Google login is not yet implemented.');
   };
 
-  // Process the social login session
   const processSocialLogin = async (session: any) => {
     if (!session) return;
 
-    setLoading(true); // Start loading while processing the session
+    setLoading(true);
 
     const { user } = session;
     const userPayload = {

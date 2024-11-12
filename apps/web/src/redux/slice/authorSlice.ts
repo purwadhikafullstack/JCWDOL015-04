@@ -1,4 +1,3 @@
-// authorSlice.ts
 import { deleteToken } from "@/lib/server";
 import { IUserState } from "@/types/iuser";
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';

@@ -1,4 +1,3 @@
-// /src/services/companyService.ts
 import { fetchCompanies } from '@/lib/company';
 import { Company } from '@/types/company';
 import base_url from '../lib/user';

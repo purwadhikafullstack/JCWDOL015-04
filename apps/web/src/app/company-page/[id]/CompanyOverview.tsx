@@ -1,6 +1,6 @@
 'use client';
 import moment from 'moment';
-import { OverviewItem } from '@/app/job-page/[id]/OverviewItem'; // Adjust path as necessary
+import { OverviewItem } from '@/app/job-page/[id]/OverviewItem';
 import {
   FaGlobe,
   FaEnvelope,

@@ -8,7 +8,7 @@ import SaveButton from '../assets/save-button.svg';
 import SavedButton from '../assets/saved-button.svg';
 import { JobCardProps } from '@/types/job';
 import { FiImage } from 'react-icons/fi';
-import { toggleSaveJob } from '@/lib/job'; // Import the toggleSaveJob function
+import { toggleSaveJob } from '@/lib/job';
 
 const FeatureJob = () => {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
@@ -72,9 +72,9 @@ const JobCard = ({ job }: JobCardComponentProps) => {
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSaveClick = async () => {
-    const response = await toggleSaveJob(job.job_id); // Call the toggleSaveJob function
+    const response = await toggleSaveJob(job.job_id);
     if (response.ok) {
-      setIsSaved((prev) => !prev); // Toggle the saved state if the request was successful
+      setIsSaved((prev) => !prev);
     } else {
       console.error(response.msg);
     }

@@ -7,7 +7,6 @@ const TermsAndConditions = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Adjust the offset based on your navbar height
       if (window.scrollY > 120) {
         setIsScrolled(true);
       } else {

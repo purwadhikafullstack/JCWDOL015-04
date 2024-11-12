@@ -1,4 +1,3 @@
-// src/app/company-page/OverviewItem.tsx
 import React from 'react';
 
 interface OverviewItemProps {

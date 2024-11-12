@@ -71,7 +71,6 @@ const SettingAccount = () => {
   };
 
   const handleSaveChanges = async () => {
-    // Validate password fields
     if (passwordFields.newPassword) {
       if (!passwordFields.currentPassword) {
         toast.error('Current password is required to change the password.');
@@ -86,7 +85,6 @@ const SettingAccount = () => {
     setShowSaveConfirm(false);
     setIsEditing(false);
 
-    // Create a FormData object to send data
     const formData = new FormData();
     formData.append('email', email);
     formData.append('phone', phone);
@@ -94,7 +92,7 @@ const SettingAccount = () => {
     formData.append('Newpassword', passwordFields.newPassword);
     formData.append('Confirmpassword', passwordFields.confirmPassword);
 
-    const { result, ok } = await updateUserInfo(formData); // Send data as FormData
+    const { result, ok } = await updateUserInfo(formData);
 
     if (ok) {
       toast.success('Account updated successfully!');

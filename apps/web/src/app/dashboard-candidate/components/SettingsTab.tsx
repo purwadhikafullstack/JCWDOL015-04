@@ -1,5 +1,3 @@
-// src/app/dashboard-candidate/components/SettingsTab.tsx
-
 import { useState } from 'react';
 import SettingPersonal from './TabSetting/SettingPersonal';
 import SettingProfile from './TabSetting/SettingProfile';

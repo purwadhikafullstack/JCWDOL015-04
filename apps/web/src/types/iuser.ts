@@ -6,9 +6,9 @@ export interface IUserReg {
   email: string;
   password: string;
   role: string;
-  company_name?: string; // Optional, only needed for admin
-  company_email?: string; // Optional, only needed for admin
-  country?: string; // Optional, only needed for admin
+  company_name?: string;
+  company_email?: string;
+  country?: string;
 }
 
 
@@ -43,7 +43,7 @@ export interface IUserProfile {
   user_id: number;
   email: string;
   password: string;
-  role: UserRole;  // Enum for role
+  role: UserRole;
   first_name: string;
   last_name: string;
   profile_picture?: string;

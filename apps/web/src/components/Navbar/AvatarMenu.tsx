@@ -16,16 +16,10 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
   const handleProfileClick = () => {
     if (userRole === UserRole.Candidate) {
       router.push('/dashboard-candidate');
-    } else if (userRole === UserRole.Admin || userRole === UserRole.Developer) {
-      router.push('/dashboard-admin-developer');
-    }
-  };
-
-  const handleSettingClick = () => {
-    if (userRole === UserRole.Candidate) {
-      router.push('/dashboard-candidate?tab=account-setting');
-    } else if (userRole === UserRole.Admin || userRole === UserRole.Developer) {
-      router.push('/dashboard-admin-developer');
+    } else if (userRole === UserRole.Developer) {
+      router.push('/dashboard-developer');
+    } else if (userRole === UserRole.Admin) {
+      router.push('/dashboard-admin');
     }
   };
 
@@ -55,20 +49,19 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
       >
-        {userRole === UserRole.Candidate && UserRole.Admin && (
-          <li>
-            <button onClick={handleProfileClick}>Profile</button>
-          </li>
-        )}
+        {/* Profile Button - Conditional on userRole */}
+        <li>
+          <button onClick={handleProfileClick}>Profile</button>
+        </li>
         {userRole === UserRole.Developer && (
-          <li>
-            <button>Assessments</button>
-          </li>
-        )}
-        {userRole === UserRole.Developer && (
-          <li>
-            <button>Subscription</button>
-          </li>
+          <>
+            <li>
+              <button>Assessments</button>
+            </li>
+            <li>
+              <button>Subscription</button>
+            </li>
+          </>
         )}
         <li>
           <button

@@ -1,4 +1,3 @@
-// src/app/dashboard-candidate/components/AppliedJobsTab.tsx
 'use client';
 
 import { useEffect, useState } from 'react';

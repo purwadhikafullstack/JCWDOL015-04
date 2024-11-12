@@ -1,5 +1,3 @@
-// /src/components/CompanyCard.tsx
-
 import { Company } from '@/types/company';
 import Link from 'next/link';
 import Image from 'next/image';

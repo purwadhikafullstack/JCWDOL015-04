@@ -1,13 +1,12 @@
-"use client"
+'use client';
 import { useEffect, useState } from 'react';
 import JobFilterBar from './JobFilterBar';
 import { fetchJobs } from '@/services/jobService';
 import Card from '@/components/Card';
 import { JobCardProps } from '@/types/job';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { fetchUserLocation } from '@/services/locationService'; // --- IMPORTED LOCATION SERVICE ---
+import { fetchUserLocation } from '@/services/locationService';
 
-// Define a type for the location structure
 type Location = { latitude: number; longitude: number } | null;
 
 export default function JobListingsPage() {
@@ -15,11 +14,10 @@ export default function JobListingsPage() {
   const [sortOrder, setSortOrder] = useState('latest');
   const [locationAccessDenied, setLocationAccessDenied] = useState(false);
 
-  // Update location state with the correct type
   const [location, setLocation] = useState<Location>(null);
 
   useEffect(() => {
-    fetchUserLocation(setLocation, setLocationAccessDenied); // --- USING LOCATION SERVICE FUNCTION ---
+    fetchUserLocation(setLocation, setLocationAccessDenied);
   }, []);
 
   const loadJobs = async (
@@ -60,15 +58,15 @@ export default function JobListingsPage() {
 
   useEffect(() => {
     if (location) {
-      loadJobs({}, location.latitude, location.longitude); // --- UPDATED LOADJOBS CALL WITH LOCATION ---
+      loadJobs({}, location.latitude, location.longitude);
     } else {
-      loadJobs(); // Load jobs normally if location is not available
+      loadJobs();
     }
   }, [sortOrder, location]);
 
   const handleSearch = (filters: any) => {
     if (location) {
-      loadJobs(filters, location.latitude, location.longitude); // --- PASS LOCATION IN SEARCH ---
+      loadJobs(filters, location.latitude, location.longitude);
     } else {
       loadJobs(filters);
     }

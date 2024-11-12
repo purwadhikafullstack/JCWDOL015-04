@@ -44,7 +44,6 @@ export class UserController {
 
       const { newUser, newCompany } = createdData;
 
-      // Generate a verification token
       const payload = { id: newUser.user_id };
       const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '60m' });
 
@@ -60,7 +59,6 @@ export class UserController {
         link: `http://localhost:3000/verify/${token}`,
       });
 
-      // Send verification email
       await transporter.sendMail({
         from: process.env.MAIL_USER,
         to: newUser.email,
@@ -68,7 +66,6 @@ export class UserController {
         html: emailHtml,
       });
 
-      // Response to client
       res.status(201).json({
         status: 'ok',
         msg: 'Account created successfully! Please verify your email!',
@@ -256,7 +253,6 @@ export class UserController {
         years_of_experience,
       } = req.body;
 
-      // Access the uploaded profile picture file path
       const profilePictureUrl = req.file
         ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
         : undefined;
@@ -294,15 +290,14 @@ export class UserController {
         hashedPassword = await hash(Newpassword, await genSalt(10));
       }
 
-      // Prepare the data for update, including the profile picture
       const updateData: any = {};
       if (first_name) updateData.first_name = first_name;
       if (last_name) updateData.last_name = last_name;
       if (phone) updateData.phone = phone;
       if (email) {
-        // If the email is being updated, mark `is_verified` as false
+       
         updateData.email = email;
-        updateData.is_verified = false; // Set is_verified to false when email is updated
+        updateData.is_verified = false;
       }
       if (website) updateData.website = website;
       if (title) updateData.title = title;
@@ -328,7 +323,6 @@ export class UserController {
         data: updateData,
       });
 
-      // Send a verification email if the email was updated
       if (email && email !== user.email) {
         const payload = { id: updatedUser.user_id };
         const token = sign(payload, process.env.SECRET_JWT!, {
@@ -348,7 +342,6 @@ export class UserController {
           link: `http://localhost:3000/verify/${token}`,
         });
 
-        // Send the verification email
         await transporter.sendMail({
           from: process.env.MAIL_USER,
           to: updatedUser.email,
@@ -435,21 +428,17 @@ export class UserController {
     try {
       const { email } = req.body;
 
-      // Check if user exists
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         return res
           .status(404)
           .json({ status: 'error', msg: 'User not found!' });
       }
-
-      // Generate a reset token that expires in 15 minutes
       const payload = { id: user.user_id };
       const resetToken = sign(payload, process.env.SECRET_JWT!, {
         expiresIn: '15m',
       });
 
-      // Create reset link
       const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
 
       const templatePath = path.join(
@@ -465,7 +454,6 @@ export class UserController {
         link: resetLink,
       });
 
-      // Send email
       await transporter.sendMail({
         from: process.env.MAIL_USER,
         to: email,
@@ -493,10 +481,8 @@ export class UserController {
           .json({ status: 'error', msg: 'Passwords do not match' });
       }
 
-      // Verify the token
       const decoded = verify(token, process.env.SECRET_JWT!) as { id: number };
 
-      // Fetch the user using decoded token data
       const user = await prisma.user.findUnique({
         where: { user_id: decoded.id },
       });
@@ -506,11 +492,9 @@ export class UserController {
           .json({ status: 'error', msg: 'User not found!' });
       }
 
-      // Hash the new password
       const salt = await genSalt(10);
       const hashedPassword = await hash(newPassword, salt);
 
-      // Update user password and respond
       await prisma.user.update({
         where: { user_id: user.user_id },
         data: { password: hashedPassword },
@@ -531,12 +515,10 @@ export class UserController {
     const { email, first_name, last_name, profile_picture } = req.body;
 
     try {
-      // Check if the user already exists in the MySQL database
       let user = await prisma.user.findUnique({
         where: { email },
       });
 
-      // If the user does not exist, create a new one
       if (!user) {
         user = await prisma.user.create({
           data: {
@@ -545,17 +527,15 @@ export class UserController {
             last_name,
             profile_picture,
             is_verified: true,
-            password: '', // Social login users won't have a password set
-            role: 'candidate', // Assign default role or customize as needed
+            password: '',
+            role: 'candidate',
           },
         });
       }
 
-      // Generate JWT token for the session
       const payload = { user_id: user.user_id, role: user.role };
       const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '1d' });
 
-      // Return the user data and token
       res.status(200).json({
         status: 'ok',
         msg: 'Social login successful',
@@ -615,7 +595,7 @@ export class UserController {
     try {
       const userCount = await prisma.user.count({
         where: {
-          is_verified: true, // Assuming only verified users are considered subscribed
+          is_verified: true, 
         },
       });
       res.status(200).json({ status: 'ok', userCount });

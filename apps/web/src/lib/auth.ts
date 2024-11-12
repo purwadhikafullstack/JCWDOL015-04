@@ -1,4 +1,3 @@
-// src/lib/auth.ts
 import { supabase } from './supabaseClient';
 
 export const signInWithGoogle = async () => {

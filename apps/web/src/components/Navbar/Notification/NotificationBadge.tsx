@@ -1,5 +1,3 @@
-// NotificationModal.tsx
-
 import React from 'react';
 import { Notification as NotificationType } from '@/types/notification';
 

@@ -1,7 +1,7 @@
 "use client"
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Error404 from '@/assets/page404.png'; // Ensure this path is correct
+import Error404 from '@/assets/page404.png';
 
 const NotFoundPage = () => {
   const router = useRouter();

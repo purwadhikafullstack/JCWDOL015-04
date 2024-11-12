@@ -54,7 +54,6 @@ export async function notifyApplicationStatusChange(
   const jobTitle = job?.job_title || 'the position';
   const companyName = job?.company?.company_name || 'the company';
 
-  // Get friendly status labels
   const friendlyCurrentStatus = getFriendlyStatus(currentStatus);
   const friendlyNewStatus = getFriendlyStatus(newStatus);
 

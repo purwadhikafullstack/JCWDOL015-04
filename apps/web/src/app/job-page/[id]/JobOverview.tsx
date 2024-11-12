@@ -1,4 +1,3 @@
-// job-page/[id]/JobOverview.tsx
 import moment from 'moment';
 import { OverviewItem } from '@/app/job-page/[id]/OverviewItem';
 import {

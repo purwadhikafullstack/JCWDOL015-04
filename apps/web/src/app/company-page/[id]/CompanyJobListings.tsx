@@ -10,9 +10,9 @@ interface CompanyJobListingsProps {
 const CompanyJobListings = ({ companyId }: CompanyJobListingsProps) => {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1); // For pagination
-  const [jobsPerPage] = useState(3); // Number of jobs per page
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [jobsPerPage] = useState(3);
+  
   useEffect(() => {
     const fetchJobs = async () => {
       const { jobs: fetchedJobs, ok } = await getJobsByCompanyId(companyId);

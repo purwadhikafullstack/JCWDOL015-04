@@ -28,7 +28,7 @@ const EmailVerification = () => {
         toast.info('User is already verified.');
       } else if (ok) {
         toast.success('Verification email resent successfully!');
-        setCounter(60); // Start countdown after resending
+        setCounter(60);
         router.push('/sign-in');
       } else {
         toast.error(message || 'Failed to resend verification link.');

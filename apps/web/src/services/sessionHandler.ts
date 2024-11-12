@@ -1,4 +1,3 @@
-// services/sessionService.ts
 import { Dispatch } from 'redux';
 import { toast } from 'react-toastify';
 import { loginAction } from '@/redux/slice/authorSlice';

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FiBriefcase } from 'react-icons/fi';
-import { fetchRecentlyPostedJobs } from '@/lib/job'; // Ensure this function is correct
+import { fetchRecentlyPostedJobs } from '@/lib/job';
 import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import moment from 'moment';
@@ -17,10 +17,8 @@ const ViewAllJobsPosted = () => {
       const userResponse = await getUserInfo();
       if (userResponse.ok && userResponse.user) {
         const userId = userResponse.user.user_id;
-
-        // Fetch recently posted jobs using userId
         const recentJobs = await fetchRecentlyPostedJobs(userId);
-        setRecentlyPostedJobs(recentJobs.jobs || []); // Ensure it's an empty array if no jobs are found
+        setRecentlyPostedJobs(recentJobs.jobs || []); 
       } else {
         console.error('Failed to fetch user info');
       }
@@ -29,15 +27,13 @@ const ViewAllJobsPosted = () => {
     fetchData();
   }, []);
 
-  // Calculate the jobs to display on the current page
+  
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = recentlyPostedJobs.slice(indexOfFirstJob, indexOfLastJob); // Safely using slice
+  const currentJobs = recentlyPostedJobs.slice(indexOfFirstJob, indexOfLastJob);
 
-  // Determine the total number of pages
   const totalPages = Math.ceil(recentlyPostedJobs.length / jobsPerPage);
 
-  // Handle page navigation
   const handlePreviousPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };

@@ -1,4 +1,3 @@
-// Notification.tsx
 import React, { useEffect, useState } from 'react';
 import { getUnreadNotifications, markNotificationAsRead } from '@/lib/notificationApi';
 import { Notification as NotificationType } from '@/types/notification';
@@ -83,7 +82,7 @@ const Notification: React.FC = () => {
               <li
                 key={notification.notification_id}
                 className="flex items-start p-4 hover:bg-gray-100 border-b border-gray-200 cursor-pointer"
-                onClick={() => openNotificationModal(notification)} // Open modal on click
+                onClick={() => openNotificationModal(notification)} 
               >
                 {/* Notification Icon */}
                 <div className="mr-3">

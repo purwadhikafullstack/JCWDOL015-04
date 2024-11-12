@@ -2,7 +2,6 @@ export const toProperCase = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-// Country names mapping for conversion
 export const getCountryName = (code: string): string => {
   const countryNames: { [key: string]: string } = {
     ID: 'Indonesia',
@@ -17,7 +16,6 @@ export const getCountryName = (code: string): string => {
   return countryNames[code] || code;
 };
 
-// Job category names mapping for display
 export const getJobTypeName = (jobType: string): string => {
   const typesNames: { [key: string]: string } = {
     fullTime: 'Full-Time',
@@ -96,7 +94,6 @@ export const jobExperienceLevels = [
   { value: 'expert', label: 'Expert' },
 ];
 
-// Industry options for dropdowns
 export const industryOptions = [
   { value: 'TECHNOLOGY', label: 'Technology' },
   { value: 'FINANCE', label: 'Finance' },

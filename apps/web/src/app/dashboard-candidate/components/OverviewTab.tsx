@@ -1,5 +1,3 @@
-// src/app/dashboard-candidate/components/OverviewTab.tsx
-
 import { ReactNode, useEffect, useState } from 'react';
 import { FiBriefcase, FiBookmark } from 'react-icons/fi';
 import {

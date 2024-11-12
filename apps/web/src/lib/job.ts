@@ -2,7 +2,6 @@ import { FavoriteJob, Job } from '@/types/job';
 import { getToken } from './server';
 import base_url from './user';
 
-// Function to get all jobs with optional filters
 export const getJobs = async (
   filters: {
     search?: string;
@@ -41,7 +40,6 @@ export const getJobs = async (
   }
 };
 
-// Function to get a single job by ID
 export const getJobById = async (
   jobId: string,
 ): Promise<{ job: Job | null; ok: boolean }> => {
@@ -115,18 +113,18 @@ export const fetchFavoriteJobs = async (
 };
 
 export const fetchTotalJobsCount = async (userId: number) => {
-  const token = await getToken();  // Retrieve the token
+  const token = await getToken(); 
   if (!token) {
     console.error('No token found');
-    return { totalJobsCount: 0, ok: false }; // Early return if no token
+    return { totalJobsCount: 0, ok: false }; 
   }
 
   try {
     const res = await fetch(`${base_url}/jobs/total-jobs-count/${userId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,  // Pass token in the Authorization header
-        'Content-Type': 'application/json',   // Ensure correct content type
+        'Authorization': `Bearer ${token}`, 
+        'Content-Type': 'application/json',
       },
     });
     const result = await res.json();

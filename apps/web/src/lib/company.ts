@@ -1,4 +1,3 @@
-// /src/lib/company.ts
 import { Company } from '@/types/company';
 import { Job } from '@/types/job';
 import base_url from './user';

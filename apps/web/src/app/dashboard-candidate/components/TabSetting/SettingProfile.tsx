@@ -17,7 +17,6 @@ const SettingProfile = () => {
   const [tempatLahir, setTempatLahir] = useState('');
   const [skills, setSkills] = useState('');
 
-  // Fetch user info when the component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       const { user, ok } = await getUserInfo();
@@ -39,7 +38,6 @@ const SettingProfile = () => {
     fetchUserData();
   }, []);
 
-  // Toggle edit mode
   const toggleEditMode = () => {
     if (isEditing) {
       handleSaveChanges();
@@ -47,7 +45,6 @@ const SettingProfile = () => {
     setIsEditing(!isEditing);
   };
 
-  // Handle saving changes
   const handleSaveChanges = async () => {
     const formData = new FormData();
     formData.append('nationality', nationality);
@@ -134,15 +131,11 @@ const SettingProfile = () => {
             value={country}
             onChange={(e) => setCountry(e.target.value)}
           >
-            <option value="">Select...</option>
-            <option value="ID">Indonesia</option>
-            <option value="SG">Singapore</option>
-            <option value="MY">Malaysia</option>
-            <option value="US">United States</option>
-            <option value="GB">United Kingdom</option>
-            <option value="DE">Germany</option>
-            <option value="JP">Japan</option>
-            <option value="CN">China</option>
+            {countryOptions.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.name}
+              </option>
+            ))}
           </select>
         </div>
         <div>

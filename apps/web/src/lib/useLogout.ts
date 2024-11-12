@@ -10,9 +10,9 @@ const useLogout = () => {
 
   const logout = async () => {
     toast.success('Logged out successfully!');
-    await deleteToken(); // Call your token deletion logic
-    dispatch(logoutAction()); // Dispatch the logout action
-    router.push('/'); // Redirect to the home page
+    await deleteToken();
+    dispatch(logoutAction());
+    router.push('/');
   };
 
   return logout;
