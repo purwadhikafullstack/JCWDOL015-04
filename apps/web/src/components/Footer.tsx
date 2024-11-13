@@ -17,14 +17,16 @@ export const Footer = () => {
             <h2 className="text-white text-lg font-bold mb-4">HireMe</h2>
             <p className="text-sm">
               Call now:{' '}
-              <Link href="tel:3195550115" className="text-white">
-                (319) 555-0115
+              <Link href="tel:+60327789000" className="text-white">
+                (+60) 3 2778 9000
               </Link>
             </p>
+            <p className="text-sm">HireMe.com Sdn Bhd</p>
             <p className="text-sm">
-              6391 Elgin St. Celina, Delaware 10299, New York, United States of
-              America
+              Lv 16, Menara AIA Cap Square,
             </p>
+            <p className="text-sm">No. 10, Jalan Munshi Abdullah</p>
+            <p className="text-sm">Kuala Lumpur 50100</p>
           </div>
 
           {/* Quick Link section */}
@@ -39,7 +41,7 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/contact-support" className="hover:text-white">
                   Contact
                 </Link>
               </li>

@@ -15,6 +15,8 @@ export class NotificationRouter {
   private initializeRoutes(): void {
     this.router.get('/', verifyToken, this.notificationController.getUserNotifications);
     this.router.patch('/:notificationId/read', verifyToken, this.notificationController.markAsRead);
+    this.router.patch('/mark-all-read', verifyToken, this.notificationController.markAllAsRead);
+
   }
 
   getRouter(): Router {

@@ -130,7 +130,7 @@ export const updateUserInfo = async (data: FormData): Promise<{ result: any; ok:
     return { result, ok: res.ok };
   } catch (error) {
     console.error('Error updating user info:', error);
-    return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
+    return { result: { status: 'error', msg: 'An error occurred on updating profile, maybe image too large maximum 1MB' }, ok: false };
   }
 };
 

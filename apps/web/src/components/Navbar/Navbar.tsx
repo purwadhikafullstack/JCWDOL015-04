@@ -30,6 +30,10 @@ const Navbar = () => {
     router.push('/');
   };
 
+  const handleCloseMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <nav className="bg-white shadow-md z-50 fixed w-full top-0 lg:relative">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -81,6 +85,7 @@ const Navbar = () => {
           isLoggedIn={isLoggedIn}
           userRole={user.role as UserRole | null}
           onLogout={onLogout}
+          onClose={handleCloseMenu}
         />
       )}
     </nav>

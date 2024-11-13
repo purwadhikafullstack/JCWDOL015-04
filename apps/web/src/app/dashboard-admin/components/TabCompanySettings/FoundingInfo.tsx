@@ -1,98 +1,63 @@
 import { useState, useEffect } from 'react';
 import { fetchUserCompany, updateCompany } from '@/lib/company';
+import { countryOptions, industryOptions } from '@/utils/format';
 import { toast } from 'react-toastify';
-import { countryOptions, industryOptions } from '@/utils/format'; 
-import { formatNumberWithCommas } from '@/utils/format';
 
 const FoundingInfo = () => {
   const [companyId, setCompanyId] = useState<string | null>(null);
-  const [organizationType, setOrganizationType] = useState('');
-  const [industryType, setIndustryType] = useState('');
   const [country, setCountry] = useState('');
-  const [address, setAddress] = useState('');
+  const [officeAddress, setOfficeAddress] = useState('');
+  const [industryType, setIndustryType] = useState('');
   const [teamSize, setTeamSize] = useState('');
-  const [yearOfEstablishment, setYearOfEstablishment] = useState('');
-  const [companyWebsite, setCompanyWebsite] = useState('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [yearOfEstablish, setYearOfEstablish] = useState('');
+  const [website, setWebsite] = useState('');
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchCompanyData = async () => {
-      try {
-        const { company, ok } = await fetchUserCompany();
-        if (ok && company) {
-          setCompanyId(company.company_id.toString());
-          setOrganizationType(company.company_name);
-          setIndustryType(company.IndustryType || '');
-          setCountry(company.country || '');
-          setAddress(company.address || '');
-          setTeamSize(company.TeamSize ? String(company.TeamSize) : '');
-          setYearOfEstablishment(company.yearOfEstablish || '');
-          setCompanyWebsite(company.website || '');
-        } else {
-          setError('Failed to fetch company data.');
-        }
-      } catch (error) {
-        console.error('Error fetching company data:', error);
-        setError('An error occurred while fetching company data.');
-      } finally {
-        setLoading(false);
+      const { company, ok } = await fetchUserCompany();
+      if (ok && company) {
+        setCompanyId(company.company_id.toString());
+        setCountry(company.country || '');
+        setOfficeAddress(company.address || '');
+        setIndustryType(company.IndustryType || '');
+        setTeamSize(company.TeamSize || '');
+        setYearOfEstablish(company.yearOfEstablish || '');
+        setWebsite(company.website || '');
+      } else {
+        toast.error('Failed to fetch company data');
       }
+      setLoading(false);
     };
-
     fetchCompanyData();
   }, []);
 
   const handleEditToggle = () => setIsEditing(!isEditing);
 
   const handleSaveChanges = async () => {
-    if (!isEditing || !companyId) return;
-
-    // Ensure that no required fields are empty before submitting
-    if (!organizationType || !yearOfEstablishment || !companyWebsite || !country) {
-      toast.error('Please fill all the required fields.');
-      return;
-    }
+    if (!companyId) return;
 
     const formData = new FormData();
-    formData.append('company_name', organizationType);
-    formData.append('IndustryType', industryType);
     formData.append('country', country);
-    formData.append('address', address);
+    formData.append('address', officeAddress);
+    formData.append('IndustryType', industryType);
     formData.append('TeamSize', teamSize);
-    formData.append('yearOfEstablish', yearOfEstablishment);
-    formData.append('website', companyWebsite);
+    formData.append('yearOfEstablish', yearOfEstablish);
+    formData.append('website', website);
 
-    try {
-      const { company, ok } = await updateCompany(companyId, formData);
+    const { company, ok } = await updateCompany(companyId, formData);
 
-      if (ok && company) {
-        // Update state after successful update
-        setOrganizationType(company?.company_name || '');
-        setIndustryType(company?.IndustryType || '');
-        setCountry(company?.country || '');
-        setAddress(company?.address || '');
-        setTeamSize(company?.TeamSize || '');
-        setYearOfEstablishment(company?.yearOfEstablish || '');
-        setCompanyWebsite(company?.website || '');
-
-        toast.success('Company information updated successfully');
-        setIsEditing(false);
-      } else {
-        toast.error('Failed to update company information');
-      }
-    } catch (error) {
-      toast.error('An error occurred while updating company information');
+    if (ok) {
+      toast.success('Company information updated successfully');
+      setIsEditing(false);
+    } else {
+      toast.error('Failed to update company information');
     }
   };
 
   if (loading) {
     return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
   }
 
   return (
@@ -121,8 +86,8 @@ const FoundingInfo = () => {
             type="text"
             className="input input-bordered w-full"
             placeholder="Office address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={officeAddress}
+            onChange={(e) => setOfficeAddress(e.target.value)}
             disabled={!isEditing}
           />
         </div>
@@ -149,7 +114,7 @@ const FoundingInfo = () => {
             type="text"
             className="input input-bordered w-full"
             placeholder="Enter Team Size"
-            value={(teamSize)}
+            value={teamSize}
             onChange={(e) => setTeamSize(e.target.value)}
             disabled={!isEditing}
           />
@@ -161,8 +126,8 @@ const FoundingInfo = () => {
             type="text"
             className="input input-bordered w-full"
             placeholder="Enter Year of Establishment"
-            value={yearOfEstablishment}
-            onChange={(e) => setYearOfEstablishment(e.target.value)}
+            value={yearOfEstablish}
+            onChange={(e) => setYearOfEstablish(e.target.value)}
             disabled={!isEditing}
           />
         </div>
@@ -173,8 +138,8 @@ const FoundingInfo = () => {
             type="url"
             className="input input-bordered w-full"
             placeholder="Enter Company Website"
-            value={companyWebsite}
-            onChange={(e) => setCompanyWebsite(e.target.value)}
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
             disabled={!isEditing}
           />
         </div>

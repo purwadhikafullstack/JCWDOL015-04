@@ -136,18 +136,6 @@ const SocialMediaLink = () => {
             disabled={!isEditing}
           />
         </div>
-
-        <div>
-          <label className="block text-gray-600 mb-2">Website</label>
-          <input
-            type="url"
-            className="input input-bordered w-full"
-            placeholder="Enter Website URL"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            disabled={!isEditing}
-          />
-        </div>
       </div>
       <button
         onClick={isEditing ? handleSaveChanges : handleEditToggle}

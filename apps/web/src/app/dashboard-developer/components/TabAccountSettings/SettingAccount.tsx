@@ -17,8 +17,6 @@ const SettingAccount = () => {
 
   const [email, setEmail] = useState('');
   const [initialEmail, setInitialEmail] = useState(email);
-  const [phone, setPhone] = useState('');
-  const [initialPhone, setInitialPhone] = useState(phone);
 
   const [passwordFields, setPasswordFields] = useState({
     currentPassword: '',
@@ -34,9 +32,7 @@ const SettingAccount = () => {
       const { user, ok } = await getUserInfo();
       if (ok && user) {
         setEmail(user.email || '');
-        setPhone(user.phone || '');
         setInitialEmail(user.email || '');
-        setInitialPhone(user.phone || '');
       } else {
         toast.error('Failed to load account data');
       }
@@ -48,7 +44,6 @@ const SettingAccount = () => {
     if (
       isEditing &&
       (email !== initialEmail ||
-        phone !== initialPhone ||
         passwordFields.newPassword ||
         passwordFields.currentPassword ||
         passwordFields.confirmPassword)
@@ -57,7 +52,6 @@ const SettingAccount = () => {
     } else {
       setIsEditing(!isEditing);
       setInitialEmail(email);
-      setInitialPhone(phone);
       setPasswordFields({
         currentPassword: '',
         newPassword: '',
@@ -87,7 +81,6 @@ const SettingAccount = () => {
 
     const formData = new FormData();
     formData.append('email', email);
-    formData.append('phone', phone);
     formData.append('currentPassword', passwordFields.currentPassword);
     formData.append('Newpassword', passwordFields.newPassword);
     formData.append('Confirmpassword', passwordFields.confirmPassword);
@@ -97,7 +90,6 @@ const SettingAccount = () => {
     if (ok) {
       toast.success('Account updated successfully!');
       setInitialEmail(email);
-      setInitialPhone(phone);
     } else {
       toast.error(result.msg || 'Failed to update account');
     }
@@ -124,17 +116,6 @@ const SettingAccount = () => {
         Contact Info
       </h3>
       <div>
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-gray-600 mt-3">Phone</label>
-            <input
-              type="text"
-              className="input input-bordered w-full mt-2"
-              placeholder="Phone number.."
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={!isEditing}
-            />
-        </div>
         <div className="col-span-1 md:col-span-2">
           <label className="block text-gray-600 mt-3">Email</label>
           <input

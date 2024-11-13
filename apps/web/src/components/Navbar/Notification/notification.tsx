@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getUnreadNotifications, markNotificationAsRead } from '@/lib/notificationApi';
+import React, { useEffect, useRef, useState } from 'react';
+import { getUnreadNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/notificationApi';
 import { Notification as NotificationType } from '@/types/notification';
 import { BsBell } from 'react-icons/bs';
 import NotificationModal from './NotificationModal';
@@ -13,6 +13,7 @@ const Notification: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<NotificationType | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchUnreadNotifications() {
@@ -24,6 +25,25 @@ const Notification: React.FC = () => {
     }
     fetchUnreadNotifications();
   }, []);
+
+  useEffect(() => {
+    // Close the dropdown when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -53,8 +73,21 @@ const Notification: React.FC = () => {
     }
   };
 
+  const markAllAsRead = async () => {
+    const { ok } = await markAllNotificationsAsRead();
+    if (ok) {
+      setNotifications(prevNotifications =>
+        prevNotifications.map(notification => ({
+          ...notification,
+          is_read: true,
+        }))
+      );
+      setUnreadCount(0);
+    }
+  };
+
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       {/* Notification Bell Icon */}
       <button onClick={toggleDropdown} className="relative btn btn-ghost btn-circle">
         <BsBell size={24} />
@@ -72,7 +105,7 @@ const Notification: React.FC = () => {
             <h3 className="text-lg font-semibold">Notifications</h3>
             <button
               className="text-sm text-blue-500 hover:underline"
-              onClick={() => notifications.forEach(notification => handleMarkAsRead(notification.notification_id))}
+              onClick={markAllAsRead}
             >
               Mark all as read
             </button>
@@ -82,7 +115,7 @@ const Notification: React.FC = () => {
               <li
                 key={notification.notification_id}
                 className="flex items-start p-4 hover:bg-gray-100 border-b border-gray-200 cursor-pointer"
-                onClick={() => openNotificationModal(notification)} 
+                onClick={() => openNotificationModal(notification)}
               >
                 {/* Notification Icon */}
                 <div className="mr-3">

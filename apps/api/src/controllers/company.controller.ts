@@ -95,7 +95,7 @@ export class CompanyController {
         description,
       } = req.body;
       console.log(req.body);
-      const teamSizeString = String(TeamSize);
+
       const logoUrl = req.files?.logo?.[0]
         ? `http://localhost:8000/api/public/company_logos/${req.files.logo[0].filename}`
         : undefined;
@@ -116,9 +116,9 @@ export class CompanyController {
           instagram,
           twitter,
           facebook,
-          yearOfEstablish: String(yearOfEstablish),
+          yearOfEstablish,
           IndustryType,
-          TeamSize: teamSizeString,
+          TeamSize,
           country,
           address,
           description,
@@ -187,7 +187,7 @@ export class CompanyController {
       }
   
       if (TeamSize) {
-        filter.TeamSize as string}
+        filter.TeamSize};
   
       const orderBy: Prisma.CompanyOrderByWithRelationInput = {
         created_at: dateRange === 'latest' ? 'desc' : 'asc',
@@ -258,16 +258,17 @@ export class CompanyController {
         });
       }
 
+      // Fetch companies associated with the authenticated user
       const company = await prisma.company.findFirst({
         where: {
           users: {
             some: {
-              user_id: userId,
+              user_id: userId, // User associated with the company
             },
           },
         },
         include: {
-          users: true,  
+          users: true,  // You can include more relations if necessary
         },
       });
 
@@ -278,6 +279,7 @@ export class CompanyController {
         });
       }
 
+      // Return the company data
       res.status(200).json({
         status: 'ok',
         company,

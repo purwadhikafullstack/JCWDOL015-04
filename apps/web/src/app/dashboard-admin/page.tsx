@@ -12,6 +12,7 @@ import CompanySettings from './components/SettingCompany';
 import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ViewAllJobsPosted from './components/VIewAllJobs';
+import SettingsTab from './components/SettingAccount';
 
 const AdminDashboard = () => {
   const searchParams = useSearchParams();
@@ -61,6 +62,8 @@ const AdminDashboard = () => {
         return <ViewAllJobsPosted />;
       case 'SettingCompany':
         return <CompanySettings />;
+      case 'accountSettings':
+        return <SettingsTab />;
       default:
         return <OverviewTab setSelectedTab={setSelectedTab} />;
     }

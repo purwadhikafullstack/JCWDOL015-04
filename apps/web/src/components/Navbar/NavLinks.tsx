@@ -17,7 +17,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
         <li><Link href="/dashboard-admin" className="hover:text-Primary-blue">Dashboard</Link></li>
         <li><Link href="/my-jobs" className="hover:text-Primary-blue">My Jobs</Link></li>
         <li><Link href="/applications" className="hover:text-Primary-blue">Applications</Link></li>
-        <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
+        <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );
   }
@@ -26,7 +26,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
       <>
         <li><Link href="/assessment-page" className="hover:text-Primary-blue">Dashboard Assessments</Link></li>
         <li><Link href="/Subscription" className="hover:text-Primary-blue">Subscription</Link></li>
-        <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
+        <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );
   }
@@ -36,7 +36,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
         <li><Link href="/job-page" className="hover:text-Primary-blue">Find Job</Link></li>
         <li><Link href="/company-page" className="hover:text-Primary-blue">Find Employers</Link></li>
         <li><Link href="/dashboard-candidate" className="hover:text-Primary-blue">Dashboard</Link></li>
-        <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
+        <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );
   }
@@ -46,7 +46,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
       <li><Link href="/company-page" className="hover:text-Primary-blue">Find Employers</Link></li>
       <li><Link href="/candidates" className="hover:text-Primary-blue">Candidates</Link></li>
       <li><Link href="/pricing-plans" className="hover:text-Primary-blue">Pricing Plans</Link></li>
-      <li><Link href="/support" className="hover:text-Primary-blue">Customer Supports</Link></li>
+      <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
     </>
   );
 };

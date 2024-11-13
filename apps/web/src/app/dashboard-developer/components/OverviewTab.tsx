@@ -60,13 +60,7 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
         <p className="text-gray-600">Welcome to your dashboard</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
-        <SummaryCard
-          color="bg-blue-50"
-          icon={<FiBriefcase className="text-blue-500 text-3xl" />}
-          count={totalJobPostCount}
-          label="Total Jobs Posted"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 justify-center">
         <SummaryCard
           color="bg-yellow-50"
           icon={<FiBookmark className="text-yellow-500 text-3xl" />}
