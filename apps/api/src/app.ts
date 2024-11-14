@@ -5,11 +5,16 @@ import express, {
   Request,
   Response,
   NextFunction,
-  Router,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { UserRouter } from './routers/user.router';
+import { JobRouter } from './routers/job.router';
+import { NotificationRouter } from './routers/notification.router';
+import { ApplicationRouter } from './routers/application.router';
+import { FavoriteJobRouter } from './routers/favoriteJob.router';
+import { CompanyRouter } from './routers/company.router';
+import { base_fe_url } from './controllers/user.controller';
 
 export default class App {
   private app: Express;
@@ -22,9 +27,10 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors());
+    this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
+    this.app.use('/api/public', express.static('public'));
   }
 
   private handleError(): void {
@@ -51,18 +57,28 @@ export default class App {
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
+    const userRouter = new UserRouter();
+    const jobRouter = new JobRouter();
+    const notificationRouter = new NotificationRouter();
+    const applicationRouter = new ApplicationRouter();
+    const favoriteJobRouter = new FavoriteJobRouter();
+    const companyRouter = new CompanyRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/user', userRouter.getRouter());
+    this.app.use('/api/jobs', jobRouter.getRouter());
+    this.app.use('/api/notifications', notificationRouter.getRouter());
+    this.app.use('/api/applications', applicationRouter.getRouter());
+    this.app.use('/api/favorite-job', favoriteJobRouter.getRouter());
+    this.app.use('/api/companies', companyRouter.getRouter());
   }
 
   public start(): void {
     this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
     });
   }
 }
