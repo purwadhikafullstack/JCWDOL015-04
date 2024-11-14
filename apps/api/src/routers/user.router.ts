@@ -31,6 +31,12 @@ export class UserRouter {
     this.router.post('/resend-verification', this.userController.resendVerificationLink);
     this.router.post('/request-password-reset', this.userController.requestPasswordReset);
     this.router.post('/reset-password', this.userController.resetPassword);
+
+    // Social login route
+    this.router.post('/social-login', this.userController.socialLogin.bind(this.userController));
+
+    this.router.delete('/delete', verifyToken, this.userController.deleteUser.bind(this.userController));
+    
   }
 
   getRouter(): Router {

@@ -32,16 +32,10 @@ enum InterviewStatus {
   canceled
 }
 
-// Enum for Subscription Type
-enum SubscriptionType {
-  standard
-  professional
-}
-
 // Enum for Subscription Status
 enum SubscriptionStatus {
   active
-  expired
+  inactive
 }
 
 // Enum for Assessment Status
@@ -247,6 +241,7 @@ model User {
   paymentTransactions     PaymentTransaction[]
   userAssessmentResponses UserAssessmentResponse[]
   jobs                    Job[]
+  SubscriptionType        SubscriptionType[]
 
   @@index([email])
 }
@@ -337,22 +332,39 @@ model Application {
   @@index([user_id])
 }
 
-// Subscription model
-model Subscription {
-  subscription_id   Int                @id @default(autoincrement())
-  subscription_type SubscriptionType
-  start_date        DateTime
-  end_date          DateTime
-  status            SubscriptionStatus
-  payment_proof     String?
-  created_at        DateTime           @default(now())
-  updated_at        DateTime           @updatedAt
-  amount            Decimal?
+// Tipe Subscription
+model SubscriptionType {
+  subs_type_id Int     @id @default(autoincrement())
+  type         String
+  description  String
+  price        Decimal
+  features     Json
+  is_recomend  Boolean @default(false)
 
   // Relations
-  user                User                 @relation(fields: [user_id], references: [user_id])
-  user_id             Int
-  paymentTransactions PaymentTransaction[] // Back-reference to PaymentTransaction
+  subscriptions      Subscription[]
+  User               User?                @relation(fields: [User_id], references: [user_id])
+  User_id            Int?
+  PaymentTransaction PaymentTransaction[]
+}
+
+// Subscription model
+model Subscription {
+  subscription_id Int                 @id @default(autoincrement())
+  start_date      DateTime?
+  end_date        DateTime?
+  status          SubscriptionStatus?
+  payment_proof   Boolean?
+  created_at      DateTime            @default(now())
+  updated_at      DateTime            @updatedAt
+  amount          Decimal?
+
+  // Relations
+  user                 User?                @relation(fields: [user_id], references: [user_id])
+  user_id              Int?
+  subscriptionType     SubscriptionType     @relation(fields: [subscription_type_id], references: [subs_type_id])
+  subscription_type_id Int
+  paymentTransactions  PaymentTransaction[] // Back-reference to PaymentTransaction
 
   @@index([user_id])
   @@index([status, end_date])
@@ -381,14 +393,17 @@ model SkillAssessment {
 
 // Review model
 model Review {
-  review_id       Int      @id @default(autoincrement())
-  rating          Int
-  comment         String?  @db.Text()
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  salary_estimate Decimal?
-  position        String?
-  is_anonymous    Boolean
+  review_id                 Int      @id @default(autoincrement())
+  rating                    Int?
+  comment                   String?  @db.Text()
+  created_at                DateTime @default(now())
+  updated_at                DateTime @updatedAt
+  salary_estimate           Decimal?
+  position                  String?
+  workCultureRating         Int
+  workLifeBalanceRating     Int
+  facilitiesRating          Int
+  careerOpportunitiesRating Int
 
   // Relations
   user       User    @relation(fields: [user_id], references: [user_id])
@@ -566,18 +581,20 @@ model JobSave {
 
 // PaymentTransaction model
 model PaymentTransaction {
-  transaction_id   Int               @id @default(autoincrement())
-  user             User              @relation(fields: [user_id], references: [user_id])
-  user_id          Int
-  amount           Decimal
-  transaction_date DateTime          @default(now())
-  status           TransactionStatus
-  payment_method   PaymentMethod?
-  receipt          String?
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @updatedAt
-  subscription_id  Int?
-  subscription     Subscription?     @relation(fields: [subscription_id], references: [subscription_id])
+  transaction_id       Int               @id @default(autoincrement())
+  user                 User              @relation(fields: [user_id], references: [user_id])
+  user_id              Int
+  amount               Decimal
+  transaction_date     DateTime          @default(now())
+  status               TransactionStatus @default(pending)
+  payment_method       PaymentMethod?    @default(bank_transfer)
+  receipt              String?
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
+  subscription_id      Int?
+  subscription         Subscription?     @relation(fields: [subscription_id], references: [subscription_id])
+  subscriptionType     SubscriptionType  @relation(fields: [subscription_type_id], references: [subs_type_id])
+  subscription_type_id Int
 
   @@index([user_id])
 }

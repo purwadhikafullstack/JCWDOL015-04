@@ -9,8 +9,11 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
+import { SubsTypeRouter } from './routers/plan.router';
+import { ReviewRouter } from './routers/review.router';
+import { SubscriptionRouter } from './routers/subscript.router';
+import { PaymentRouter } from './routers/payment.router';
 import { UserRouter } from './routers/user.router';
-import { JobRouter } from './routers/job.router';
 
 export default class App {
   private app: Express;
@@ -53,15 +56,22 @@ export default class App {
   }
 
   private routes(): void {
+
+    const planRouter = new SubsTypeRouter();
+    const reviewRouter = new ReviewRouter();
+    const subscriptRouter = new SubscriptionRouter();
+    const paymentRouter = new PaymentRouter();
     const userRouter = new UserRouter();
-    const jobRouter = new JobRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
     this.app.use('/api/user', userRouter.getRouter());
-    this.app.use('/api/jobs', jobRouter.getRouter());
+    this.app.use('/api/plans', planRouter.getRouter());
+    this.app.use('/api/review', reviewRouter.getRouter());
+    this.app.use('/api/subscription', subscriptRouter.getRouter());
+    this.app.use('/api/payment', paymentRouter.getRouter());
   }
 
   public start(): void {

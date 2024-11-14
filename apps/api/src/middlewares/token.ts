@@ -1,11 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
-type IUser = {
-  user_id: number;
-  role: string;
-};
-
 export const verifyToken = async (
   req: Request,
   res: Response,
@@ -18,7 +13,8 @@ export const verifyToken = async (
 
     const verifiedToken = verify(token, process.env.SECRET_JWT!);
 
-    req.user = verifiedToken as IUser;
+    // Isi user ke dalam req.user
+    req.user = verifiedToken as User;
 
     next();
   } catch (err) {

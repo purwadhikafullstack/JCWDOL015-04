@@ -8,14 +8,15 @@ type FileNameCallback = (error: Error | null, filename: string) => void;
 
 export const uploader = (
   filePrefix: string,
-  fileType: 'resume' | 'profile_picture' | 'company_logo' | 'company_banner'
+  fileType: 'resume' | 'profile_picture' | 'logo' | 'banner' | 'payment'
 ) => {
   // Define default directories for each file type
   const directories = {
     resume: path.join(__dirname, '../../public/resumes'),
     profile_picture: path.join(__dirname, '../../public/profile_pictures'),
-    company_logo: path.join(__dirname, '../../public/company_logos'),
-    company_banner: path.join(__dirname, '../../public/company_banners'),
+    logo: path.join(__dirname, '../../public/company_logos'),
+    banner: path.join(__dirname, '../../public/company_banners'),
+    payment: path.join(__dirname, '../../public/payment-proof'),
   };
 
   // Get the directory based on the fileType
@@ -29,27 +30,21 @@ export const uploader = (
   };
 
   const storage = multer.diskStorage({
-    destination: (
-      req: Request,
-      file: Express.Multer.File,
-      cb: DestinationCallback,
-    ) => {
-      // Ensure the appropriate folder exists
+    destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
       ensureFolderExists(defaultDir);
+      console.log(`Saving file to: ${defaultDir}`);
       cb(null, defaultDir);
     },
-    filename: (
-      req: Request,
-      file: Express.Multer.File,
-      cb: FileNameCallback,
-    ) => {
+    filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
       const originalNameParts = file.originalname.split('.');
-      const fileExtension =
-        originalNameParts[originalNameParts.length - 1].toLowerCase();
+      const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
       const newFileName = `${filePrefix}_${Date.now()}.${fileExtension}`;
+      console.log(`Generated filename: ${newFileName}`);
       cb(null, newFileName);
     },
   });
+  
+  
 
   // File filter for validation based on the type
   const fileFilter = (
@@ -58,21 +53,24 @@ export const uploader = (
     cb: FileFilterCallback,
   ) => {
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    const fileExtension = file.mimetype;
-
-    if (fileType === 'resume' && fileExtension === 'application/pdf') {
-      cb(null, true); // Allow PDF for resume
-    } else if (
-      (fileType === 'profile_picture' || fileType === 'company_logo' || fileType === 'company_banner') &&
-      allowedImageTypes.includes(fileExtension)
+    const allowedDocumentTypes = ['application/pdf'];
+  
+    if (
+      (fileType === 'profile_picture' || fileType === 'logo' || fileType === 'banner') &&
+      allowedImageTypes.includes(file.mimetype)
     ) {
       cb(null, true);
+    } else if (fileType === 'resume' && allowedDocumentTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else if (fileType === 'payment' && allowedImageTypes.includes(file.mimetype)) {
+      cb(null, true);
     } else {
-      cb(null, false);
+      cb(new Error('Invalid file type'));
     }
   };
+  
 
-  // Define max file size (e.g., 5 MB for images and resume)
+  // Define max file size
   const maxSize = fileType === 'profile_picture' ? 1 * 1024 * 1024 : 5 * 1024 * 1024; // 1MB for profile pictures, 5MB for others
 
   return multer({
