@@ -282,6 +282,7 @@ model User {
   userAssessmentResponses UserAssessmentResponse[]
   jobs                    Job[]
   Favorite                Favorite[]
+  testResults         TestResult[]
 
   @@index([email])
 }
@@ -345,6 +346,8 @@ model Job {
   User         User?         @relation(fields: [User_id], references: [user_id])
   User_id      Int?
   Favorite     Favorite[]
+  preSelectionTest PreSelectionTest?
+  testResults      TestResult[]
 
   @@index([company_id])
   @@index([is_active, jobCategory])
@@ -646,4 +649,37 @@ model Interview {
   updated_at       DateTime        @updatedAt
 
   @@index([application_id])
+}
+
+model PreSelectionTest {
+  test_id          Int               @id @default(autoincrement())
+  job_id           Int               @unique
+  questions        TestQuestion[]
+  job              Job               @relation(fields: [job_id], references: [job_id])
+}
+
+model TestQuestion {
+  question_id      Int               @id @default(autoincrement())
+  test_id          Int
+  question_text    String
+  options          TestOption[]      
+  correct_answer   Int               
+  preSelectionTest PreSelectionTest  @relation(fields: [test_id], references: [test_id])
+}
+
+model TestResult {
+  result_id        Int               @id @default(autoincrement())
+  user_id          Int
+  job_id           Int
+  score            Int               // Skor dari total 30 poin
+  completed_at     DateTime          @default(now())
+  job              Job               @relation(fields: [job_id], references: [job_id])
+  user             User              @relation(fields: [user_id], references: [user_id])
+}
+
+model TestOption {
+  option_id        Int               @id @default(autoincrement())
+  question_id      Int
+  option_text      String
+  testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
 }
