@@ -7,6 +7,9 @@ import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
 
+export const base_url = process.env.BASE_API_URL
+export const base_fe_url = process.env.BASE_FE_URL
+
 export class UserController {
   async createUser(req: Request, res: Response) {
     try {
@@ -56,7 +59,7 @@ export class UserController {
       const compiledTemplate = handlebars.compile(templateSource);
       const emailHtml = compiledTemplate({
         name: newUser.first_name + ' ' + newUser.last_name,
-        link: `http://localhost:3000/verify/${token}`,
+        link: `${base_fe_url}/verify/${token}`,
       });
 
       await transporter.sendMail({
@@ -254,7 +257,7 @@ export class UserController {
       } = req.body;
 
       const profilePictureUrl = req.file
-        ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
+        ? `${base_url}/public/profile_pictures/${req.file.filename}`
         : undefined;
 
       const userId = req.user?.user_id;
@@ -339,7 +342,7 @@ export class UserController {
 
         const emailHtml = compiledTemplate({
           name: updatedUser.first_name + ' ' + updatedUser.last_name,
-          link: `http://localhost:3000/verify/${token}`,
+          link: `${base_fe_url}/verify/${token}`,
         });
 
         await transporter.sendMail({
@@ -401,7 +404,7 @@ export class UserController {
 
       const emailHtml = compiledTemplate({
         name: user.first_name + ' ' + user.last_name,
-        link: `http://localhost:3000/verify/${token}`,
+        link: `${base_fe_url}/verify/${token}`,
       });
 
       await transporter.sendMail({
@@ -439,7 +442,7 @@ export class UserController {
         expiresIn: '15m',
       });
 
-      const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+      const resetLink = `${base_fe_url}/reset-password?token=${resetToken}`;
 
       const templatePath = path.join(
         __dirname,

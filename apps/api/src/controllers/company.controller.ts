@@ -2,6 +2,9 @@ import prisma from '@/prisma';
 import { $Enums, CountryCode, IndustryType, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 
+export const base_url = process.env.BASE_API_URL
+
+
 export class CompanyController {
   async createCompany(req: Request, res: Response) {
     try {
@@ -24,11 +27,11 @@ export class CompanyController {
       } = req.body;
 
       const logoUrl = req.files?.logo?.[0]
-        ? `http://localhost:8000/api/public/company_logos/${req.files.logo[0].filename}`
+        ? `${base_url}/public/company_logos/${req.files.logo[0].filename}`
         : null;
 
       const bannerUrl = req.files?.banner?.[0]
-        ? `http://localhost:8000/api/public/company_banners/${req.files.banner[0].filename}`
+        ? `${base_url}/public/company_banners/${req.files.banner[0].filename}`
         : null;
 
       const userId = req.user?.user_id;
@@ -97,11 +100,11 @@ export class CompanyController {
       console.log(req.body);
 
       const logoUrl = req.files?.logo?.[0]
-        ? `http://localhost:8000/api/public/company_logos/${req.files.logo[0].filename}`
+        ? `${base_url}/public/company_logos/${req.files.logo[0].filename}`
         : undefined;
 
       const bannerUrl = req.files?.banner?.[0]
-        ? `http://localhost:8000/api/public/company_banners/${req.files.banner[0].filename}`
+        ? `${base_url}/public/company_banners/${req.files.banner[0].filename}`
         : undefined;
       console.log('aboutUs', aboutUs);
       const updatedCompany = await prisma.company.update({
