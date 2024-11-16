@@ -35,7 +35,7 @@ const MyCompanyJobSideBar: React.FC = () => {
             Post a Job
           </Button>
         </Link>
-        <Link href="/myjobs">
+        <Link href="/my-jobs">
           <Button
             fullWidth
             variant="text"

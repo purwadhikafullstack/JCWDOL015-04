@@ -44,6 +44,7 @@ const SchedulePage: React.FC = () => {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const companyId = 29;
 
   const handleOpenDialog = (applicant: Applicant) => {
     setSelectedApplicant(applicant);
@@ -83,14 +84,13 @@ const SchedulePage: React.FC = () => {
           Interview Schedule Management
         </Typography>
 
-        <SelectApplicants applicants={applicants} onSchedule={handleOpenDialog} />
+        <SelectApplicants companyId={companyId} onSchedule={handleOpenDialog} />
         <InterviewSchedules 
           schedules={schedules} 
           onEdit={(schedule) => handleOpenDialog(applicants.find(app => app.id === schedule.applicantId)!)} 
           onDelete={handleDeleteSchedule} 
         />
 
-        {/* Dialog untuk Membuat atau Mengedit Jadwal */}
         <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
           <DialogTitle className="text-blue-800 font-semibold">Schedule Interview</DialogTitle>
           <DialogContent className="space-y-4">

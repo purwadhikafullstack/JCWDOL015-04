@@ -1,11 +1,52 @@
 // components/SalaryTrends.tsx
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Paper, Box } from '@mui/material';
 import { MonetizationOn } from '@mui/icons-material';
 
+// Definisikan tipe data yang diterima dari API
+interface SalaryByLocation {
+  location: string;
+  avgSalary: number;
+}
+
+interface PopularPosition {
+  jobTitle: string;
+  avgSalary: number;
+}
+
 const SalaryTrends: React.FC = () => {
+  const [salaryByLocation, setSalaryByLocation] = useState<SalaryByLocation[]>([]);
+  const [popularPositions, setPopularPositions] = useState<PopularPosition[]>([]);
+
+  useEffect(() => {
+    // Fungsi untuk mengambil data dari backend
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/analytics/salary-trends`); // Ganti endpoint sesuai kebutuhan
+        const data = await response.json();
+
+        // Format data sesuai kebutuhan
+        const formattedSalaryByLocation = data.salaryByLocation.map((location: any) => ({
+          location: location.location,
+          avgSalary: location._avg.salary,
+        }));
+        const formattedPopularPositions = data.popularPositions.map((position: any) => ({
+          jobTitle: position.job_title,
+          avgSalary: position._avg.salary,
+        }));
+
+        setSalaryByLocation(formattedSalaryByLocation);
+        setPopularPositions(formattedPopularPositions);
+      } catch (error) {
+        console.error('Error fetching salary trends:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Paper elevation={3} className="bg-white shadow-lg rounded-lg p-6 w-full">
       <Box className="flex items-center justify-center mb-4">
@@ -18,14 +59,23 @@ const SalaryTrends: React.FC = () => {
         <Typography className="text-gray-800">
           <strong>Average Salary by Location:</strong>
         </Typography>
-        <Typography className="ml-4">- Jakarta: $30,000</Typography>
-        <Typography className="ml-4">- Surabaya: $27,000</Typography>
-        <Typography className="ml-4">- Bandung: $26,500</Typography>
+        {salaryByLocation.length > 0
+          ? salaryByLocation.map((location) => (
+              <Typography key={location.location} className="ml-4">
+                - {location.location}: ${location.avgSalary.toLocaleString()}
+              </Typography>
+            ))
+          : 'Loading...'}
         <Typography className="mt-4 text-gray-800">
           <strong>Popular Positions:</strong>
         </Typography>
-        <Typography className="ml-4">- Software Engineer: $35,000</Typography>
-        <Typography className="ml-4">- Product Manager: $40,000</Typography>
+        {popularPositions.length > 0
+          ? popularPositions.map((position) => (
+              <Typography key={position.jobTitle} className="ml-4">
+                - {position.jobTitle}: ${position.avgSalary.toLocaleString()}
+              </Typography>
+            ))
+          : 'Loading...'}
       </Box>
     </Paper>
   );

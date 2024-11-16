@@ -56,7 +56,7 @@ const InterviewSchedules: React.FC<InterviewSchedulesProps> = ({ schedules, onEd
                     size="small"
                     className="text-blue-600 hover:text-blue-800 text-xs mx-1"
                     startIcon={<Edit />}
-                    // onClick={() => onEdit(schedule)}
+                    onClick={() => onEdit(schedule)}
                   >
                     Accept
                   </Button>

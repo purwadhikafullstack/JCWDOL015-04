@@ -1,8 +1,10 @@
 // components/SelectApplicants.tsx
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar } from '@mui/material';
+import axios from 'axios';
+import base_url from '@/lib/user';
 
 type Applicant = {
   id: number;
@@ -14,11 +16,28 @@ type Applicant = {
 };
 
 type SelectApplicantsProps = {
-  applicants: Applicant[];
+  companyId: number;
   onSchedule: (applicant: Applicant) => void;
 };
 
-const SelectApplicants: React.FC<SelectApplicantsProps> = ({ applicants, onSchedule }) => {
+const SelectApplicants: React.FC<SelectApplicantsProps> = ({ companyId, onSchedule }) => {
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+
+  useEffect(() => {
+    if (!companyId) return;
+
+    const fetchApplicants = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/applications/interview-applicants/${companyId}`);
+        setApplicants(response.data.applicants);
+      } catch (error) {
+        console.error('Error fetching applicants:', error);
+      }
+    };
+
+    fetchApplicants();
+  }, [companyId]);
+
   return (
     <Paper className="p-4 shadow-lg rounded-lg">
       <Typography variant="h6" className="font-semibold mb-4">

@@ -283,6 +283,7 @@ model User {
   jobs                    Job[]
   Favorite                Favorite[]
   testResults         TestResult[]
+  answers          TestAnswer[]
 
   @@index([email])
 }
@@ -375,6 +376,7 @@ model Application {
   applied_at       DateTime          @default(now())
   updated_at       DateTime          @updatedAt
   interview_date   DateTime?
+  interview_time   DateTime?
   interview_status InterviewStatus?
 
   // Relations
@@ -655,6 +657,7 @@ model PreSelectionTest {
   test_id          Int               @id @default(autoincrement())
   job_id           Int               @unique
   questions        TestQuestion[]
+  answers          TestAnswer[]
   job              Job               @relation(fields: [job_id], references: [job_id])
 }
 
@@ -665,6 +668,7 @@ model TestQuestion {
   options          TestOption[]      
   correct_answer   Int               
   preSelectionTest PreSelectionTest  @relation(fields: [test_id], references: [test_id])
+  answers          TestAnswer[]
 }
 
 model TestResult {
@@ -682,4 +686,18 @@ model TestOption {
   question_id      Int
   option_text      String
   testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
+}
+
+model TestAnswer {
+  answer_id      Int               @id @default(autoincrement())
+  user_id        Int               // ID pengguna yang memberikan jawaban
+  question_id    Int               // ID pertanyaan terkait
+  test_id        Int               // ID tes terkait
+  selected_option Int              // Jawaban peserta (ID dari opsi)
+  is_correct     Boolean           // Apakah jawaban benar atau salah
+  answered_at    DateTime          @default(now()) // Waktu peserta menjawab
+
+  user           User              @relation(fields: [user_id], references: [user_id])
+  question       TestQuestion      @relation(fields: [question_id], references: [question_id])
+  preSelectionTest PreSelectionTest @relation(fields: [test_id], references: [test_id])
 }
