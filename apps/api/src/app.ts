@@ -16,6 +16,7 @@ import { FavoriteJobRouter } from './routers/favoriteJob.router';
 import { CompanyRouter } from './routers/company.router';
 import { PreSelectionTestRouter } from './routers/preselection.router';
 import { AnalyticsRouter } from './routers/analytic.router';
+import { base_fe_url } from './controllers/user.controller';
 
 export default class App {
   private app: Express;
@@ -28,7 +29,7 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+    this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
     this.app.use('/api/public', express.static('public'));

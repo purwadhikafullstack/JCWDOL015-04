@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
 import { getFriendlyStatus } from '@/utils/applicationStatusMapper';
+import { base_fe_url } from '@/controllers/user.controller';
 
 export async function sendNotification({
   userId,
@@ -76,7 +77,7 @@ export async function notifyApplicationStatusChange(
     companyName,
     currentStatus: friendlyCurrentStatus,
     newStatus: friendlyNewStatus,
-    loginLink: 'http://localhost:3000/sign-in',
+    loginLink: `${base_fe_url}/sign-in`,
   });
 
   await transporter.sendMail({
@@ -126,7 +127,7 @@ export async function sendApplicationStatusNotification(
     jobTitle,
     companyName,
     newStatus: friendlyStatus,
-    loginLink: 'http://localhost:3000/sign-in',
+    loginLink: `${base_fe_url}/sign-in`,
   });
 
   await transporter.sendMail({
@@ -178,7 +179,7 @@ export async function createInterviewNotification(
     jobTitle,
     companyName,
     interviewStatus: friendlyInterviewStatus,
-    loginLink: 'http://localhost:3000/sign-in',
+    loginLink: `${base_fe_url}/sign-in`,
   });
 
   await transporter.sendMail({
