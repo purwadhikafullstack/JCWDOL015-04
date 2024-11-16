@@ -230,5 +230,157 @@ export class ApplicationController {
       })),
     });
   }
+
+  async getApplicationsByJobId(req: Request, res: Response) {
+    try {
+      const jobId = parseInt(req.params.jobId, 10);
+
+      if (isNaN(jobId)) {
+        return res.status(400).json({ msg: 'Invalid Job ID' });
+      }
+
+      const applications = await prisma.application.findMany({
+        where: { job_id: jobId },
+        include: {
+          user: true, 
+          job: true,   
+        },
+      });
+
+      if (applications.length === 0) {
+        return res.status(404).json({ msg: 'No applications found for this job' });
+      }
+
+      res.status(200).json({
+        applications: applications.map((app) => ({
+          id: app.application_id,
+          name: `${app.user.first_name} ${app.user.last_name}`,
+          position: app.job?.job_title,
+          experience: app.user.years_of_experience,
+          education: app.user.education,
+          dateApplied: app.applied_at,
+          status: app.status,
+          photoUrl: app.user.profile_picture,
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      res.status(500).json({ msg: 'Failed to fetch applications' });
+    }
+  }
+
+  async getInterviewApplicantsByCompany(req: Request, res: Response) {
+    try {
+      const companyId = parseInt(req.params.companyId, 10);
+
+      if (isNaN(companyId)) {
+        return res.status(400).json({ msg: 'Invalid Company ID' });
+      }
+
+      const interviewApplicants = await prisma.application.findMany({
+        where: {
+          job: {
+            company_id: companyId,
+          },
+          status: 'interview',
+        },
+        include: {
+          user: {
+            select: {
+              user_id: true,
+              first_name: true,
+              last_name: true,
+              years_of_experience: true,
+              education: true,
+              profile_picture: true,
+            },
+          },
+          job: {
+            select: {
+              job_id: true,
+              job_title: true,
+            },
+          },
+        },
+      });
+
+      if (interviewApplicants.length === 0) {
+        return res.status(404).json({ msg: 'No interview applicants found for this company' });
+      }
+
+      res.status(200).json({
+        applicants: interviewApplicants.map((app) => ({
+          id: app.user.user_id,
+          name: `${app.user.first_name} ${app.user.last_name}`,
+          position: app.job.job_title,
+          experience: app.user.years_of_experience,
+          education: app.user.education,
+          photoUrl: app.user.profile_picture,
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching interview applicants by company:', error);
+      res.status(500).json({ msg: 'Failed to fetch interview applicants by company' });
+    }
+  }
+
+  async updateInterviewSchedule(req: Request, res: Response) {
+    try {
+      const { applicationId } = req.params;
+      const { interviewDate, interviewTime } = req.body;
+  
+      if (!applicationId || !interviewDate || !interviewTime) {
+        return res.status(400).json({ msg: 'Application ID, interview date, and time are required' });
+      }
+  
+      // Perbarui tanggal wawancara di database
+      const updatedApplication = await prisma.application.update({
+        where: { application_id: Number(applicationId) },
+        data: {
+          interview_date: new Date(interviewDate), // Pastikan format tanggal benar
+          interview_time: interviewTime, // Waktu wawancara (opsional, tambahkan di model jika diperlukan)
+          status: 'interview', // Ubah status aplikasi menjadi "interview"
+        },
+        include: {
+          user: true,
+          job: true,
+        },
+      });
+  
+      // Kirim email notifikasi ke pelamar
+      const user = updatedApplication.user;
+      const job = updatedApplication.job;
+  
+      const templatePath = path.join(
+        __dirname,
+        '../templates/interviewScheduleNotification.hbs',
+      );
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+      const compiledTemplate = handlebars.compile(templateSource);
+  
+      const emailHtml = compiledTemplate({
+        name: `${user.first_name} ${user.last_name}`,
+        jobTitle: job.job_title,
+        interviewDate,
+        interviewTime,
+      });
+  
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: 'Interview Schedule Updated',
+        html: emailHtml,
+      });
+  
+      res.status(200).json({
+        msg: 'Interview schedule updated successfully!',
+        application: updatedApplication,
+      });
+    } catch (error) {
+      console.error('Error updating interview schedule:', error);
+      res.status(500).json({ msg: 'Failed to update interview schedule' });
+    }
+  }
+  
   
 }

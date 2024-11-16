@@ -15,6 +15,8 @@ import { ApplicationRouter } from './routers/application.router';
 import { FavoriteJobRouter } from './routers/favoriteJob.router';
 import { CompanyRouter } from './routers/company.router';
 import { base_fe_url } from './controllers/user.controller';
+import { PreSelectionTestRouter } from './routers/preselection.router';
+import { AnalyticsRouter } from './routers/analytic.router';
 
 export default class App {
   private app: Express;
@@ -63,6 +65,8 @@ export default class App {
     const applicationRouter = new ApplicationRouter();
     const favoriteJobRouter = new FavoriteJobRouter();
     const companyRouter = new CompanyRouter();
+    const preSelectionTestRouter = new PreSelectionTestRouter();
+    const analyticsRouter = new AnalyticsRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -74,6 +78,8 @@ export default class App {
     this.app.use('/api/applications', applicationRouter.getRouter());
     this.app.use('/api/favorite-job', favoriteJobRouter.getRouter());
     this.app.use('/api/companies', companyRouter.getRouter());
+    this.app.use('/api/preselection', preSelectionTestRouter.getRouter());
+    this.app.use('/api/analytics', analyticsRouter.getRouter());
   }
 
   public start(): void {
