@@ -11,6 +11,7 @@ const SettingPersonal = () => {
   const [title, setTitle] = useState('');
   const [yearsOfExperience, setYearsOfExperience] = useState<number | ''>('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [phone, setPhone] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -19,6 +20,7 @@ const SettingPersonal = () => {
         setFirstName(user.first_name);
         setLastName(user.last_name);
         setTitle(user.title || '');
+        setPhone(user.phone || '');
         setYearsOfExperience(user.years_of_experience || '');
         setProfileImage(user.profile_picture);
       }
@@ -47,6 +49,7 @@ const SettingPersonal = () => {
     formData.append('last_name', lastName);
     formData.append('title', title);
     formData.append('years_of_experience', String(yearsOfExperience || ''));
+    formData.append('phone', phone);
 
     if (selectedImage) {
       formData.append('profile_picture', selectedImage);
@@ -78,17 +81,23 @@ const SettingPersonal = () => {
               disabled={!isEditing}
             />
             {profileImage ? (
-              <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+              <img
+                src={profileImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                 <FiUpload size={24} />
                 <span>Browse photo or drop here</span>
-                <p className="text-sm text-gray-500 mt-2">Max photo size 5 MB.</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Max photo size 5 MB.
+                </p>
               </div>
             )}
           </div>
         </div>
-        
+
         {/* Form fields for personal information */}
         <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -135,14 +144,27 @@ const SettingPersonal = () => {
               disabled={!isEditing}
             />
           </div>
+          <div>
+            <div className="col-span-1 md:col-span-2">
+              <label className="block text-gray-600 mt-3">Phone</label>
+              <input
+                type="text"
+                className="input input-bordered w-full mt-2"
+                placeholder="Phone number.."
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={!isEditing}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       <button
         onClick={isEditing ? handleSubmit : toggleEditMode}
-        className="btn btn-primary w-full md:w-auto mt-5"
+        className="btn btn-primary w-full mt-5 md:w-auto"
       >
-        {isEditing ? "Save Changes" : "Change Data"}
+        {isEditing ? 'Save Changes' : 'Change Data'}
       </button>
     </div>
   );
