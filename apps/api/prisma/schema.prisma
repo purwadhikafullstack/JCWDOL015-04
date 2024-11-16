@@ -242,6 +242,8 @@ model User {
   userAssessmentResponses UserAssessmentResponse[]
   jobs                    Job[]
   SubscriptionType        SubscriptionType[]
+  FeatureUsage            FeatureUsage[]
+  CV                      CV[]
 
   @@index([email])
 }
@@ -371,25 +373,6 @@ model Subscription {
 }
 
 // SkillAssessment model
-model SkillAssessment {
-  assessment_id   Int              @id @default(autoincrement())
-  badge           String?
-  score           Int?
-  status          AssessmentStatus
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
-  assessment_data String?
-  assessment_date DateTime?
-  feedback        String?
-
-  // Relations
-  user          User                     @relation(fields: [user_id], references: [user_id])
-  user_id       Int
-  questions     AssessmentQuestion[]
-  userResponses UserAssessmentResponse[] // Back-reference to UserAssessmentResponse
-
-  @@index([user_id, status])
-}
 
 // Review model
 model Review {
@@ -415,6 +398,25 @@ model Review {
   @@index([user_id])
 }
 
+model SkillAssessment {
+  assessment_id   Int              @id @default(autoincrement())
+  badge           String?
+  score           Int?
+  status          AssessmentStatus
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  assessment_data String?
+  assessment_date DateTime?
+  feedback        String?
+
+  // Relations
+  user          User                     @relation(fields: [user_id], references: [user_id])
+  user_id       Int
+  questions     AssessmentQuestion[]
+  userResponses UserAssessmentResponse[] // Back-reference to UserAssessmentResponse
+
+  @@index([user_id, status])
+}
 // AssessmentQuestion model
 model AssessmentQuestion {
   question_id      Int              @id @default(autoincrement())
@@ -614,4 +616,28 @@ model Interview {
   updated_at       DateTime        @updatedAt
 
   @@index([application_id])
+}
+
+model FeatureUsage {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  feature_name String
+  used_at      DateTime @default(now())
+
+  // Relasi ke User
+  user User @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id, feature_name])
+}
+
+model CV {
+  cv_id      Int      @id @default(autoincrement())
+  user_id    Int
+  template   String   @default("ATS")
+  content    Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
 }

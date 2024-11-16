@@ -83,67 +83,68 @@ export class PaymentController {
 
   // Mengkonfirmasi pembayaran
   async confirmPayment(req: Request, res: Response) {
-    const { transactionId, status } = req.body; // Status dapat berupa "completed" atau "failed"
-    const developerId = req.user?.user_id;
-
-    if (!developerId) {
-      return res.status(401).json({ message: 'Unauthorized access.' });
-    }
-
+    const { transaction_id, status } = req.body;
+  
     try {
-      // Cari transaksi terkait
+      if (!transaction_id) {
+        return res.status(400).json({ message: 'Transaction ID is required.' });
+      }
+  
+      if (!['completed', 'failed'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status. Must be "completed" or "failed".' });
+      }
+  
       const payment = await prisma.paymentTransaction.findUnique({
-        where: { transaction_id: transactionId },
-        include: { subscriptionType: true },
+        where: { transaction_id },
+        include: {
+          subscriptionType: true,
+        },
       });
-
+  
       if (!payment) {
         return res.status(404).json({ message: 'Transaction not found.' });
       }
-
-      // Perbarui hanya status transaksi
-      const updatedPayment = await prisma.paymentTransaction.update({
-        where: { transaction_id: transactionId },
+  
+      if (payment.status !== 'pending') {
+        return res.status(400).json({ message: 'Only pending transactions can be updated.' });
+      }
+  
+      // Update status transaksi
+      const updatedTransaction = await prisma.paymentTransaction.update({
+        where: { transaction_id },
         data: {
-          status, // Perbarui hanya status
+          status,
         },
       });
-
-      // Jika status adalah "completed", buat data baru di tabel Subscription
+  
+      // Tambahkan logika untuk membuat subscription jika status "completed"
       if (status === 'completed') {
         const startDate = new Date();
-        const endDate = addDays(startDate, 30); // 30 hari setelah tanggal mulai
-
-        const newSubscription = await prisma.subscription.create({
+        const endDate = new Date();
+        endDate.setDate(startDate.getDate() + 30);
+  
+        await prisma.subscription.create({
           data: {
             user_id: payment.user_id,
             subscription_type_id: payment.subscription_type_id,
-            status: 'active',
             start_date: startDate,
             end_date: endDate,
-            amount: payment.amount,
-            payment_proof: true, // Tambahkan payment_proof di Subscription
+            status: 'active',
+            payment_proof: true,
           },
         });
-
-        return res.json({
-          message: 'Payment confirmed and subscription created successfully',
-          updatedPayment,
-          newSubscription,
-        });
       }
-
-      // Jika status adalah "failed", tidak ada data baru di tabel Subscription
-      if (status === 'failed') {
-        return res.json({
-          message: 'Payment confirmation failed. No subscription created.',
-          updatedPayment,
-        });
-      }
+  
+      res.status(200).json({
+        message: `Transaction successfully ${status}.`,
+        updatedTransaction,
+      });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      console.error('Error confirming payment:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   }
+  
 
   // Mendapatkan bukti pembayaran berdasarkan subscription ID
   async getPaymentProof(req: Request, res: Response) {
@@ -167,6 +168,41 @@ export class PaymentController {
         error: 'Failed to fetch payment proof',
         details: error.message,
       });
+    }
+  }
+
+  async getDashboardData(req: Request, res: Response) {
+    try {
+      const totalTransactions = await prisma.paymentTransaction.count();
+      const pendingTransactions = await prisma.paymentTransaction.count({
+        where: { status: 'pending' },
+      });
+      const completedTransactions = await prisma.paymentTransaction.count({
+        where: { status: 'completed' },
+      });
+      const failedTransactions = await prisma.paymentTransaction.count({
+        where: { status: 'failed' },
+      });
+
+      const transactions = await prisma.paymentTransaction.findMany({
+        include: {
+          subscriptionType: true, // Relasi ke SubscriptionType
+          user: true, // Relasi ke User
+        },
+      });
+
+      res.status(200).json({
+        totalTransactions,
+        pendingTransactions,
+        completedTransactions,
+        failedTransactions,
+        transactions,
+      });
+    } catch (error: any) {
+      console.error('Error fetching dashboard data:', error);
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: error.message });
     }
   }
 }

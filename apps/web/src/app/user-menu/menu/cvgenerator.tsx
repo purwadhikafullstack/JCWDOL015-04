@@ -1,196 +1,172 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { FaDownload, FaEye } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Cv } from '@/types/cvgenerator';
+import { downloadCv, getCvs } from '@/lib/cvgenerator';
+import { checkSubscriptionStatus } from '@/lib/subsDashboard';
+import { getToken } from '@/lib/server';
+import ResumeForm from '../components/resumeform';
 
-const CVGenerator: React.FC = () => {
-  const pathname = usePathname(); // Mengambil pathname aktif
+export default function CvDashboard() {
+  const [cv, setCv] = useState<Cv | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isActiveSubscription, setIsActiveSubscription] = useState<boolean | null>(null);
+  const [isCreating, setIsCreating] = useState(false); // State untuk menampilkan form
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: '',
-    jobTitle: '',
-    summary: '',
-    skills: '',
-    experience: '',
-    education: '',
-    certifications: '',
-    additionalInfo: '',
-  });
-  const [selectedTemplate, setSelectedTemplate] = useState('ATS'); // Default template
-  const [previewVisible, setPreviewVisible] = useState(false);
 
-  // Hanya memungkinkan akses dari halaman profil
-//   useEffect(() => {
-//     if (!pathname.startsWith('/profile')) {
-//       router.push('/profile'); // Redirect jika tidak berasal dari halaman profil
-//     }
-//   }, [pathname, router]);
+  useEffect(() => {
+    const checkStatus = async () => {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Unauthorized: No token found');
+        setIsActiveSubscription(false);
+        return;
+      }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+      const result = await checkSubscriptionStatus(token);
+      if (result.isActive) {
+        setIsActiveSubscription(true);
+        fetchCv(); // Fetch CV setelah memastikan subscription aktif
+      } else {
+        toast.error('You do not have an active subscription.');
+        setIsActiveSubscription(false);
+
+        // Redirect to CustomerPlans after 3 seconds
+        setTimeout(() => {
+          router.push('/user-menu?tab=CustomerPlans');
+        }, 3000);
+      }
+    };
+
+    checkStatus();
+  }, [router]);
+
+  useEffect(() => {
+    console.log('Current CV state:', cv); // Debug state CV
+  }, [cv]);
+  
+
+  const fetchCv = async () => {
+    setLoading(true);
+    try {
+      const response = await getCvs();
+      console.log('API Response:', response); // Debug respons API
+      if (response.ok && response.cvs && Array.isArray(response.cvs) && response.cvs.length > 0) {
+        setCv(response.cvs[0]);
+      } else {
+        setCv(null);
+        toast.info('You do not have any CV.');
+      }
+    } catch (e) {
+      console.error('Error during fetchCv:', e);
+      toast.error('An error occurred while fetching CV');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
+  const handleCreateCv = () => {
+    setIsCreating(true); // Tampilkan form
   };
 
-  const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTemplate(e.target.value);
+  const handleFormSubmit = () => {
+    setIsCreating(false); // Sembunyikan form setelah submit
+    fetchCv(); // Refresh CV list
   };
 
-  const handleGenerateCV = () => {
-    setPreviewVisible(true);
-    // Tambahkan logika untuk mengonversi data ke template CV yang dipilih
+  const handleDownloadCv = async () => {
+    try {
+      if (!cv || !cv.cv_id) {
+        toast.error('No CV selected for download.');
+        return;
+      }
+  
+      // Panggil fungsi downloadCv
+      const result = await downloadCv(cv.cv_id.toString());
+  
+      if (result.ok && result.file) {
+        // Buat URL blob untuk file
+        const url = window.URL.createObjectURL(result.file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cv-${cv.cv_id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+  
+        toast.success('CV downloaded successfully!');
+      } else {
+        toast.error('Failed to download CV. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error downloading CV:', error);
+      toast.error('An unexpected error occurred while downloading CV.');
+    }
   };
-
-  const handleDownloadCV = () => {
-    // Tambahkan logika untuk mengunduh CV sebagai file PDF
-    alert('Download CV in ' + selectedTemplate + ' format');
-  };
+  
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
-      <h1 className="text-2xl font-semibold mb-4">CV Generator</h1>
-      <p className="text-gray-500 mb-6">
-        Generate your CV based on your profile information and additional details. Default template is ATS format.
-      </p>
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">CV Generator</h1>
 
-      {/* Form Pengisian Data CV */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block font-medium mb-2">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="Your Name"
-          />
-        </div>
-        <div>
-          <label className="block font-medium mb-2">Job Title</label>
-          <input
-            type="text"
-            name="jobTitle"
-            value={formData.jobTitle}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="Job Title"
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block font-medium mb-2">Professional Summary</label>
-          <textarea
-            name="summary"
-            value={formData.summary}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="A brief summary of your professional background"
-          ></textarea>
-        </div>
-        <div className="md:col-span-2">
-          <label className="block font-medium mb-2">Skills</label>
-          <input
-            type="text"
-            name="skills"
-            value={formData.skills}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="E.g., JavaScript, Python, Project Management"
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block font-medium mb-2">Work Experience</label>
-          <textarea
-            name="experience"
-            value={formData.experience}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="List your work experience"
-          ></textarea>
-        </div>
-        <div className="md:col-span-2">
-          <label className="block font-medium mb-2">Education</label>
-          <textarea
-            name="education"
-            value={formData.education}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="List your educational background"
-          ></textarea>
-        </div>
-        <div className="md:col-span-2">
-          <label className="block font-medium mb-2">Certifications (Optional)</label>
-          <input
-            type="text"
-            name="certifications"
-            value={formData.certifications}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="Any certifications you have"
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block font-medium mb-2">Additional Information (Optional)</label>
-          <textarea
-            name="additionalInfo"
-            value={formData.additionalInfo}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
-            placeholder="Any additional information for your CV"
-          ></textarea>
-        </div>
-      </div>
+      {isActiveSubscription === null ? (
+        <p>Loading subscription status...</p>
+      ) : isActiveSubscription ? (
+        <>
+          {isCreating ? (
+            <ResumeForm onResumeCreated={handleFormSubmit} />
 
-      {/* Template Selector */}
-      <div className="mt-6">
-        <label className="block font-medium mb-2">Select CV Template</label>
-        <select
-          value={selectedTemplate}
-          onChange={handleTemplateChange}
-          className="w-full p-2 border rounded-lg"
-        >
-          <option value="ATS">ATS Friendly (Default)</option>
-          <option value="Modern">Modern</option>
-          <option value="Professional">Professional</option>
-        </select>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center space-x-4 mt-8">
-        <button
-          onClick={handleGenerateCV}
-          className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg"
-        >
-          <FaEye className="mr-2" />
-          Preview CV
-        </button>
-        <button
-          onClick={handleDownloadCV}
-          className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg"
-        >
-          <FaDownload className="mr-2" />
-          Download CV
-        </button>
-      </div>
-
-      {/* Preview Section */}
-      {previewVisible && (
-        <div className="mt-8 p-4 border rounded-lg bg-gray-50">
-          <h3 className="text-xl font-semibold mb-4">CV Preview ({selectedTemplate} Template)</h3>
-          <p>Name: {formData.name}</p>
-          <p>Job Title: {formData.jobTitle}</p>
-          <p>Summary: {formData.summary}</p>
-          <p>Skills: {formData.skills}</p>
-          <p>Experience: {formData.experience}</p>
-          <p>Education: {formData.education}</p>
-          <p>Certifications: {formData.certifications}</p>
-          <p>Additional Info: {formData.additionalInfo}</p>
-        </div>
+          ) : cv ? (
+            <div>
+              <h2 className="text-lg font-bold mb-4">Your CV</h2>
+              <div className="border p-4 rounded mb-4">
+                <p>
+                  <strong>Full Name:</strong> {cv.content.fullName}
+                </p>
+                <p>
+                  <strong>Summary:</strong> {cv.content.summary}
+                </p>
+                <p>
+                  <strong>Template:</strong> {cv.template}
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={handleCreateCv}
+                >
+                  Update CV
+                </button>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  onClick={handleDownloadCv}
+                >
+                  Download CV
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-red-500 mb-4">Anda belum memiliki CV.</p>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={handleCreateCv}
+              >
+                Create CV
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="text-red-500">
+          You need an active subscription to access CV Generator. Redirecting to
+          subscription plans...
+        </p>
       )}
     </div>
   );
-};
-
-export default CVGenerator;
+}

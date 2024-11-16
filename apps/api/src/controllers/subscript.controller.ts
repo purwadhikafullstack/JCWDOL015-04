@@ -1,88 +1,115 @@
-import { Request, Response } from 'express';
+// controllers/dashboardController.ts
 import { PrismaClient } from '@prisma/client';
+import { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
 
-export class SubscriptionController {
-  // Mendapatkan status subscription
-  async getSubscriptionStatus(req: Request, res: Response) {
-    const userId = parseInt(req.params.userId);
+export class DashboardController {
+  async getDashboardData(req: Request, res: Response) {
     try {
-      const subscription = await prisma.subscription.findFirst({
-        where: { user_id: userId, status: 'active' }
+      // Fetch total subscribed users
+      const totalUsers = await prisma.subscription.count({
+        where: { NOT: { status: null } },
       });
-      if (!subscription) {
-        res.status(404).json({ message: 'No active subscription found' });
-      } else {
-        res.json(subscription);
-      }
-    } catch (error: any) {
-      res.status(500).json({ error: 'Failed to fetch subscription status', details: error.message });
+
+      // Fetch completed transactions
+      const completedTransactions = await prisma.paymentTransaction.count({
+        where: { status: 'completed' },
+      });
+
+      // Calculate total revenue
+      const totalRevenue = await prisma.paymentTransaction.aggregate({
+        where: { status: 'completed' },
+        _sum: { amount: true },
+      });
+
+      // Fetch active subscriptions
+      const activeSubscriptions = await prisma.subscription.findMany({
+        where: { status: 'active' },
+        include: {
+          user: {
+            select: {
+              first_name: true,
+              last_name: true,
+            },
+          },
+        },
+      });
+
+      // Fetch inactive subscriptions
+      const inactiveSubscriptions = await prisma.subscription.findMany({
+        where: { status: 'inactive' },
+        include: {
+          user: {
+            select: {
+              first_name: true,
+              last_name: true,
+            },
+          },
+        },
+      });
+
+      // Format data for response
+      res.json({
+        totalUsers,
+        completedTransactions,
+        totalRevenue: totalRevenue._sum.amount || 0,
+        activeSubscriptions: activeSubscriptions.map((sub) => ({
+          subscription_id: sub.subscription_id,
+          user_id: sub.user_id,
+          user_name: `${sub.user?.first_name} ${sub.user?.last_name}`,
+          start_date: sub.start_date?.toISOString().split('T')[0],
+          end_date: sub.end_date?.toISOString().split('T')[0],
+        })),
+        inactiveSubscriptions: inactiveSubscriptions.map((sub) => ({
+          subscription_id: sub.subscription_id,
+          user_id: sub.user_id,
+          user_name: `${sub.user?.first_name} ${sub.user?.last_name}`,
+          start_date: sub.start_date?.toISOString().split('T')[0],
+          end_date: sub.end_date?.toISOString().split('T')[0],
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
-  // Mendapatkan subscription berdasarkan ID
-  async getSubscriptionById(req: Request, res: Response) {
-    const subscriptionId = parseInt(req.params.id);
+  public async checkActiveSubscription(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     try {
-      const subscription = await prisma.subscription.findUnique({
-        where: { subscription_id: subscriptionId }
-      });
-      if (!subscription) {
-        res.status(404).json({ message: 'Subscription not found' });
-      } else {
-        res.json(subscription);
-      }
-    } catch (error: any) {
-      res.status(500).json({ error: 'Failed to fetch subscription', details: error.message });
-    }
-  }
+      // Ensure user authentication middleware has added user_id to req.user
+      const userId = req.user?.user_id;
 
-  // Membuat subscription baru
-  async createSubscription(req: Request, res: Response) {
-    const { userId, subscriptionTypeId, amount } = req.body;
-    try {
-      const newSubscription = await prisma.subscription.create({
-        data: {
+      if (!userId) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      // Find an active subscription with a valid end_date
+      const activeSubscription = await prisma.subscription.findFirst({
+        where: {
           user_id: userId,
-          subscription_type_id: subscriptionTypeId,
-          amount,
           status: 'active',
-          start_date: new Date(),
-          end_date: new Date(new Date().setDate(new Date().getDate() + 30))
-        }
+          end_date: {
+            gte: new Date(), // Ensure the subscription is still valid
+          },
+        },
       });
-      res.status(201).json(newSubscription);
-    } catch (error: any) {
-      res.status(500).json({ error: 'Failed to create subscription', details: error.message });
-    }
-  }
 
-  // Mengupdate subscription
-  async updateSubscription(req: Request, res: Response) {
-    const subscriptionId = parseInt(req.params.id);
-    const { amount, status } = req.body;
-    try {
-      const updatedSubscription = await prisma.subscription.update({
-        where: { subscription_id: subscriptionId },
-        data: { amount, status }
-      });
-      res.json(updatedSubscription);
-    } catch (error: any) {
-      res.status(500).json({ error: 'Failed to update subscription', details: error.message });
-    }
-  }
-
-  // Menghapus subscription
-  async deleteSubscription(req: Request, res: Response) {
-    const subscriptionId = parseInt(req.params.id);
-    try {
-      await prisma.subscription.delete({
-        where: { subscription_id: subscriptionId }
-      });
-      res.json({ message: 'Subscription deleted successfully' });
-    } catch (error: any) {
-      res.status(500).json({ error: 'Failed to delete subscription', details: error.message });
+      if (activeSubscription) {
+        res.status(200).json({ isActive: true });
+      } else {
+        res.status(403).json({
+          isActive: false,
+          message: 'You do not have an active subscription.',
+        });
+      }
+    } catch (error) {
+      console.error('Error checking active subscription:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
   }
 }

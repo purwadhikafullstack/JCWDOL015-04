@@ -37,6 +37,13 @@ export class PaymentRouter {
       verifyToken,
       this.paymentController.getPaymentProof,
     );
+
+    this.router.get(
+      '/dashboard',
+      verifyToken,
+      checkDeveloperRole, // Hanya role developer yang bisa mengakses
+      this.paymentController.getDashboardData,
+    );
   }
 
   getRouter(): Router {

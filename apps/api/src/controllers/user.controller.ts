@@ -615,4 +615,52 @@ export class UserController {
       });
     }
   }
+
+  async getUserSubscriptions(req: Request, res: Response) {
+    const user_id = req.user?.user_id;
+    console.log('User ID in getUserSubscriptions:', req.user?.user_id);
+
+
+    try {
+      const subscriptions = await prisma.subscription.findMany({
+        where: { user_id },
+        include: { subscriptionType: true },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: subscriptions,
+      });
+    } catch (error: any) {
+      console.error('Error fetching subscriptions:', error);
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to fetch subscriptions',
+        error: error.message,
+      });
+    }
+  }
+
+  // Mendapatkan Riwayat Pembayaran Berdasarkan user_id
+  async getUserPayments(req: Request, res: Response) {
+    const user_id = req.user?.user_id; 
+
+    try {
+      const payments = await prisma.paymentTransaction.findMany({
+        where: { user_id },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: payments,
+      });
+    } catch (error: any) {
+      console.error('Error fetching payments:', error);
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to fetch payments',
+        error: error.message,
+      });
+    }
+  }
 }

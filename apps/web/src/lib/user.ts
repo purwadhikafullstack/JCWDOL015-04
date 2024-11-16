@@ -94,7 +94,7 @@ export const resendVerificationEmail = async (email: string): Promise<{ message:
   }
 };
 
-export const getUserInfo = async (user_Id: string) => {
+export const getUserInfo = async (user_Id: number) => {
   const res = await fetch(`${base_url}/user/${user_Id}`, { cache: 'no-cache' })
   const result = await res.json()
 

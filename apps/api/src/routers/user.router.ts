@@ -36,6 +36,12 @@ export class UserRouter {
     this.router.post('/social-login', this.userController.socialLogin.bind(this.userController));
 
     this.router.delete('/delete', verifyToken, this.userController.deleteUser.bind(this.userController));
+
+    // dashboard user data subscription history
+    this.router.get('/subscriptions', verifyToken, this.userController.getUserSubscriptions);
+
+    // dashboard user data payment history
+    this.router.get('/payments', verifyToken, this.userController.getUserPayments);
     
   }
 

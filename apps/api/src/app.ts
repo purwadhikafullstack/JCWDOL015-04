@@ -5,15 +5,16 @@ import express, {
   Request,
   Response,
   NextFunction,
-  Router,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
 import { SubsTypeRouter } from './routers/plan.router';
 import { ReviewRouter } from './routers/review.router';
-import { SubscriptionRouter } from './routers/subscript.router';
+import { SubscriptionDashboardRouter } from './routers/subs-dashboard.router';
 import { PaymentRouter } from './routers/payment.router';
 import { UserRouter } from './routers/user.router';
+import { CvRouter } from './routers/cv.router';
+import { PlanBillRouter } from './routers/userplan.router';
 
 export default class App {
   private app: Express;
@@ -59,9 +60,11 @@ export default class App {
 
     const planRouter = new SubsTypeRouter();
     const reviewRouter = new ReviewRouter();
-    const subscriptRouter = new SubscriptionRouter();
+    const subscriptRouter = new SubscriptionDashboardRouter();
     const paymentRouter = new PaymentRouter();
     const userRouter = new UserRouter();
+    const CVRouter = new CvRouter();
+    const userPlan = new PlanBillRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -72,6 +75,8 @@ export default class App {
     this.app.use('/api/review', reviewRouter.getRouter());
     this.app.use('/api/subscription', subscriptRouter.getRouter());
     this.app.use('/api/payment', paymentRouter.getRouter());
+    this.app.use('/api/cv', CVRouter.getRouter());
+    this.app.use('/api/plan-bill', userPlan.getRouter());
   }
 
   public start(): void {

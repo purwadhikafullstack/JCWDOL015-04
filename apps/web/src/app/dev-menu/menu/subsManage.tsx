@@ -146,9 +146,6 @@ const SubsManage: React.FC = () => {
     }
   };
 
-  
-
-  
 
   const handleDeletePlan = async (id: number) => {
     if (userRole !== 'developer') {
