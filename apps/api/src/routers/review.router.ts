@@ -13,9 +13,17 @@ export class ReviewRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/create', verifyToken, this.reviewController.createReview);
+    this.router.post(
+      '/create',
+      verifyToken,
+      this.reviewController.createReview,
+    );
+    this.router.put('/update', verifyToken, this.reviewController.updateReview);
     this.router.get('/:company_id', this.reviewController.getReviewsByCompany);
-    this.router.get('/:company_id/average-rating', this.reviewController.getAverageRatingByCompany);
+    this.router.get(
+      '/:company_id/average-rating',
+      this.reviewController.getAverageRatingByCompany,
+    );
   }
 
   getRouter(): Router {

@@ -377,7 +377,7 @@ model Subscription {
 // Review model
 model Review {
   review_id                 Int      @id @default(autoincrement())
-  rating                    Int?
+  rating                    Decimal?
   comment                   String?  @db.Text()
   created_at                DateTime @default(now())
   updated_at                DateTime @updatedAt
@@ -417,6 +417,7 @@ model SkillAssessment {
 
   @@index([user_id, status])
 }
+
 // AssessmentQuestion model
 model AssessmentQuestion {
   question_id      Int              @id @default(autoincrement())
