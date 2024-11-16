@@ -49,6 +49,8 @@ export class ApplicationRouter {
     );
 
     this.router.get('/user/:userId/recent', verifyToken, this.applicationController.getRecentlyAppliedJobs);
+    this.router.get('/job/:jobId', verifyToken, this.applicationController.getApplicationsByJobId);
+    this.router.get('/interview-applicants/:companyId', this.applicationController.getInterviewApplicantsByCompany);
 
   }
 
