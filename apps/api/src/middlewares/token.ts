@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
-type IUser = {
+// Definisikan tipe untuk user
+interface User {
   user_id: number;
   role: string;
-};
+  iat?: number;
+  exp?: number;
+}
 
 export const verifyToken = async (
   req: Request,
@@ -12,21 +15,37 @@ export const verifyToken = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
-    console.log('Token received in middleware:', token); 
+    // Ambil token dari cookies atau header Authorization
+    const token =
+      req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
 
-    if (!token) throw new Error('Token is missing');
+    if (!token) {
+      console.error('No token provided'); // Debug log
+      throw new Error('Token is missing');
+    }
 
-    const verifiedToken = verify(token, process.env.SECRET_JWT!);
+    // Verifikasi token
+    const verifiedToken = verify(token, process.env.SECRET_JWT!) as User;
 
-    req.user = verifiedToken as IUser;
+    // Periksa apakah token memiliki properti user_id
+    if (!verifiedToken.user_id) {
+      console.error('Invalid token structure'); // Debug log
+      throw new Error('Invalid token structure');
+    }
 
-    next();
+    // Masukkan informasi pengguna ke req.user
+    req.user = verifiedToken;
+
+    console.log('Verified token:', verifiedToken); // Debugging log
+
+    next(); // Lanjutkan ke middleware berikutnya
   } catch (err) {
-    console.error('Error:', err);
+    console.error('Token verification error:', err); // Log error
     res.status(400).send({
       status: 'error',
       msg: 'Invalid or expired token',
     });
   }
 };
+
+

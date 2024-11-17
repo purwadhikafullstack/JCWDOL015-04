@@ -7,18 +7,29 @@ import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
 
-export const base_url = process.env.BASE_API_URL
-export const base_fe_url = process.env.BASE_FE_URL
+export const base_url = process.env.BASE_API_URL;
+export const base_fe_url = process.env.BASE_FE_URL;
 
 export class UserController {
   async createUser(req: Request, res: Response) {
     try {
-      const { first_name, last_name, email, password, role, company_name, company_email, country } = req.body;
+      const {
+        first_name,
+        last_name,
+        email,
+        password,
+        role,
+        company_name,
+        company_email,
+        country,
+      } = req.body;
       console.log('Request body:', req.body);
-      
+
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        return res.status(400).json({ status: 'error', msg: 'Email already in use!' });
+        return res
+          .status(400)
+          .json({ status: 'error', msg: 'Email already in use!' });
       }
 
       const salt = await genSalt(10);
@@ -26,9 +37,15 @@ export class UserController {
 
       const createdData = await prisma.$transaction(async (prisma) => {
         const newUser = await prisma.user.create({
-          data: { first_name, last_name, email, password: hashedPassword, role, is_verified: false },
+          data: {
+            first_name,
+            last_name,
+            email,
+            password: hashedPassword,
+            role,
+            is_verified: false,
+          },
         });
-
 
         let newCompany = null;
         if (role === 'admin' && company_name && company_email) {
@@ -48,7 +65,9 @@ export class UserController {
       const { newUser, newCompany } = createdData;
 
       const payload = { id: newUser.user_id };
-      const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '60m' });
+      const token = sign(payload, process.env.SECRET_JWT!, {
+        expiresIn: '60m',
+      });
 
       const templatePath = path.join(
         __dirname,
@@ -77,7 +96,12 @@ export class UserController {
       });
     } catch (err) {
       console.error('Error during registration:', err);
-      res.status(400).json({ status: 'error', msg: 'An error occurred during user registration.' });
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          msg: 'An error occurred during user registration.',
+        });
     }
   }
 
@@ -85,33 +109,64 @@ export class UserController {
     try {
       const { email, password } = req.body;
 
+      // Mencari user berdasarkan email
       const existingUser = await prisma.user.findUnique({
         where: { email: email },
+        select: {
+          user_id: true,
+          role: true,
+          is_verified: true,
+          password: true,
+        },
       });
 
       if (!existingUser) throw new Error('Account not found!');
       if (!existingUser.is_verified) throw new Error('Account not verified!');
 
+      // Verifikasi password
       const isValidPass = await compare(password, existingUser.password);
-
       if (!isValidPass) throw new Error('Incorrect password!');
 
-      const payload = {
+      // Mendapatkan `company_id` pertama yang terkait dengan user ini (jika ada)
+      const userCompanies = await prisma.company.findFirst({
+        where: {
+          users: {
+            some: {
+              user_id: existingUser.user_id,
+            },
+          },
+        },
+        select: {
+          company_id: true,
+        },
+      });
+
+      // Membuat payload token dengan `company_id` opsional
+      const payload: { user_id: number; role: string; company_id?: number } = {
         user_id: existingUser.user_id,
         role: existingUser.role,
       };
+
+      if (userCompanies?.company_id) {
+        payload.company_id = userCompanies.company_id;
+      }
+
+      // Membuat token JWT
       const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '1d' });
+
+      // Menghapus password dari response
+      const { password: _, ...userWithoutPassword } = existingUser;
 
       res.status(200).send({
         status: 'ok',
         msg: 'Login success!',
         token,
-        user: existingUser,
+        user: userWithoutPassword,
       });
     } catch (err) {
       res.status(400).send({
         status: 'error',
-        msg: err instanceof Error ? err.message : err,
+        msg: err instanceof Error ? err.message : String(err),
       });
     }
   }
@@ -244,6 +299,11 @@ export class UserController {
         Newpassword,
         Confirmpassword,
         website,
+        linkedin,
+        github,
+        twitter,
+        facebook,
+        instagram,
         title,
         education,
         biography,
@@ -252,6 +312,8 @@ export class UserController {
         languages,
         nationality,
         gender,
+        country,
+        tempat_lahir,
         DateOfBirth,
         years_of_experience,
       } = req.body;
@@ -298,7 +360,6 @@ export class UserController {
       if (last_name) updateData.last_name = last_name;
       if (phone) updateData.phone = phone;
       if (email) {
-       
         updateData.email = email;
         updateData.is_verified = false;
       }
@@ -431,18 +492,22 @@ export class UserController {
     try {
       const { email } = req.body;
 
+      // Check if user exists
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         return res
           .status(404)
           .json({ status: 'error', msg: 'User not found!' });
       }
+
+      // Generate a reset token that expires in 15 minutes
       const payload = { id: user.user_id };
       const resetToken = sign(payload, process.env.SECRET_JWT!, {
         expiresIn: '15m',
       });
 
-      const resetLink = `${base_fe_url}/reset-password?token=${resetToken}`;
+      // Create reset link
+      const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
 
       const templatePath = path.join(
         __dirname,
@@ -457,6 +522,7 @@ export class UserController {
         link: resetLink,
       });
 
+      // Send email
       await transporter.sendMail({
         from: process.env.MAIL_USER,
         to: email,
@@ -484,8 +550,10 @@ export class UserController {
           .json({ status: 'error', msg: 'Passwords do not match' });
       }
 
+      // Verify the token
       const decoded = verify(token, process.env.SECRET_JWT!) as { id: number };
 
+      // Fetch the user using decoded token data
       const user = await prisma.user.findUnique({
         where: { user_id: decoded.id },
       });
@@ -495,9 +563,11 @@ export class UserController {
           .json({ status: 'error', msg: 'User not found!' });
       }
 
+      // Hash the new password
       const salt = await genSalt(10);
       const hashedPassword = await hash(newPassword, salt);
 
+      // Update user password and respond
       await prisma.user.update({
         where: { user_id: user.user_id },
         data: { password: hashedPassword },
@@ -593,7 +663,7 @@ export class UserController {
       });
     }
   }
-
+  
   async getTotalUserSubscribe(req: Request, res: Response) {
     try {
       const userCount = await prisma.user.count({
@@ -606,6 +676,52 @@ export class UserController {
       res.status(500).json({
         status: 'error',
         message: 'Failed to fetch total user subscribe count',
+      });
+    }
+  }
+  async getUserSubscriptions(req: Request, res: Response) {
+    const user_id = req.user?.user_id;
+    console.log('User ID in getUserSubscriptions:', req.user?.user_id);
+
+    try {
+      const subscriptions = await prisma.subscription.findMany({
+        where: { user_id },
+        include: { subscriptionType: true },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: subscriptions,
+      });
+    } catch (error: any) {
+      console.error('Error fetching subscriptions:', error);
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to fetch subscriptions',
+        error: error.message,
+      });
+    }
+  }
+
+  // Mendapatkan Riwayat Pembayaran Berdasarkan user_id
+  async getUserPayments(req: Request, res: Response) {
+    const user_id = req.user?.user_id;
+
+    try {
+      const payments = await prisma.paymentTransaction.findMany({
+        where: { user_id },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: payments,
+      });
+    } catch (error: any) {
+      console.error('Error fetching payments:', error);
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to fetch payments',
+        error: error.message,
       });
     }
   }
