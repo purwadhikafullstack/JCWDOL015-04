@@ -36,13 +36,13 @@ enum InterviewStatus {
   canceled
 }
 
-// Enum for Subscription Status
+// Enum for Subscription Status (naufal)
 enum SubscriptionStatus {
   active
-  expired
+  inactive
 }
 
-// Enum for Assessment Status
+// Enum for Assessment Status (naufal)
 enum AssessmentStatus {
   passed
   failed
@@ -96,7 +96,7 @@ enum DeviceType {
   tablet
 }
 
-// Enum for Transaction Status
+// Enum for Transaction Status (naufal)
 enum TransactionStatus {
   pending
   completed
@@ -273,7 +273,7 @@ model User {
   jobViews                JobView[]
   jobSaves                JobSave[]
   paymentTransactions     PaymentTransaction[]
-  userAssessmentResponses UserAssessmentResponse[]
+  UserAssessmentResponses UserAssessmentResponse[]
   jobs                    Job[]
   Favorite                Favorite[]
   testResults             TestResult[]
@@ -561,7 +561,21 @@ model TestAnswer {
   testQuestion     TestQuestion     @relation(fields: [question_id], references: [question_id])
 }
 
-// Subscription model
+model SubscriptionType {
+  subs_type_id       Int                  @id @default(autoincrement())
+  type               String
+  description        String
+  price              Decimal
+  features           Json
+  User_id            Int?
+  is_recomend        Boolean              @default(false)
+  PaymentTransaction PaymentTransaction[]
+  subscriptions      Subscription[]
+  User               User?                @relation(fields: [User_id], references: [user_id])
+
+  @@index([User_id], map: "SubscriptionType_User_id_fkey")
+}
+
 model Subscription {
   subscription_id      Int                  @id @default(autoincrement())
   start_date           DateTime?
@@ -582,44 +596,27 @@ model Subscription {
   @@index([subscription_type_id], map: "Subscription_subscription_type_id_fkey")
 }
 
-// SubscriptionType model
-model SubscriptionType {
-  subs_type_id       Int                  @id @default(autoincrement())
-  type               String
-  description        String
-  price              Decimal
-  features           Json
-  User_id            Int?
-  is_recomend        Boolean              @default(false)
-  PaymentTransaction PaymentTransaction[]
-  subscriptions      Subscription[]
-  User               User?                @relation(fields: [User_id], references: [user_id])
-
-  @@index([User_id], map: "SubscriptionType_User_id_fkey")
-}
-
-// Review model
 model Review {
-  review_id       Int      @id @default(autoincrement())
-  rating          Int
-  comment         String?  @db.Text()
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  salary_estimate Decimal?
-  position        String?
-  is_anonymous    Boolean
-
-  // Relations
-  user       User    @relation(fields: [user_id], references: [user_id])
-  user_id    Int
-  company    Company @relation(fields: [company_id], references: [company_id])
-  company_id Int
+  review_id                 Int      @id @default(autoincrement())
+  rating                    Decimal?
+  comment                   String?  @db.Text
+  created_at                DateTime @default(now())
+  updated_at                DateTime @updatedAt
+  salary_estimate           Decimal?
+  position                  String?
+  user_id                   Int
+  company_id                Int
+  careerOpportunitiesRating Int
+  facilitiesRating          Int
+  workCultureRating         Int
+  workLifeBalanceRating     Int
+  company                   Company  @relation(fields: [company_id], references: [company_id])
+  user                      User     @relation(fields: [user_id], references: [user_id])
 
   @@index([company_id])
   @@index([user_id])
 }
 
-// SkillAssessment model
 model SkillAssessment {
   assessment_id   Int              @id @default(autoincrement())
   badge           String?
@@ -640,43 +637,36 @@ model SkillAssessment {
   @@index([user_id, status])
 }
 
-// AssessmentQuestion model
 model AssessmentQuestion {
-  question_id      Int              @id @default(autoincrement())
-  question_text    String           @db.Text()
-  question_type    QuestionType
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-  is_active        Boolean
-  difficulty_level DifficultyLevel?
-  points           Int?
-
-  // Relations
-  skillAssessment SkillAssessment          @relation(fields: [assessment_id], references: [assessment_id])
-  assessment_id   Int
-  answers         AssessmentAnswer[]
-  userResponses   UserAssessmentResponse[] // Back-reference to UserAssessmentResponse
+  question_id            Int                      @id @default(autoincrement())
+  question_text          String                   @db.Text
+  question_type          QuestionType             @default(multiple_choice)
+  created_at             DateTime                 @default(now())
+  updated_at             DateTime                 @updatedAt
+  is_active              Boolean
+  difficulty_level       DifficultyLevel?
+  points                 Int?
+  assessment_id          Int
+  answers                AssessmentAnswer[]
+  skillAssessment        SkillAssessment          @relation(fields: [assessment_id], references: [assessment_id], onDelete: Cascade)
+  UserAssessmentResponse UserAssessmentResponse[]
 
   @@index([assessment_id])
 }
 
-// AssessmentAnswer model
 model AssessmentAnswer {
-  answer_id   Int      @id @default(autoincrement())
-  answer_text String
-  is_correct  Boolean?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  // Relations
-  question      AssessmentQuestion       @relation(fields: [question_id], references: [question_id])
-  question_id   Int
-  userResponses UserAssessmentResponse[] // Back-reference to UserAssessmentResponse
+  answer_id              Int                      @id @default(autoincrement())
+  answer_text            String
+  is_correct             Boolean?
+  created_at             DateTime                 @default(now())
+  updated_at             DateTime                 @updatedAt
+  question_id            Int
+  question               AssessmentQuestion       @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+  UserAssessmentResponse UserAssessmentResponse[]
 
   @@index([question_id])
 }
 
-// UserAssessmentResponse model
 model UserAssessmentResponse {
   response_id Int      @id @default(autoincrement())
   answer_text String?  @db.Text()
@@ -698,7 +688,6 @@ model UserAssessmentResponse {
   @@index([assessment_id])
 }
 
-// FeatureUsage model
 model FeatureUsage {
   id           Int      @id @default(autoincrement())
   user_id      Int
@@ -709,7 +698,6 @@ model FeatureUsage {
   @@index([user_id, feature_name])
 }
 
-// CV model
 model CV {
   cv_id      Int      @id @default(autoincrement())
   user_id    Int
@@ -722,22 +710,23 @@ model CV {
   @@index([user_id])
 }
 
-// PaymentTransaction model
 model PaymentTransaction {
-  transaction_id               Int               @id @default(autoincrement())
-  user                         User              @relation(fields: [user_id], references: [user_id])
-  user_id                      Int
-  amount                       Decimal
-  transaction_date             DateTime          @default(now())
-  status                       TransactionStatus
-  payment_method               PaymentMethod?
-  receipt                      String?
-  created_at                   DateTime          @default(now())
-  updated_at                   DateTime          @updatedAt
-  subscription_id              Int?
-  subscription                 Subscription?     @relation(fields: [subscription_id], references: [subscription_id])
-  SubscriptionType             SubscriptionType? @relation(fields: [subscriptionTypeSubs_type_id], references: [subs_type_id])
-  subscriptionTypeSubs_type_id Int?
+  transaction_id       Int               @id @default(autoincrement())
+  user_id              Int
+  amount               Decimal
+  transaction_date     DateTime          @default(now())
+  status               TransactionStatus @default(pending)
+  payment_method       PaymentMethod?    @default(bank_transfer)
+  receipt              String?
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
+  subscription_id      Int?
+  subscription_type_id Int
+  subscription         Subscription?     @relation(fields: [subscription_id], references: [subscription_id])
+  subscriptionType     SubscriptionType  @relation(fields: [subscription_type_id], references: [subs_type_id])
+  user                 User              @relation(fields: [user_id], references: [user_id])
 
   @@index([user_id])
+  @@index([subscription_id], map: "PaymentTransaction_subscription_id_fkey")
+  @@index([subscription_type_id], map: "PaymentTransaction_subscription_type_id_fkey")
 }

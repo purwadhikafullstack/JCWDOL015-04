@@ -31,22 +31,18 @@ export const uploader = (
 
   const storage = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
-    destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
       ensureFolderExists(defaultDir);
       console.log(`Saving file to: ${defaultDir}`);
       cb(null, defaultDir);
     },
     filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
-    filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
       const originalNameParts = file.originalname.split('.');
-      const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
       const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
       const newFileName = `${filePrefix}_${Date.now()}.${fileExtension}`;
       console.log(`Generated filename: ${newFileName}`);
       cb(null, newFileName);
     },
   });
-  
   
 
   // File filter for validation based on the type
