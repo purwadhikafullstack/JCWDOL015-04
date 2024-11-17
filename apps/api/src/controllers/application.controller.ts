@@ -233,24 +233,29 @@ export class ApplicationController {
 
   async getApplicationsByJobId(req: Request, res: Response) {
     try {
+      // Gunakan req.params.jobId, sesuai dengan rute
       const jobId = parseInt(req.params.jobId, 10);
-
+  
+      console.log('Parsed Job ID:', jobId); // Log untuk debugging
+  
       if (isNaN(jobId)) {
+        console.warn('Invalid Job ID:', jobId);
         return res.status(400).json({ msg: 'Invalid Job ID' });
       }
-
+  
       const applications = await prisma.application.findMany({
         where: { job_id: jobId },
         include: {
-          user: true, 
-          job: true,   
+          user: true,
+          job: true,
         },
       });
-
+  
       if (applications.length === 0) {
+        console.warn('No applications found for job ID:', jobId);
         return res.status(404).json({ msg: 'No applications found for this job' });
       }
-
+  
       res.status(200).json({
         applications: applications.map((app) => ({
           id: app.application_id,
@@ -268,6 +273,10 @@ export class ApplicationController {
       res.status(500).json({ msg: 'Failed to fetch applications' });
     }
   }
+  
+  
+  
+  
 
   async getInterviewApplicantsByCompany(req: Request, res: Response) {
     try {
@@ -333,13 +342,12 @@ export class ApplicationController {
         return res.status(400).json({ msg: 'Application ID, interview date, and time are required' });
       }
   
-      // Perbarui tanggal wawancara di database
       const updatedApplication = await prisma.application.update({
         where: { application_id: Number(applicationId) },
         data: {
-          interview_date: new Date(interviewDate), // Pastikan format tanggal benar
-          interview_time: interviewTime, // Waktu wawancara (opsional, tambahkan di model jika diperlukan)
-          status: 'interview', // Ubah status aplikasi menjadi "interview"
+          interview_date: new Date(interviewDate),
+          interview_time: interviewTime, 
+          status: 'interview', 
         },
         include: {
           user: true,
@@ -347,13 +355,12 @@ export class ApplicationController {
         },
       });
   
-      // Kirim email notifikasi ke pelamar
       const user = updatedApplication.user;
       const job = updatedApplication.job;
   
       const templatePath = path.join(
         __dirname,
-        '../templates/interviewScheduleNotification.hbs',
+        '../templates/interviewSchedule.hbs',
       );
       const templateSource = fs.readFileSync(templatePath, 'utf-8');
       const compiledTemplate = handlebars.compile(templateSource);

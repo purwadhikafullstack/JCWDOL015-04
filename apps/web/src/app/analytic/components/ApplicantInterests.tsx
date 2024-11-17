@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Paper, Box } from '@mui/material';
 import { Interests } from '@mui/icons-material';
+import base_url from '@/lib/user';
 
 interface JobCategory {
   jobCategory: string;
@@ -26,24 +27,27 @@ const ApplicantInterests: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {
-    // Fungsi untuk mengambil data dari backend
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/analytics/applicant-interests`); // Ganti endpoint sesuai kebutuhan
+        const response = await fetch(`${base_url}/analytics/applicant-interests`);
         const data = await response.json();
 
-        // Mapping hasil dari `_count` ke `count` untuk menyesuaikan dengan tanpa garis bawah
         const formattedJobCategories = data.jobCategories.map((category: any) => ({
           jobCategory: category.jobCategory,
           count: category._count.jobCategory,
         }));
+
         const formattedLocations = data.locations.map((location: any) => ({
           location: location.location,
           count: location._count.location,
         }));
 
-        setJobCategories(formattedJobCategories);
-        setLocations(formattedLocations);
+        setJobCategories(
+          formattedJobCategories.sort((a: JobCategory, b: JobCategory) => b.count - a.count).slice(0, 3)
+        );
+        setLocations(
+          formattedLocations.sort((a: Location, b: Location) => b.count - a.count).slice(0, 3)
+        );
       } catch (error) {
         console.error('Error fetching applicant interests:', error);
       }

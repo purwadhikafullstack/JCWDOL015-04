@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
@@ -12,21 +12,63 @@ import {
   Box,
 } from '@mui/material';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import base_url from '@/lib/user';
 
 type Question = {
+  questionId?: number;
   question: string;
   options: string[];
   correctAnswer: string;
 };
 
-const TestCreation: React.FC = () => {
-  const [questions, setQuestions] = useState<Question[]>(Array.from({ length: 25 }, () => ({
-    question: '',
-    options: ['', '', '', ''],
-    correctAnswer: ''
-  })));
-  
-  const testId = 1;
+const TestCreation = ({ params }: { params: { id: string } }) => {
+  const jobId = params.id; // Ambil jobId langsung dari params
+  const [questions, setQuestions] = useState<Question[]>(
+    Array.from({ length: 25 }, () => ({
+      questionId: undefined,
+      question: '',
+      options: ['', '', '', ''],
+      correctAnswer: '',
+    }))
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExistingQuestions = async () => {
+      try {
+        const response = await fetch(`${base_url}/preselection/get-questions/${jobId}`);
+        if (response.ok) {
+          const data = await response.json();
+          const existingQuestions = data.questions.map((q: any) => ({
+            questionId: q.questionId,
+            question: q.questionText,
+            options: q.options.map((opt: any) => opt.text),
+            correctAnswer: q.options[q.correctAnswer - 1]?.text || '',
+          }));
+
+          const totalQuestions = [...existingQuestions];
+          while (totalQuestions.length < 25) {
+            totalQuestions.push({
+              questionId: undefined,
+              question: '',
+              options: ['', '', '', ''],
+              correctAnswer: '',
+            });
+          }
+
+          setQuestions(totalQuestions);
+        } else {
+          console.error('Failed to fetch existing questions');
+        }
+      } catch (error) {
+        console.error('Error fetching existing questions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExistingQuestions();
+  }, [jobId]);
 
   const handleQuestionChange = (index: number, value: string) => {
     const newQuestions = [...questions];
@@ -48,61 +90,76 @@ const TestCreation: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const formattedQuestions = questions.map((q) => ({
-        questionText: q.question,
-        options: q.options.map((opt) => ({ text: opt })),
-        correctAnswer: q.options.indexOf(q.correctAnswer) + 1, // Mengambil indeks jawaban benar
-      }));
+      const formattedQuestions = questions
+        .filter(
+          (q) =>
+            q.question.trim() !== '' &&
+            q.options.every((opt) => opt.trim() !== '') &&
+            q.correctAnswer.trim() !== '' &&
+            q.options.includes(q.correctAnswer)
+        )
+        .map((q) => ({
+          questionId: q.questionId || null,
+          questionText: q.question,
+          options: q.options.map((opt) => ({ text: opt })),
+          correctAnswer: q.options.indexOf(q.correctAnswer) + 1,
+        }));
   
-      console.log("Data yang dikirim:", {
-        testId,
-        questions: formattedQuestions,
-      });
+      if (formattedQuestions.length === 0) {
+        alert('Tidak ada soal valid untuk disimpan. Pastikan semua soal terisi dengan benar.');
+        return;
+      }
   
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/preselection/add-question`, {
+      const response = await fetch(`${base_url}/preselection/add-question`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          testId,
+          testId: jobId,
           questions: formattedQuestions,
         }),
       });
   
       if (response.ok) {
-        alert("Tes berhasil disimpan!");
+        alert('Tes berhasil disimpan!');
       } else {
         const errorData = await response.json();
-        console.error("Error dari server:", errorData);
-        alert("Gagal menyimpan tes. Silakan coba lagi.");
+        console.error('Error dari server:', errorData);
+        alert('Gagal menyimpan tes. Silakan coba lagi.');
       }
     } catch (error) {
-      console.error("Error saving test:", error);
-      alert("Terjadi kesalahan saat menyimpan tes.");
+      console.error('Error saving test:', error);
+      alert('Terjadi kesalahan saat menyimpan tes.');
     }
   };
   
+
+  if (loading) {
+    return <Typography align="center">Memuat soal...</Typography>;
+  }
 
   return (
     <ProtectedRoute requiredRole="admin">
       <Container maxWidth="md" className="bg-white p-6 rounded-lg shadow-md my-8">
         <Typography variant="h4" align="center" gutterBottom>
-          Buat Pre-Selection Test
+          Buat atau Edit Pre-Selection Test
         </Typography>
-        
+
         {questions.map((q, index) => (
           <div key={index} className="mb-6 p-4 border rounded-md bg-gray-100">
             <Typography variant="h6" gutterBottom>
               Pertanyaan {index + 1}
             </Typography>
-            
+
             <TextField
               label="Pertanyaan"
               variant="outlined"
               fullWidth
               value={q.question}
               onChange={(e) => handleQuestionChange(index, e.target.value)}
+              error={q.question.trim() === ''}
+              helperText={q.question.trim() === '' ? 'Pertanyaan tidak boleh kosong' : ''}
               className="mb-4"
             />
 
@@ -115,6 +172,8 @@ const TestCreation: React.FC = () => {
                   fullWidth
                   value={option}
                   onChange={(e) => handleOptionChange(index, optIndex, e.target.value)}
+                  error={option.trim() === ''}
+                  helperText={option.trim() === '' ? 'Pilihan tidak boleh kosong' : ''}
                 />
               </Box>
             ))}
@@ -127,6 +186,7 @@ const TestCreation: React.FC = () => {
                 value={q.correctAnswer}
                 onChange={(e) => handleCorrectAnswerChange(index, e.target.value as string)}
                 displayEmpty
+                error={q.correctAnswer.trim() === ''}
               >
                 <MenuItem value="" disabled>
                   Pilih jawaban yang benar
@@ -137,6 +197,11 @@ const TestCreation: React.FC = () => {
                   </MenuItem>
                 ))}
               </Select>
+              {q.correctAnswer.trim() === '' && (
+                <Typography variant="caption" color="error">
+                  Pilih jawaban yang benar
+                </Typography>
+              )}
             </FormControl>
           </div>
         ))}
@@ -147,14 +212,14 @@ const TestCreation: React.FC = () => {
             color="primary"
             onClick={handleSubmit}
             sx={{
-              backgroundColor: "#007bff",
-              color: "#fff",
-              fontWeight: "bold",
-              padding: "10px 20px",
-              borderRadius: "8px",
+              backgroundColor: '#007bff',
+              color: '#fff',
+              fontWeight: 'bold',
+              padding: '10px 20px',
+              borderRadius: '8px',
               '&:hover': {
-                backgroundColor: "#0056b3"
-              }
+                backgroundColor: '#0056b3',
+              },
             }}
           >
             Simpan Tes

@@ -14,27 +14,31 @@ export class PreSelectionTestRouter {
   }
 
   private initializeRoutes(): void {
-    // Rute untuk membuat Pre-Selection Test baru
     this.router.post(
       '/create-test',
-      verifyToken,
-      checkAdminDev,
+      // verifyToken,
+      // checkAdminDev,
       (req, res) => this.preSelectionTestController.createTest(req, res)
     );
 
-    // Rute untuk menambahkan pertanyaan ke dalam Pre-Selection Test
     this.router.post(
       '/add-question',
     //   verifyToken,
     //   checkAdminDev,
       (req, res) => this.preSelectionTestController.addQuestion(req, res)
     );
-
-    // Rute untuk mendapatkan Pre-Selection Test beserta soal dan opsi jawabannya
+    this.router.post(
+      '/save-answer', 
+      // verifyToken, 
+      (req, res) => this.preSelectionTestController.saveTestAnswer(req, res)
+    );
     this.router.get(
       '/:testId',
       (req, res) => this.preSelectionTestController.getTestWithQuestions(req, res)
-    );
+    );  
+    this.router.get('/get-questions/:jobId', this.preSelectionTestController.getQuestionsByJobId);
+    this.router.get('/check-test/:jobId', this.preSelectionTestController.checkTest);
+ 
   }
 
   getRouter(): Router {
