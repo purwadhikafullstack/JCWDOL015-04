@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum UserRole {
   normal
   candidate
@@ -299,6 +298,123 @@ model Application {
   @@index([user_id])
 }
 
+model Notification {
+  notification_id Int              @id @default(autoincrement())
+  user_id         Int
+  message         String
+  is_read         Boolean
+  type            NotificationType
+  related_id      Int?
+  link            String?
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  user            User             @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
+}
+
+model UserSkill {
+  user_skill_id       Int               @id @default(autoincrement())
+  user_id             Int
+  skill_name          String
+  years_of_experience Int?
+  proficiency_level   ProficiencyLevel?
+  certification       String?
+  description         String?
+  is_verified         Boolean
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
+  user                User              @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
+}
+
+model AdminLog {
+  log_id           Int        @id @default(autoincrement())
+  action           String
+  timestamp        DateTime   @default(now())
+  details          String?
+  ip_address       String?
+  user_agent       String?
+  status           LogStatus?
+  affected_user_id Int?
+  admin_id         Int
+  affected_job_id  Int?
+  admin            User       @relation(fields: [admin_id], references: [user_id])
+
+  @@index([admin_id])
+}
+
+model JobReport {
+  report_id       Int          @id @default(autoincrement())
+  job_id          Int
+  user_id         Int
+  reason          String
+  status          ReportStatus
+  admin_response  String?
+  is_anonymous    Boolean
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  resolution_date DateTime?
+  job             Job          @relation(fields: [job_id], references: [job_id])
+  user            User         @relation(fields: [user_id], references: [user_id])
+
+  @@index([job_id])
+  @@index([user_id])
+}
+
+model JobView {
+  view_id     Int         @id @default(autoincrement())
+  job_id      Int
+  user_id     Int?
+  viewed_at   DateTime    @default(now())
+  ip_address  String?
+  user_agent  String?
+  location    String?
+  device_type DeviceType?
+  referrer    String?
+  session_id  String?
+  job         Job         @relation(fields: [job_id], references: [job_id])
+  user        User?       @relation(fields: [user_id], references: [user_id])
+
+  @@index([job_id])
+  @@index([user_id], map: "JobView_user_id_fkey")
+}
+
+model JobSave {
+  save_id         Int       @id @default(autoincrement())
+  job_id          Int
+  user_id         Int
+  saved_at        DateTime  @default(now())
+  is_favorite     Boolean
+  notes           String?
+  expiration_date DateTime?
+  reminder_set    Boolean
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  job             Job       @relation(fields: [job_id], references: [job_id])
+  user            User      @relation(fields: [user_id], references: [user_id])
+
+  @@index([job_id])
+  @@index([user_id])
+}
+
+model Interview {
+  interview_id     Int             @id @default(autoincrement())
+  application_id   Int
+  scheduled_time   DateTime
+  status           InterviewStatus
+  feedback         String?         @db.Text
+  interviewer_name String?
+  interview_link   String?
+  interview_type   InterviewType?
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt
+  application      Application     @relation(fields: [application_id], references: [application_id])
+
+  @@index([application_id])
+}
+
 model SubscriptionType {
   subs_type_id       Int                  @id @default(autoincrement())
   type               String
@@ -426,104 +542,25 @@ model UserAssessmentResponse {
   @@index([assessment_id])
 }
 
-model Notification {
-  notification_id Int              @id @default(autoincrement())
-  user_id         Int
-  message         String
-  is_read         Boolean
-  type            NotificationType
-  related_id      Int?
-  link            String?
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
-  user            User             @relation(fields: [user_id], references: [user_id])
+model FeatureUsage {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  feature_name String
+  used_at      DateTime @default(now())
+  user         User     @relation(fields: [user_id], references: [user_id])
 
-  @@index([user_id])
+  @@index([user_id, feature_name])
 }
 
-model UserSkill {
-  user_skill_id       Int               @id @default(autoincrement())
-  user_id             Int
-  skill_name          String
-  years_of_experience Int?
-  proficiency_level   ProficiencyLevel?
-  certification       String?
-  description         String?
-  is_verified         Boolean
-  created_at          DateTime          @default(now())
-  updated_at          DateTime          @updatedAt
-  user                User              @relation(fields: [user_id], references: [user_id])
+model CV {
+  cv_id      Int      @id @default(autoincrement())
+  user_id    Int
+  template   String   @default("ATS")
+  content    Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [user_id], references: [user_id])
 
-  @@index([user_id])
-}
-
-model AdminLog {
-  log_id           Int        @id @default(autoincrement())
-  action           String
-  timestamp        DateTime   @default(now())
-  details          String?
-  ip_address       String?
-  user_agent       String?
-  status           LogStatus?
-  affected_user_id Int?
-  admin_id         Int
-  affected_job_id  Int?
-  admin            User       @relation(fields: [admin_id], references: [user_id])
-
-  @@index([admin_id])
-}
-
-model JobReport {
-  report_id       Int          @id @default(autoincrement())
-  job_id          Int
-  user_id         Int
-  reason          String
-  status          ReportStatus
-  admin_response  String?
-  is_anonymous    Boolean
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
-  resolution_date DateTime?
-  job             Job          @relation(fields: [job_id], references: [job_id])
-  user            User         @relation(fields: [user_id], references: [user_id])
-
-  @@index([job_id])
-  @@index([user_id])
-}
-
-model JobView {
-  view_id     Int         @id @default(autoincrement())
-  job_id      Int
-  user_id     Int?
-  viewed_at   DateTime    @default(now())
-  ip_address  String?
-  user_agent  String?
-  location    String?
-  device_type DeviceType?
-  referrer    String?
-  session_id  String?
-  job         Job         @relation(fields: [job_id], references: [job_id])
-  user        User?       @relation(fields: [user_id], references: [user_id])
-
-  @@index([job_id])
-  @@index([user_id], map: "JobView_user_id_fkey")
-}
-
-model JobSave {
-  save_id         Int       @id @default(autoincrement())
-  job_id          Int
-  user_id         Int
-  saved_at        DateTime  @default(now())
-  is_favorite     Boolean
-  notes           String?
-  expiration_date DateTime?
-  reminder_set    Boolean
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
-  job             Job       @relation(fields: [job_id], references: [job_id])
-  user            User      @relation(fields: [user_id], references: [user_id])
-
-  @@index([job_id])
   @@index([user_id])
 }
 
@@ -546,42 +583,4 @@ model PaymentTransaction {
   @@index([user_id])
   @@index([subscription_id], map: "PaymentTransaction_subscription_id_fkey")
   @@index([subscription_type_id], map: "PaymentTransaction_subscription_type_id_fkey")
-}
-
-model Interview {
-  interview_id     Int             @id @default(autoincrement())
-  application_id   Int
-  scheduled_time   DateTime
-  status           InterviewStatus
-  feedback         String?         @db.Text
-  interviewer_name String?
-  interview_link   String?
-  interview_type   InterviewType?
-  created_at       DateTime        @default(now())
-  updated_at       DateTime        @updatedAt
-  application      Application     @relation(fields: [application_id], references: [application_id])
-
-  @@index([application_id])
-}
-
-model FeatureUsage {
-  id           Int      @id @default(autoincrement())
-  user_id      Int
-  feature_name String
-  used_at      DateTime @default(now())
-  user         User     @relation(fields: [user_id], references: [user_id])
-
-  @@index([user_id, feature_name])
-}
-
-model CV {
-  cv_id      Int      @id @default(autoincrement())
-  user_id    Int
-  template   String   @default("ATS")
-  content    Json
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  user       User     @relation(fields: [user_id], references: [user_id])
-
-  @@index([user_id])
 }
