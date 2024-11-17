@@ -14,9 +14,9 @@ import { NotificationRouter } from './routers/notification.router';
 import { ApplicationRouter } from './routers/application.router';
 import { FavoriteJobRouter } from './routers/favoriteJob.router';
 import { CompanyRouter } from './routers/company.router';
-import { base_fe_url } from './controllers/user.controller';
 import { PreSelectionTestRouter } from './routers/preselection.router';
 import { AnalyticsRouter } from './routers/analytic.router';
+import { base_fe_url } from './controllers/user.controller';
 
 export default class App {
   private app: Express;
