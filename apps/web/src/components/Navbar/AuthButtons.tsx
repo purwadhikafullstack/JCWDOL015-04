@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { UserRole } from '@/types/role';
 import AvatarMenu from './AvatarMenu';
+import Notification from './Notification/notification';
 
 interface AuthButtonsProps {
   isLoggedIn: boolean;
@@ -9,24 +10,31 @@ interface AuthButtonsProps {
   onLogout: () => void;
 }
 
-const AuthButtons: React.FC<AuthButtonsProps> = ({ isLoggedIn, userRole, onLogout }) => (
+const AuthButtons: React.FC<AuthButtonsProps> = ({
+  isLoggedIn,
+  userRole,
+  onLogout,
+}) => (
   <div className="flex items-center space-x-2">
     {isLoggedIn ? (
       <>
-        {(userRole === UserRole.Admin || userRole === UserRole.Developer) && (
-          <Link href="/post-jobs">
+        {(userRole === UserRole.Admin) && (
+          <Link href="/ ISI DISINI ">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-              Post A Job
+              Manage Jobs
             </button>
           </Link>
         )}
         {userRole && (
-          <AvatarMenu onLogout={onLogout} userRole={userRole} />
+          <>
+            <Notification />
+            <AvatarMenu onLogout={onLogout} userRole={userRole} />
+          </>
         )}
       </>
     ) : (
       <>
-        <Link href="/post-job">
+        <Link href="/sign-in">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Post A Job
           </button>

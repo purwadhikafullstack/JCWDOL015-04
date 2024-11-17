@@ -1,4 +1,4 @@
-// authorSlice.ts
+import { deleteToken } from "@/lib/server";
 import { IUserState } from "@/types/iuser";
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -35,6 +35,8 @@ export const userSlice = createSlice({
             state.role = "";
             state.profile_picture = "";
             state.isAuthenticated = false;
+            localStorage.clear();
+            deleteToken();
         }
     }
 });

@@ -1,17 +1,24 @@
-// job-page.tsx
 'use client';
-
 import { useEffect, useState } from 'react';
 import JobFilterBar from './JobFilterBar';
 import { fetchJobs } from '@/services/jobService';
 import Card from '@/components/Card';
 import { JobCardProps } from '@/types/job';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { fetchUserLocation } from '@/services/locationService';
+
+type Location = { latitude: number; longitude: number } | null;
 
 export default function JobListingsPage() {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
   const [sortOrder, setSortOrder] = useState('latest');
   const [locationAccessDenied, setLocationAccessDenied] = useState(false);
+
+  const [location, setLocation] = useState<Location>(null);
+
+  useEffect(() => {
+    fetchUserLocation(setLocation, setLocationAccessDenied);
+  }, []);
 
   const loadJobs = async (
     filters = {},
@@ -35,7 +42,7 @@ export default function JobListingsPage() {
         job_id: job.job_id,
         job_title: job.job_title,
         location: job.location,
-        salary: job.salary ? `$${job.salary}K` : null,
+        salary: job.salary ? `$${Number(job.salary).toLocaleString()}` : null,
         company: {
           company_name: job.company.company_name,
           logo: job.company.logo || null,
@@ -49,17 +56,24 @@ export default function JobListingsPage() {
     }
   };
 
-  // Load jobs on component mount and when sortOrder changes
   useEffect(() => {
-    console.log('asc');
-    loadJobs();
-  }, [sortOrder]);
+    if (location) {
+      loadJobs({}, location.latitude, location.longitude);
+    } else {
+      loadJobs();
+    }
+  }, [sortOrder, location]);
 
   const handleSearch = (filters: any) => {
-    loadJobs(filters);
+    if (location) {
+      loadJobs(filters, location.latitude, location.longitude);
+    } else {
+      loadJobs(filters);
+    }
   };
 
   return (
+    <div className="bg-[#F1F2F4]">
     <ProtectedRoute requiredRole="candidate">
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
@@ -108,5 +122,6 @@ export default function JobListingsPage() {
         </div>
       </div>
     </ProtectedRoute>
+    </div>
   );
 }

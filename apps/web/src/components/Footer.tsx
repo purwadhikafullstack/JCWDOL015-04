@@ -17,14 +17,16 @@ export const Footer = () => {
             <h2 className="text-white text-lg font-bold mb-4">HireMe</h2>
             <p className="text-sm">
               Call now:{' '}
-              <Link href="tel:3195550115" className="text-white">
-                (319) 555-0115
+              <Link href="tel:+60327789000" className="text-white">
+                (+60) 3 2778 9000
               </Link>
             </p>
+            <p className="text-sm">HireMe.com Sdn Bhd</p>
             <p className="text-sm">
-              6391 Elgin St. Celina, Delaware 10299, New York, United States of
-              America
+              Lv 16, Menara AIA Cap Square,
             </p>
+            <p className="text-sm">No. 10, Jalan Munshi Abdullah</p>
+            <p className="text-sm">Kuala Lumpur 50100</p>
           </div>
 
           {/* Quick Link section */}
@@ -39,7 +41,7 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/contact-support" className="hover:text-white">
                   Contact
                 </Link>
               </li>
@@ -56,23 +58,18 @@ export const Footer = () => {
             <h3 className="text-white text-md font-semibold mb-4">Candidate</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/job-page" className="hover:text-white">
                   Browse Jobs
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link href="/company-page" className="hover:text-white">
                   Browse Employers
                 </Link>
               </li>
               <li>
                 <Link href="#" className="hover:text-white">
                   Candidate Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white">
-                  Saved Jobs
                 </Link>
               </li>
             </ul>
@@ -112,11 +109,6 @@ export const Footer = () => {
               <li>
                 <Link href="#" className="hover:text-white">
                   FAQs
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white">
-                  Privacy Policy
                 </Link>
               </li>
               <li>

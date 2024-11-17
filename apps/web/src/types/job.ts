@@ -1,3 +1,27 @@
+export interface RecentlyAppliedJob {
+  application_id: number;
+  job_title: string;
+  company_name: string;
+  logo: string;
+  location: string;
+  date_applied: string;
+  status: string;
+}
+
+export interface FavoriteJob {
+  id: number;
+  job: {
+    job_id: number;
+    job_title: string;
+    location: string;
+    company: {
+      company_name: string;
+      logo: string | null;
+    };
+  };
+  created_at: string;
+}
+
 export interface Company {
   company_id: number;
   company_name: string;
@@ -62,4 +86,15 @@ export interface JobCardProps {
     company_name: string;
     logo: string | null;
   };
+}
+
+export interface RecentlyPostedJob {
+  job_id: number;
+  job_title: string;
+  company_name: string;
+  logo: string;
+  location: string;
+  created_at: string;
+  jobExpired_at: string;
+  is_active: boolean;
 }

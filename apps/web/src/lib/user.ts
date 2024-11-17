@@ -1,7 +1,9 @@
-// lib/user.ts
-import { IUserLogin, IUserReg, IUserVerify, IUserState } from '@/types/iuser';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+import { jwtDecode } from 'jwt-decode';
+import { IUserLogin, IUserReg, IUserVerify } from '@/types/iuser';
+import { getToken } from './server';
+
+export const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
 export const regUser = async (data: IUserReg) => {
   try {
@@ -72,34 +74,106 @@ export const verifyUser = async (token: string) => {
 
 export const resendVerificationEmail = async (email: string): Promise<{ message: string; ok: boolean; is_verified: boolean }> => {
   try {
-    console.log('Calling resendVerificationEmail with email:', email);
     const response = await fetch(`${base_url}/user/resend-verification`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
-
-    console.log('Response status:', response.status);
     const data: IUserVerify & { message?: string } = await response.json();
-    console.log('Response data:', data);
-
     return { 
       message: data.message || 'Verification email resent successfully!', 
       ok: response.ok,
       is_verified: data.is_verified 
     };
   } catch (error: any) {
-    console.error('Error in resendVerificationEmail:', error.message);
     return { message: error.message || 'An error occurred. Please try again.', ok: false, is_verified: false };
   }
 };
 
-export const getUserInfo = async (user_Id: number) => {
-  const res = await fetch(`${base_url}/user/${user_Id}`, { cache: 'no-cache' })
-  const result = await res.json()
+export const getUserInfo = async () => {
+  try {
+    const token = await getToken();
+    if (!token) {
+      console.error('No token found');
+      return { user: null, ok: false };
+    }
 
-  return { result, user: result.user, ok: res.ok }
-}
+    const decoded: any = jwtDecode(token);
+    const userId = decoded?.user_id;
+
+    if (!userId) {
+      console.error('Invalid token');
+      return { user: null, ok: false };
+    }
+
+    const res = await fetch(`${base_url}/user/${userId}`, { cache: 'no-cache' });
+    const result = await res.json();
+    return { result, user: result.user, ok: res.ok };
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    return { user: null, ok: false };
+  }
+};
+
+export const updateUserInfo = async (data: FormData): Promise<{ result: any; ok: boolean }> => {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${base_url}/user/update`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: data,
+    });
+
+    const result = await res.json();
+    return { result, ok: res.ok };
+  } catch (error) {
+    console.error('Error updating user info:', error);
+    return { result: { status: 'error', msg: 'An error occurred on updating profile, maybe image too large maximum 1MB' }, ok: false };
+  }
+};
+
+export const updateUserCredential = async (data: { email?: string; phone?: string; currentPassword?: string; Newpassword?: string; Confirmpassword?: string }) => {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${base_url}/user/update`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    return { result, ok: res.ok };
+  } catch (error) {
+    console.error('Error updating user credentials:', error);
+    return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
+  }
+};
+
+export const deleteUserAccount = async (email: string, password: string) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${base_url}/user/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+    return { ok: response.ok, result };
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    return { ok: false, result: { status: 'error', msg: 'An error occurred while deleting the account' } };
+  }
+};
+
 
 
 

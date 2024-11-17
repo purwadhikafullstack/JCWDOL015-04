@@ -8,9 +8,13 @@ type User = {
 
 
 declare namespace Express {
-    export interface Request {
-        user?: User
-    }
+  export interface Request {
+    user?: User;
+    files?: {
+      logo?: Express.Multer.File[];
+      banner?: Express.Multer.File[];
+    };
+  }
 }
 
 declare namespace Express {

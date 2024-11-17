@@ -14,6 +14,62 @@ textarea {
   @apply bg-white;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* notification */
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 20rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+.notification-dropdown .notification-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notification-dropdown .notification-list {
+  max-height: 20rem;
+  overflow-y: auto;
+}
+.notification-dropdown .notification-item {
+  padding: 1rem;
+  display: flex;
+  align-items: start;
+  transition: background 0.2s;
+}
+.notification-dropdown .notification-item:hover {
+  background: #f3f4f6;
+}
+.notification-dropdown .notification-icon img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+.notification-dropdown .notification-text {
+  margin-left: 0.75rem;
+  flex-grow: 1;
+}
+.notification-dropdown .notification-time {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
 .form-checkbox {
   @apply bg-white ;  
 }

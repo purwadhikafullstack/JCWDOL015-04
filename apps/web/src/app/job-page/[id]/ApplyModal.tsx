@@ -1,29 +1,50 @@
-import Link from 'next/link';
+"use client";
 import { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { applyForJob } from '@/lib/applyJob';
+import { toast } from 'react-toastify';
 
 const ApplyModal = ({ jobId }: any) => {
   const [coverLetter, setCoverLetter] = useState('');
+  const [resume, setResume] = useState<File | null>(null);
   const [showConfirmation, setShowConfirmation] = useState<{
     type: 'apply' | 'cancel' | null;
   }>({ type: null });
 
-  const handleApplyClick = () => {
-    setShowConfirmation({ type: 'apply' });
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setResume(event.target.files[0]);
+    }
   };
 
   const handleCancelClick = () => {
     setShowConfirmation({ type: 'cancel' });
   };
 
-  const handleConfirm = () => {
+  const handleApplyClick = () => {
+    setShowConfirmation({ type: 'apply' });
+  };
+
+  const handleConfirm = async () => {
     if (showConfirmation.type === 'apply') {
-      window.location.href = `/apply/${jobId}`;
+      if (!resume) {
+        toast.warning('Please upload a resume before applying.');
+        return;
+      }
+      const response = await applyForJob(jobId, coverLetter, resume);
+      if (response.ok) {
+        toast.success('Application submitted successfully!');
+        window.history.back();
+        setShowConfirmation({ type: null });
+        return;
+      } else {
+        toast.error(response.msg || 'Failed to submit the application.');
+      }
+      setShowConfirmation({ type: null });
     } else if (showConfirmation.type === 'cancel') {
       window.history.back();
     }
-    setShowConfirmation({ type: null });
   };
 
   const handleDeny = () => {
@@ -44,6 +65,8 @@ const ApplyModal = ({ jobId }: any) => {
         <input
           type="file"
           className="file-input file-input-bordered w-full mb-6"
+          onChange={handleFileChange}
+          accept=".pdf"
         />
 
         {/* Cover Letter with Larger Rich Text Editor */}

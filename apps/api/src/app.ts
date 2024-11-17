@@ -13,6 +13,12 @@ import { ReviewRouter } from './routers/review.router';
 import { SubscriptionDashboardRouter } from './routers/subs-dashboard.router';
 import { PaymentRouter } from './routers/payment.router';
 import { UserRouter } from './routers/user.router';
+import { JobRouter } from './routers/job.router';
+import { NotificationRouter } from './routers/notification.router';
+import { ApplicationRouter } from './routers/application.router';
+import { FavoriteJobRouter } from './routers/favoriteJob.router';
+import { CompanyRouter } from './routers/company.router';
+import { base_fe_url } from './controllers/user.controller';
 import { CvRouter } from './routers/cv.router';
 import { PlanBillRouter } from './routers/userplan.router';
 import { AssessmentRouter } from './routers/assessment.router';
@@ -29,7 +35,7 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+    this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
     this.app.use('/api/public', express.static('public'));
@@ -65,6 +71,11 @@ export default class App {
     const subscriptRouter = new SubscriptionDashboardRouter();
     const paymentRouter = new PaymentRouter();
     const userRouter = new UserRouter();
+    const jobRouter = new JobRouter();
+    const notificationRouter = new NotificationRouter();
+    const applicationRouter = new ApplicationRouter();
+    const favoriteJobRouter = new FavoriteJobRouter();
+    const companyRouter = new CompanyRouter();
     const CVRouter = new CvRouter();
     const userPlan = new PlanBillRouter();
     const assessmentRouter = new AssessmentRouter();
@@ -75,6 +86,11 @@ export default class App {
     });
 
     this.app.use('/api/user', userRouter.getRouter());
+    this.app.use('/api/jobs', jobRouter.getRouter());
+    this.app.use('/api/notifications', notificationRouter.getRouter());
+    this.app.use('/api/applications', applicationRouter.getRouter());
+    this.app.use('/api/favorite-job', favoriteJobRouter.getRouter());
+    this.app.use('/api/companies', companyRouter.getRouter());
     this.app.use('/api/plans', planRouter.getRouter());
     this.app.use('/api/review', reviewRouter.getRouter());
     this.app.use('/api/subscription', subscriptRouter.getRouter());

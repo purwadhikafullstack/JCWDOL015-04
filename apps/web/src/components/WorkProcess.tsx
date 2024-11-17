@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Importing the icons and arrows from the correct asset paths
 import IconApplyJob from '../assets/howitworks/Icon-ApplyJob.png';
 import IconCreateAccount from '../assets/howitworks/Icon-create-account.png';
 import IconFindJob from '../assets/howitworks/Icon-FindJob.png';

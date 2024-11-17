@@ -6,17 +6,26 @@ import { transporter } from '@/helpers/notmailer';
 import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
-import { EducationLevel, Gender } from '@prisma/client';
+
+export const base_url = process.env.BASE_API_URL;
+export const base_fe_url = process.env.BASE_FE_URL;
 
 export class UserController {
   async createUser(req: Request, res: Response) {
     try {
-      const { first_name, last_name, email, password, role } = req.body;
+      const {
+        first_name,
+        last_name,
+        email,
+        password,
+        role,
+        company_name,
+        company_email,
+        country,
+      } = req.body;
+      console.log('Request body:', req.body);
 
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
-
+      const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
         return res
           .status(400)
@@ -26,16 +35,34 @@ export class UserController {
       const salt = await genSalt(10);
       const hashedPassword = await hash(password, salt);
 
-      const newUser = await prisma.user.create({
-        data: {
-          first_name,
-          last_name,
-          email,
-          password: hashedPassword,
-          role,
-          is_verified: false,
-        },
+      const createdData = await prisma.$transaction(async (prisma) => {
+        const newUser = await prisma.user.create({
+          data: {
+            first_name,
+            last_name,
+            email,
+            password: hashedPassword,
+            role,
+            is_verified: false,
+          },
+        });
+
+        let newCompany = null;
+        if (role === 'admin' && company_name && company_email) {
+          newCompany = await prisma.company.create({
+            data: {
+              company_name,
+              email: company_email,
+              country,
+              users: { connect: { user_id: newUser.user_id } },
+            },
+          });
+        }
+
+        return { newUser, newCompany };
       });
+
+      const { newUser, newCompany } = createdData;
 
       const payload = { id: newUser.user_id };
       const token = sign(payload, process.env.SECRET_JWT!, {
@@ -51,10 +78,9 @@ export class UserController {
       const compiledTemplate = handlebars.compile(templateSource);
       const emailHtml = compiledTemplate({
         name: newUser.first_name + ' ' + newUser.last_name,
-        link: `http://localhost:3000/verify/${token}`,
+        link: `${base_fe_url}/verify/${token}`,
       });
 
-      // Send verification email
       await transporter.sendMail({
         from: process.env.MAIL_USER,
         to: newUser.email,
@@ -62,18 +88,20 @@ export class UserController {
         html: emailHtml,
       });
 
-      // Respond with success
       res.status(201).json({
         status: 'ok',
         msg: 'Account created successfully! Please verify your email!',
         user: newUser,
+        company: newCompany,
       });
     } catch (err) {
       console.error('Error during registration:', err);
-      res.status(400).json({
-        status: 'error',
-        msg: 'An error occurred during user registration.',
-      });
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          msg: 'An error occurred during user registration.',
+        });
     }
   }
 
@@ -290,9 +318,8 @@ export class UserController {
         years_of_experience,
       } = req.body;
 
-      // Access the uploaded profile picture file path
       const profilePictureUrl = req.file
-        ? `http://localhost:8000/api/public/profile_pictures/${req.file.filename}`
+        ? `${base_url}/public/profile_pictures/${req.file.filename}`
         : undefined;
 
       const userId = req.user?.user_id;
@@ -328,39 +355,64 @@ export class UserController {
         hashedPassword = await hash(Newpassword, await genSalt(10));
       }
 
-      const yearsOfExperienceInt = years_of_experience
-        ? parseInt(years_of_experience, 10)
-        : undefined;
-
-      const parsedDateOfBirth = DateOfBirth ? new Date(DateOfBirth) : undefined;
+      const updateData: any = {};
+      if (first_name) updateData.first_name = first_name;
+      if (last_name) updateData.last_name = last_name;
+      if (phone) updateData.phone = phone;
+      if (email) {
+        updateData.email = email;
+        updateData.is_verified = false;
+      }
+      if (website) updateData.website = website;
+      if (title) updateData.title = title;
+      if (education) updateData.education = education;
+      if (biography) updateData.biography = biography;
+      if (location) updateData.location = location;
+      if (skills) updateData.skills = skills;
+      if (languages) updateData.languages = languages;
+      if (nationality) updateData.nationality = nationality;
+      if (gender) updateData.gender = gender;
+      if (DateOfBirth) updateData.DateOfBirth = new Date(DateOfBirth);
+      if (years_of_experience) {
+        updateData.years_of_experience = parseInt(
+          String(years_of_experience),
+          10,
+        );
+      }
+      if (profilePictureUrl) updateData.profile_picture = profilePictureUrl;
+      if (hashedPassword) updateData.password = hashedPassword;
 
       const updatedUser = await prisma.user.update({
         where: { user_id: userId },
-        data: {
-          first_name,
-          last_name,
-          phone,
-          email,
-          profile_picture: profilePictureUrl,
-          website,
-          linkedin,
-          github,
-          twitter,
-          facebook,
-          instagram,
-          title,
-          education,
-          biography,
-          location,
-          skills,
-          languages,
-          nationality,
-          gender,
-          DateOfBirth: parsedDateOfBirth,
-          years_of_experience: yearsOfExperienceInt,
-          ...(hashedPassword && { password: hashedPassword }),
-        },
+        data: updateData,
       });
+
+      if (email && email !== user.email) {
+        const payload = { id: updatedUser.user_id };
+        const token = sign(payload, process.env.SECRET_JWT!, {
+          expiresIn: '60m',
+        });
+
+        const templatePath = path.join(
+          __dirname,
+          '../templates',
+          'reVerification.hbs',
+        );
+        const templateSource = fs.readFileSync(templatePath, 'utf-8');
+        const compiledTemplate = handlebars.compile(templateSource);
+
+        const emailHtml = compiledTemplate({
+          name: updatedUser.first_name + ' ' + updatedUser.last_name,
+          link: `${base_fe_url}/verify/${token}`,
+        });
+
+        await transporter.sendMail({
+          from: process.env.MAIL_USER,
+          to: updatedUser.email,
+          subject: 'Verify Your HireMe Account',
+          html: emailHtml,
+        });
+      }
 
       res.status(200).send({
         status: 'ok',
@@ -413,7 +465,7 @@ export class UserController {
 
       const emailHtml = compiledTemplate({
         name: user.first_name + ' ' + user.last_name,
-        link: `http://localhost:3000/verify/${token}`,
+        link: `${base_fe_url}/verify/${token}`,
       });
 
       await transporter.sendMail({
@@ -536,12 +588,10 @@ export class UserController {
     const { email, first_name, last_name, profile_picture } = req.body;
 
     try {
-      // Check if the user already exists in the MySQL database
       let user = await prisma.user.findUnique({
         where: { email },
       });
 
-      // If the user does not exist, create a new one
       if (!user) {
         user = await prisma.user.create({
           data: {
@@ -550,17 +600,15 @@ export class UserController {
             last_name,
             profile_picture,
             is_verified: true,
-            password: '', // Social login users won't have a password set
-            role: 'candidate', // Assign default role or customize as needed
+            password: '',
+            role: 'candidate',
           },
         });
       }
 
-      // Generate JWT token for the session
       const payload = { user_id: user.user_id, role: user.role };
       const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '1d' });
 
-      // Return the user data and token
       res.status(200).json({
         status: 'ok',
         msg: 'Social login successful',
@@ -615,11 +663,25 @@ export class UserController {
       });
     }
   }
-
+  
+  async getTotalUserSubscribe(req: Request, res: Response) {
+    try {
+      const userCount = await prisma.user.count({
+        where: {
+          is_verified: true, 
+        },
+      });
+      res.status(200).json({ status: 'ok', userCount });
+    } catch (error) {
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch total user subscribe count',
+      });
+    }
+  }
   async getUserSubscriptions(req: Request, res: Response) {
     const user_id = req.user?.user_id;
     console.log('User ID in getUserSubscriptions:', req.user?.user_id);
-
 
     try {
       const subscriptions = await prisma.subscription.findMany({
@@ -643,7 +705,7 @@ export class UserController {
 
   // Mendapatkan Riwayat Pembayaran Berdasarkan user_id
   async getUserPayments(req: Request, res: Response) {
-    const user_id = req.user?.user_id; 
+    const user_id = req.user?.user_id;
 
     try {
       const payments = await prisma.paymentTransaction.findMany({

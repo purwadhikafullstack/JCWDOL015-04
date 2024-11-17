@@ -2,7 +2,6 @@ export const toProperCase = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-// Country names mapping for conversion
 export const getCountryName = (code: string): string => {
   const countryNames: { [key: string]: string } = {
     ID: 'Indonesia',
@@ -14,10 +13,9 @@ export const getCountryName = (code: string): string => {
     JP: 'Japan',
     CN: 'China',
   };
-  return countryNames[code] || code; 
+  return countryNames[code] || code;
 };
 
-// Job category names mapping for display
 export const getJobTypeName = (jobType: string): string => {
   const typesNames: { [key: string]: string } = {
     fullTime: 'Full-Time',
@@ -95,3 +93,50 @@ export const jobExperienceLevels = [
   { value: 'senior_level', label: 'Senior Level' },
   { value: 'expert', label: 'Expert' },
 ];
+
+export const industryOptions = [
+  { value: 'TECHNOLOGY', label: 'Technology' },
+  { value: 'FINANCE', label: 'Finance' },
+  { value: 'HEALTHCARE', label: 'Healthcare' },
+  { value: 'EDUCATION', label: 'Education' },
+  { value: 'RETAIL', label: 'Retail' },
+  { value: 'HOSPITALITY', label: 'Hospitality' },
+  { value: 'TRANSPORTATION', label: 'Transportation' },
+  { value: 'CONSTRUCTION', label: 'Construction' },
+  { value: 'REAL_ESTATE', label: 'Real Estate' },
+  { value: 'CONSULTING', label: 'Consulting' },
+  { value: 'GOVERNMENT', label: 'Government' },
+  { value: 'ENERGY', label: 'Energy' },
+  { value: 'TELECOMMUNICATIONS', label: 'Telecommunications' },
+  { value: 'ENTERTAINMENT', label: 'Entertainment' },
+  { value: 'AGRICULTURE', label: 'Agriculture' },
+  { value: 'MANUFACTURING', label: 'Manufacturing' },
+  { value: 'INSURANCE', label: 'Insurance' },
+  { value: 'LEGAL', label: 'Legal' },
+  { value: 'MARKETING', label: 'Marketing' },
+  { value: 'ADVERTISING', label: 'Advertising' },
+  { value: 'MEDIA', label: 'Media' },
+  { value: 'NON_PROFIT', label: 'Non-Profit' },
+  { value: 'RESEARCH', label: 'Research' },
+  { value: 'AUTOMOTIVE', label: 'Automotive' },
+  { value: 'PHARMACEUTICALS', label: 'Pharmaceuticals' },
+];
+
+export const getStatusLabel = (status: string): string => {
+  const statusLabels: { [key: string]: string } = {
+    active: 'Application Received',
+    under_review: 'Under Review',
+    interview: 'Interview In Progress',
+    pending: 'Next Steps Pending',
+    accepted: 'Offer Extended',
+    hired: 'Welcome Aboard!',
+    rejected: 'Thanks for Applying',
+  };
+
+  return statusLabels[status] || status;
+};
+
+export const formatNumberWithCommas = (num: number | string): string => {
+  if (num === '') return '';
+  return Number(num).toLocaleString();
+};

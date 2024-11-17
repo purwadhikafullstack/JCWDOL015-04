@@ -7,6 +7,170 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum UserRole {
+  normal
+  candidate
+  admin
+  developer
+}
+
+enum ApplicationStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum InterviewStatus {
+  scheduled
+  completed
+  canceled
+}
+
+enum SubscriptionStatus {
+  active
+  inactive
+}
+
+enum AssessmentStatus {
+  passed
+  failed
+}
+
+enum QuestionType {
+  multiple_choice
+  true_false
+  open_ended
+}
+
+enum DifficultyLevel {
+  easy
+  medium
+  hard
+}
+
+enum NotificationType {
+  application
+  interview
+  subscription
+}
+
+enum ProficiencyLevel {
+  beginner
+  intermediate
+  advanced
+}
+
+enum LogStatus {
+  success
+  failure
+}
+
+enum ReportStatus {
+  pending
+  resolved
+  dismissed
+}
+
+enum DeviceType {
+  desktop
+  mobile
+  tablet
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  failed
+}
+
+enum PaymentMethod {
+  bank_transfer
+  credit_card
+  paypal
+}
+
+enum InterviewType {
+  in_person
+  virtual
+}
+
+enum EducationLevel {
+  HIGH_SCHOOL
+  ASSOCIATES
+  BACHELORS
+  MASTERS
+  DOCTORATE
+  DIPLOMA
+  VOCATIONAL
+  CERTIFICATION
+  SOME_COLLEGE
+  POSTGRADUATE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum JobType {
+  fullTime
+  partTime
+  freelance
+  contractor
+}
+
+enum CountryCode {
+  ID
+  SG
+  MY
+  US
+  GB
+  DE
+  JP
+  CN
+}
+
+enum JobEducationLevel {
+  high_school
+  intermediate
+  graduate
+  bachelor_degree
+  master_degree
+  doctor_degree
+}
+
+enum JobExperience {
+  entry_level
+  mid_level
+  senior_level
+  expert
+}
+
+enum JobCategory {
+  software_engineering
+  data_science
+  machine_learning
+  artificial_intelligence
+  cybersecurity
+  business_intelligence
+  cyber_security
+  product_management
+  marketing
+  design
+  finance
+  accounting
+  legal
+  management
+  human_resources
+  customer_service
+  sales
+  legal_and_compliance
+  management_and_leadership
+  public_relations
+}
+
 model User {
   user_id                Int                      @id @default(autoincrement())
   email                  String                   @unique
@@ -420,167 +584,4 @@ model CV {
   user       User     @relation(fields: [user_id], references: [user_id])
 
   @@index([user_id])
-}
-
-enum UserRole {
-  normal
-  candidate
-  admin
-  developer
-}
-
-enum ApplicationStatus {
-  pending
-  accepted
-  rejected
-}
-
-enum InterviewStatus {
-  scheduled
-  completed
-  canceled
-}
-
-enum SubscriptionStatus {
-  active
-  inactive
-}
-
-enum AssessmentStatus {
-  passed
-  failed
-}
-
-enum QuestionType {
-  multiple_choice
-  true_false
-  open_ended
-}
-
-enum DifficultyLevel {
-  easy
-  medium
-  hard
-}
-
-enum NotificationType {
-  application
-  interview
-  subscription
-}
-
-enum ProficiencyLevel {
-  beginner
-  intermediate
-  advanced
-}
-
-enum LogStatus {
-  success
-  failure
-}
-
-enum ReportStatus {
-  pending
-  resolved
-  dismissed
-}
-
-enum DeviceType {
-  desktop
-  mobile
-  tablet
-}
-
-enum TransactionStatus {
-  pending
-  completed
-  failed
-}
-
-enum PaymentMethod {
-  bank_transfer
-  credit_card
-  paypal
-}
-
-enum InterviewType {
-  in_person
-  virtual
-}
-
-enum EducationLevel {
-  HIGH_SCHOOL
-  ASSOCIATES
-  BACHELORS
-  MASTERS
-  DOCTORATE
-  DIPLOMA
-  VOCATIONAL
-  CERTIFICATION
-  SOME_COLLEGE
-  POSTGRADUATE
-}
-
-enum Gender {
-  MALE
-  FEMALE
-  OTHER
-}
-
-enum JobType {
-  fullTime
-  partTime
-  freelance
-  contractor
-}
-
-enum CountryCode {
-  ID
-  SG
-  MY
-  US
-  GB
-  DE
-  JP
-  CN
-}
-
-enum JobEducationLevel {
-  high_school
-  intermediate
-  graduate
-  bachelor_degree
-  master_degree
-  doctor_degree
-}
-
-enum JobExperience {
-  entry_level
-  mid_level
-  senior_level
-  expert
-}
-
-enum JobCategory {
-  software_engineering
-  data_science
-  machine_learning
-  artificial_intelligence
-  cybersecurity
-  business_intelligence
-  cyber_security
-  product_management
-  marketing
-  design
-  finance
-  accounting
-  legal
-  management
-  human_resources
-  customer_service
-  sales
-  legal_and_compliance
-  management_and_leadership
-  public_relations
 }

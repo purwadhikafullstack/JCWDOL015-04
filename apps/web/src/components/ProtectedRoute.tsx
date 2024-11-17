@@ -6,13 +6,11 @@ import { toast } from 'react-toastify';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: string; // Optional role restriction
+  requiredRole?: string;
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { isAuthenticated, role } = useSelector(
-    (state: RootState) => state.user,
-  );
+  const { isAuthenticated, role } = useSelector((state: RootState) => state.user);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -23,22 +21,16 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   useEffect(() => {
     if (isClient) {
       if (!isAuthenticated) {
-        // Redirect to homepage if user is not authenticated
-        toast.error('Register or login to apply for this job!');
+        toast.info('Register or login to view all features!');
         router.push('/auth');
       } else if (requiredRole && role !== requiredRole) {
-        // Redirect if user does not have the required role
         router.push('/');
       }
     }
   }, [isAuthenticated, role, router, requiredRole, isClient]);
 
-  if (
-    !isClient ||
-    !isAuthenticated ||
-    (requiredRole && role !== requiredRole)
-  ) {
-    return null; // Prevents flashing protected content before redirect
+  if (!isClient || !isAuthenticated || (requiredRole && role !== requiredRole)) {
+    return null;
   }
 
   return <>{children}</>;

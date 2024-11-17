@@ -8,22 +8,21 @@ import SaveButton from '../assets/save-button.svg';
 import SavedButton from '../assets/saved-button.svg';
 import { JobCardProps } from '@/types/job';
 import { FiImage } from 'react-icons/fi';
+import { toggleSaveJob } from '@/lib/job';
 
 const FeatureJob = () => {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
 
   const loadJobs = async () => {
     try {
-      // Fetch jobs with the latest sorting, limited to six jobs
       const jobFilters = { dateRange: 'latest' };
       const jobsData = await fetchJobs('latest', jobFilters);
 
-      // Map jobsData to match JobCardProps structure
       const formattedJobs = jobsData.slice(0, 6).map((job) => ({
         job_id: job.job_id,
         job_title: job.job_title,
         location: job.location,
-        salary: job.salary !== undefined ? `$${job.salary}K` : null, // Convert salary to string or null
+        salary: job.salary !== undefined ? `$${job.salary}K` : null,
         company: {
           company_name: job.company.company_name,
           logo: job.company.logo || null,
@@ -72,8 +71,13 @@ interface JobCardComponentProps {
 const JobCard = ({ job }: JobCardComponentProps) => {
   const [isSaved, setIsSaved] = useState(false);
 
-  const handleSaveClick = () => {
-    setIsSaved(!isSaved);
+  const handleSaveClick = async () => {
+    const response = await toggleSaveJob(job.job_id);
+    if (response.ok) {
+      setIsSaved((prev) => !prev);
+    } else {
+      console.error(response.msg);
+    }
   };
 
   return (

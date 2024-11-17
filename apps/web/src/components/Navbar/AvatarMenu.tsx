@@ -1,7 +1,8 @@
-"use client";
+'use client';
 import React from 'react';
 import { UserRole } from '@/types/role';
-import { useAppSelector } from '@/redux/hooks'; // Import useAppSelector to access Redux state
+import { useAppSelector } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
 
 interface AvatarMenuProps {
   onLogout: () => void;
@@ -10,6 +11,22 @@ interface AvatarMenuProps {
 
 const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
   const profilePicture = useAppSelector((state) => state.user.profile_picture);
+  const router = useRouter();
+
+  const handleProfileClick = () => {
+    if (userRole === UserRole.Candidate) {
+      router.push('/dashboard-candidate');
+    } else if (userRole === UserRole.Developer) {
+      router.push('/dashboard-developer');
+    } else if (userRole === UserRole.Admin) {
+      router.push('/dashboard-admin');
+    }
+  };
+
+  const handleLogout = () => {
+    onLogout();
+    router.push('/');
+  };
 
   return (
     <div className="dropdown dropdown-end">
@@ -21,7 +38,10 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         <div className="w-10 rounded-full">
           <img
             alt="Avatar"
-            src={profilePicture || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+            src={
+              profilePicture ||
+              'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
+            }
           />
         </div>
       </div>
@@ -29,14 +49,23 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
       >
-        <li><a href='/user-menu'>Profile</a></li>
-        <li><button>Setting</button></li>
+        {/* Profile Button - Conditional on userRole */}
+        <li>
+          <button onClick={handleProfileClick}>Profile</button>
+        </li>
         {userRole === UserRole.Developer && (
-          <li><button>Assessments</button></li>
+          <>
+            <li>
+              <button>Assessments</button>
+            </li>
+            <li>
+              <button>Subscription</button>
+            </li>
+          </>
         )}
         <li>
           <button
-            onClick={onLogout}
+            onClick={handleLogout}
             className="rounded-lg hover:text-white hover:bg-red-600"
           >
             Logout

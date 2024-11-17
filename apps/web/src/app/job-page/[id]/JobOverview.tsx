@@ -1,4 +1,3 @@
-// job-page/[id]/JobOverview.tsx
 import moment from 'moment';
 import { OverviewItem } from '@/app/job-page/[id]/OverviewItem';
 import {
@@ -29,7 +28,7 @@ const JobOverview = ({ job }: any) => (
       <OverviewItem
         icon={<FiCalendar />}
         label="Job Expire In"
-        value={moment(job.jobExpired_at).format('DD MMMM, YYYY')}
+        value={job.jobExpired_at !== null ? moment(job.jobExpired_at).format('DD MMMM, YYYY') : "No Expire Date provided" }
       />
       <OverviewItem
         icon={<FiGrid />}
@@ -47,7 +46,7 @@ const JobOverview = ({ job }: any) => (
         value={
           job.salary !== null
             ? `$${Number(job.salary).toLocaleString()} / month`
-            : 'Not provided'
+            : 'Compensation to Be Determined'
         }
       />
       <OverviewItem

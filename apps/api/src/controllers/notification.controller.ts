@@ -33,4 +33,24 @@ export class NotificationController {
       res.status(500).json({ msg: 'Failed to mark notification as read' });
     }
   }
+
+  async markAllAsRead(req: Request, res: Response) {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        return res.status(400).json({ msg: 'User ID is required' });
+      }
+  
+      await prisma.notification.updateMany({
+        where: { user_id: userId, is_read: false },
+        data: { is_read: true },
+      });
+  
+      res.status(200).json({ msg: 'All notifications marked as read' });
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      res.status(500).json({ msg: 'Failed to mark all notifications as read' });
+    }
+  }
+  
 }

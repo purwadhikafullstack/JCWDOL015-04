@@ -7,7 +7,6 @@ const TermsAndConditions = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Adjust the offset based on your navbar height
       if (window.scrollY > 120) {
         setIsScrolled(true);
       } else {
@@ -21,7 +20,7 @@ const TermsAndConditions = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 relative">
+    <div className="min-h-screen bg-gray-50 pt-12 lg:pt-0 text-gray-800 relative">
       <div className="max-w-5xl mx-auto py-16 px-6 lg:flex">
         {/* Main Content */}
         <div className="lg:w-3/4">

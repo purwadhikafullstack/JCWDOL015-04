@@ -1,4 +1,3 @@
-// Navbar.tsx
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -12,18 +11,16 @@ import { useRouter } from 'next/navigation';
 import logo from '../../assets/logo.png';
 import { toast } from 'react-toastify';
 import NavLinks from './NavLinks';
-import SearchBar from './SearchBar';
 import AuthButtons from './AuthButtons';
 import MobileMenu from './MobileMenu';
+import Notification from './Notification/notification';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  
-  // Use Redux user state
+
   const user = useAppSelector((state) => state.user);
-  console.log("User state in Redux:", user);
   const isLoggedIn = !!user.user_id;
 
   const onLogout = async () => {
@@ -31,6 +28,10 @@ const Navbar = () => {
     await deleteToken();
     dispatch(logoutAction());
     router.push('/');
+  };
+
+  const handleCloseMenu = () => {
+    setMenuOpen(false);
   };
 
   return (
@@ -50,30 +51,42 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Search Bar */}
-        <div className="hidden lg:flex flex-grow mx-6 items-center">
-          <SearchBar />
-        </div>
-
         {/* Desktop Navigation Links and Auth Buttons */}
         <div className="hidden lg:flex items-center space-x-4">
           <ul className="flex space-x-6 text-gray-700">
             <NavLinks userRole={user.role as UserRole | null} />
           </ul>
-          <AuthButtons isLoggedIn={isLoggedIn} userRole={user.role as UserRole | null} onLogout={onLogout} />
+          <AuthButtons
+            isLoggedIn={isLoggedIn}
+            userRole={user.role as UserRole | null}
+            onLogout={onLogout}
+          />
         </div>
 
         {/* Mobile Menu Toggle Button */}
         <div className="flex items-center lg:hidden space-x-2">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="text-gray-700">
-            {menuOpen ? <FiX className="text-2xl" /> : <FiMenu className="text-2xl" />}
+          <Notification />
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-gray-700"
+          >
+            {menuOpen ? (
+              <FiX className="text-2xl" />
+            ) : (
+              <FiMenu className="text-2xl" />
+            )}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <MobileMenu isLoggedIn={isLoggedIn} userRole={user.role as UserRole | null} onLogout={onLogout} />
+        <MobileMenu
+          isLoggedIn={isLoggedIn}
+          userRole={user.role as UserRole | null}
+          onLogout={onLogout}
+          onClose={handleCloseMenu}
+        />
       )}
     </nav>
   );
