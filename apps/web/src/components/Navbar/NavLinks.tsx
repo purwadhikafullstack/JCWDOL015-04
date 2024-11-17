@@ -13,10 +13,9 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
   if (checkRole(UserRole.Admin)) {
     return (
       <>
-        <li><Link href="/find-candidate" className="hover:text-Primary-blue">Find Candidate</Link></li>
+        <li><Link href="/saved-candidate" className="hover:text-Primary-blue">Saved Candidate</Link></li>
         <li><Link href="/dashboard-admin" className="hover:text-Primary-blue">Dashboard</Link></li>
         <li><Link href="/my-jobs" className="hover:text-Primary-blue">My Jobs</Link></li>
-        <li><Link href="/applications" className="hover:text-Primary-blue">Applications</Link></li>
         <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );
