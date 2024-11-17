@@ -25,7 +25,7 @@ export class JobRouter {
   this.router.get('/:id', this.jobController.getJobById);
 
   this.router.post('/', verifyToken, checkAdminDev, this.jobController.createJob);
-  this.router.put('/:id', verifyToken, checkAdminDev, this.jobController.updateJob);
+  this.router.patch('/:id', this.jobController.updateJob);
 
   }
 

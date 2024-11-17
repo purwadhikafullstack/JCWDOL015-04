@@ -30,7 +30,7 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
     const fetchApplicants = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/applications/job/${jobId}`,
+          `${base_url}/applications/job/${jobId}`,
           {
             headers: {
               Authorization: `Bearer ${Cookies.get('token')}`,

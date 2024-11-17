@@ -30,7 +30,7 @@ const JobForm = ({ jobId }: { jobId?: number }) => {
   useEffect(() => {
     if (jobId) {
       axios
-        .get(`${process.env.NEXT_PUBLIC_BASE_URL}/jobs/${jobId}`)
+        .get(`${base_url}/jobs/${jobId}`)
         .then((response) => {
           setFormData(response.data.job);
         })

@@ -84,27 +84,28 @@ export class AnalyticsController {
       const averageExperience = await prisma.user.aggregate({
         _avg: { years_of_experience: true },
       });
-
+  
       const genderDistribution = await prisma.user.groupBy({
         by: ['gender'],
         _count: { gender: true },
       });
-
-      const topLocations = await prisma.user.groupBy({
-        by: ['location'],
-        _count: { location: true },
-        orderBy: { _count: { location: 'desc' } },
+  
+      const topCountries = await prisma.user.groupBy({
+        by: ['country'],
+        _count: { country: true },
+        orderBy: { _count: { country: 'desc' } },
         take: 5,
       });
-
+  
       res.status(200).json({
         averageExperience: averageExperience._avg?.years_of_experience || 0,
         genderDistribution,
-        topLocations,
+        topCountries,
       });
     } catch (error) {
       console.error('Error fetching user demographics:', error);
       res.status(500).json({ msg: 'Failed to fetch user demographics' });
     }
   }
+  
 }

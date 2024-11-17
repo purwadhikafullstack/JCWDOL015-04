@@ -675,7 +675,7 @@ model TestResult {
   result_id        Int               @id @default(autoincrement())
   user_id          Int
   job_id           Int
-  score            Int               // Skor dari total 30 poin
+  score            Int              
   completed_at     DateTime          @default(now())
   job              Job               @relation(fields: [job_id], references: [job_id])
   user             User              @relation(fields: [user_id], references: [user_id])
@@ -690,14 +690,14 @@ model TestOption {
 
 model TestAnswer {
   answer_id      Int               @id @default(autoincrement())
-  user_id        Int               // ID pengguna yang memberikan jawaban
-  question_id    Int               // ID pertanyaan terkait
-  test_id        Int               // ID tes terkait
-  selected_option Int              // Jawaban peserta (ID dari opsi)
-  is_correct     Boolean           // Apakah jawaban benar atau salah
-  answered_at    DateTime          @default(now()) // Waktu peserta menjawab
+  user_id        Int               
+  question_id    Int               
+  test_id        Int               
+  selected_option Int              
+  is_correct     Boolean           
+  answered_at    DateTime          @default(now()) 
 
   user           User              @relation(fields: [user_id], references: [user_id])
-  question       TestQuestion      @relation(fields: [question_id], references: [question_id])
   preSelectionTest PreSelectionTest @relation(fields: [test_id], references: [test_id])
+  testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
 }

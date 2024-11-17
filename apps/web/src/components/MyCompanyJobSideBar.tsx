@@ -15,7 +15,7 @@ const MyCompanyJobSideBar: React.FC = () => {
         My Jobs
       </Typography>
       <nav className="space-y-2">
-        <Link href="/myjobs">
+        <Link href="/my-jobs">
           <Button
             fullWidth
             variant="text"
@@ -33,16 +33,6 @@ const MyCompanyJobSideBar: React.FC = () => {
             className="text-gray-700 hover:bg-blue-200 justify-start"
           >
             Post a Job
-          </Button>
-        </Link>
-        <Link href="/my-jobs">
-          <Button
-            fullWidth
-            variant="text"
-            startIcon={<AssignmentIndIcon />}
-            className="text-gray-700 hover:bg-blue-200 justify-start"
-          >
-            My Jobs
           </Button>
         </Link>
         <Link href="/saved-candidate">

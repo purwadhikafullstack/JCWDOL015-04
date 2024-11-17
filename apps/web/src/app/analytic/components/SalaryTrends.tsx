@@ -4,8 +4,8 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Paper, Box } from '@mui/material';
 import { MonetizationOn } from '@mui/icons-material';
+import base_url from '@/lib/user';
 
-// Definisikan tipe data yang diterima dari API
 interface SalaryByLocation {
   location: string;
   avgSalary: number;
@@ -21,13 +21,11 @@ const SalaryTrends: React.FC = () => {
   const [popularPositions, setPopularPositions] = useState<PopularPosition[]>([]);
 
   useEffect(() => {
-    // Fungsi untuk mengambil data dari backend
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/analytics/salary-trends`); // Ganti endpoint sesuai kebutuhan
+        const response = await fetch(`${base_url}/analytics/salary-trends`);
         const data = await response.json();
 
-        // Format data sesuai kebutuhan
         const formattedSalaryByLocation = data.salaryByLocation.map((location: any) => ({
           location: location.location,
           avgSalary: location._avg.salary,

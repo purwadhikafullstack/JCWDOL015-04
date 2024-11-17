@@ -5,9 +5,6 @@ import {
   Typography,
   Paper,
   Button,
-  Menu,
-  MenuItem,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -17,13 +14,13 @@ import {
   TablePagination,
   Select,
   FormControl,
+  MenuItem,
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MyCompanyJobSideBar from '@/components/MyCompanyJobSideBar';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { fetchRecentlyPostedJobs } from '@/lib/job'; 
-import { getUserInfo } from '@/lib/user';
+import { fetchRecentlyPostedJobs } from '@/lib/job';
+import base_url, { getUserInfo } from '@/lib/user';
 
 type Job = {
   id: number;
@@ -35,13 +32,11 @@ type Job = {
 };
 
 const MyJobs: React.FC = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filterStatus, setFilterStatus] = useState('All Jobs');
   const [jobs, setJobs] = useState<Job[]>([]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const userResponse = await getUserInfo();
@@ -65,46 +60,70 @@ const MyJobs: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, job: Job) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedJob(job);
-  };
+  const updateJobStatus = async (
+    jobId: number,
+    newStatus: 'Active' | 'Expire',
+  ) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}/jobs/${jobId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ is_active: newStatus === 'Active' }),
+        },
+      );
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedJob(null);
+      if (!response.ok) {
+        throw new Error('Failed to update job status');
+      }
+
+      const result = await response.json();
+      console.log('Job status updated:', result);
+
+      setJobs((prevJobs) =>
+        prevJobs.map((job) =>
+          job.id === jobId ? { ...job, status: newStatus } : job,
+        ),
+      );
+    } catch (error) {
+      console.error('Error updating job status:', error);
+    }
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleStatusChange = (jobId: number, newStatus: 'Active' | 'Expire') => {
-    setJobs((prevJobs) =>
-      prevJobs.map((job) =>
-        job.id === jobId ? { ...job, status: newStatus } : job
-      )
-    );
-  };
-
-  const filteredJobs = filterStatus === 'All Jobs' ? jobs : jobs.filter(job => job.status === filterStatus);
+  const filteredJobs =
+    filterStatus === 'All Jobs'
+      ? jobs
+      : jobs.filter((job) => job.status === filterStatus);
 
   return (
     <ProtectedRoute requiredRole="admin">
       <div className="flex justify-center bg-gray-100 min-h-screen p-6 space-x-6">
         <MyCompanyJobSideBar />
-        <div className="w-full max-w-5xl">
-          <div className="flex justify-between items-center mb-4">
+        <div className="w-full max-w-5xl bg-white p-4 shadow-lg rounded-md">
+          <div className="flex justify-between items-center mb-6">
+            <Typography variant="h5" className="font-bold text-gray-700">
+              My Jobs
+            </Typography>
             <FormControl variant="outlined" className="w-48">
               <Select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as string)}
                 displayEmpty
+                className="bg-gray-100 rounded-md"
               >
                 <MenuItem value="All Jobs">All Jobs</MenuItem>
                 <MenuItem value="Active">Active</MenuItem>
@@ -113,25 +132,34 @@ const MyJobs: React.FC = () => {
             </FormControl>
           </div>
 
-          <Paper className="shadow-lg rounded-lg">
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Jobs</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Applications</TableCell>
-                    <TableCell>Selection Test</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredJobs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((job) => (
-                    <TableRow key={job.id}>
+          <TableContainer>
+            <Table className="border">
+              <TableHead>
+                <TableRow className="bg-gray-200">
+                  <TableCell className="font-semibold">Jobs</TableCell>
+                  <TableCell className="font-semibold">Status</TableCell>
+                  <TableCell className="font-semibold">View Detail</TableCell>
+                  <TableCell className="font-semibold">Selection Test</TableCell>
+                  <TableCell className="font-semibold">View Applications</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredJobs
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((job) => (
+                    <TableRow
+                      key={job.id}
+                      className="hover:bg-gray-50 transition duration-150"
+                    >
                       <TableCell>
-                        <div className="flex flex-col">
-                          <Typography>{job.title}</Typography>
-                          <Typography variant="caption" className="text-gray-500">
+                        <div>
+                          <Typography className="font-medium text-gray-800">
+                            {job.title}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            className="text-gray-500"
+                          >
                             {job.type} • {job.daysRemaining} days remaining
                           </Typography>
                         </div>
@@ -140,8 +168,13 @@ const MyJobs: React.FC = () => {
                         <FormControl variant="outlined" size="small">
                           <Select
                             value={job.status}
-                            onChange={(e) => handleStatusChange(job.id, e.target.value as 'Active' | 'Expire')}
-                            displayEmpty
+                            onChange={(e) => {
+                              const newStatus = e.target.value as
+                                | 'Active'
+                                | 'Expire';
+                              updateJobStatus(job.id, newStatus);
+                            }}
+                            className="bg-gray-100"
                           >
                             <MenuItem value="Active">Active</MenuItem>
                             <MenuItem value="Expire">Expire</MenuItem>
@@ -149,50 +182,104 @@ const MyJobs: React.FC = () => {
                         </FormControl>
                       </TableCell>
                       <TableCell>
-                        <Typography>{job.applications} Applications</Typography>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          className="hover:bg-blue-50"
+                          onClick={() => {
+                            window.location.href = `/my-jobs/${job.id}`;
+                          }}
+                        >
+                          View Detail
+                        </Button>
                       </TableCell>
                       <TableCell>
-                        <Link href="http://localhost:3000/test-creation">
-                          <Button variant="outlined" color="secondary">
-                            Selection Test
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          className="hover:bg-pink-50"
+                          onClick={async () => {
+                            try {
+                              const response = await fetch(
+                                `${base_url}/preselection/check-test/${job.id}`,
+                              );
+
+                              if (response.ok) {
+                                const data = await response.json();
+                                if (data.hasTest) {
+                                  window.location.href = `/test-creation/${job.id}`;
+                                } else {
+                                  const confirmCreate = confirm(
+                                    'Tes belum terbuat untuk pekerjaan ini. Apakah Anda ingin membuat tes baru?',
+                                  );
+                                  if (confirmCreate) {
+                                    const createResponse = await fetch(
+                                      `${base_url}/preselection/create-test`,
+                                      {
+                                        method: 'POST',
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                          jobId: job.id,
+                                        }),
+                                      },
+                                    );
+
+                                    if (createResponse.ok) {
+                                      alert(
+                                        'Tes berhasil dibuat! Anda akan diarahkan ke halaman edit.',
+                                      );
+                                      window.location.href = `/test-creation/${job.id}`;
+                                    } else {
+                                      const errorData =
+                                        await createResponse.json();
+                                      alert(
+                                        `Gagal membuat tes: ${errorData.msg}`,
+                                      );
+                                    }
+                                  }
+                                }
+                              }
+                            } catch (error) {
+                              alert('Terjadi kesalahan. Silakan coba lagi.');
+                            }
+                          }}
+                        >
+                          Selection Test
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/jobs-applicant?jobId=${job.id}&jobTitle=${encodeURIComponent(
+                            job.title,
+                          )}`}
+                        >
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            className="hover:bg-green-50"
+                          >
+                            View Applications
                           </Button>
                         </Link>
                       </TableCell>
-                      <TableCell>
-  <Link href={`/jobs-applicant?jobId=${job.id}&jobTitle=${encodeURIComponent(job.title)}`}>
-    <Button variant="outlined" color="primary" className="mr-2">
-      View Applications
-    </Button>
-  </Link>
-  <IconButton onClick={(event) => handleMenuOpen(event, job)}>
-    <MoreVertIcon />
-  </IconButton>
-  <Menu
-    anchorEl={anchorEl}
-    open={Boolean(anchorEl)}
-    onClose={handleMenuClose}
-  >
-    <MenuItem onClick={handleMenuClose}>Promote Job</MenuItem>
-    <MenuItem onClick={handleMenuClose}>View Detail</MenuItem>
-    <MenuItem onClick={handleMenuClose}>Make it Expire</MenuItem>
-  </Menu>
-</TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={filteredJobs.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Paper>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredJobs.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            className="mt-4"
+          />
         </div>
       </div>
     </ProtectedRoute>
