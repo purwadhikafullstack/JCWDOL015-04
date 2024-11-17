@@ -18,6 +18,8 @@ export default function VerifyPage() {
         }
     }
 
+    // Suppress the missing dependency warning
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (params.token) {
             onVerify();

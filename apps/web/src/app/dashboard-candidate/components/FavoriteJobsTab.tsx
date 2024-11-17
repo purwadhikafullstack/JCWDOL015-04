@@ -7,6 +7,7 @@ import { FavoriteJob } from '@/types/job';
 import moment from 'moment';
 import Link from 'next/link';
 import { getUserInfo } from '@/lib/user';
+import Image from 'next/image';
 
 const FavoriteJobsTab = () => {
   const [favoriteJobs, setFavoriteJobs] = useState<FavoriteJob[]>([]);
@@ -24,7 +25,7 @@ const FavoriteJobsTab = () => {
         console.error('Failed to fetch user info');
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -65,10 +66,12 @@ const FavoriteJobsTab = () => {
                       <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           {favorite.job.company.logo ? (
-                            <img
+                            <Image
                               src={favorite.job.company.logo}
                               alt={`${favorite.job.company.company_name} logo`}
-                              className="object-cover h-full w-full"
+                              className="object-cover"
+                              width={100}
+                              height={100}
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-400">
@@ -78,8 +81,12 @@ const FavoriteJobsTab = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="font-bold">{favorite.job.job_title}</div>
-                        <div className="text-sm opacity-50">{favorite.job.location}</div>
+                        <div className="font-bold">
+                          {favorite.job.job_title}
+                        </div>
+                        <div className="text-sm opacity-50">
+                          {favorite.job.location}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -90,7 +97,9 @@ const FavoriteJobsTab = () => {
                       {moment(favorite.created_at).format('h:mm A')}
                     </span>
                     <span className="hidden lg:block">
-                      {moment(favorite.created_at).format('D MMM, YYYY | h:mm A')}
+                      {moment(favorite.created_at).format(
+                        'D MMM, YYYY | h:mm A',
+                      )}
                     </span>
                   </td>
                   <td>

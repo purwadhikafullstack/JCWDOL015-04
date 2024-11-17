@@ -9,6 +9,7 @@ import CompanyOverview from './CompanyOverview';
 import CompanyJobListings from './CompanyJobListings';
 import { industryOptions } from '@/utils/format';
 import DOMPurify from 'dompurify';
+import Image from 'next/image';
 
 const CompanyPage = () => {
   const { id } = useParams();
@@ -19,8 +20,8 @@ const CompanyPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { company, ok } = await getCompanyById(id as string)
-        console.log("data", company?.aboutUs)
+        const { company, ok } = await getCompanyById(id as string);
+        console.log('data', company?.aboutUs);
         if (ok && company) {
           setCompany(company);
         } else {
@@ -69,11 +70,19 @@ const CompanyPage = () => {
           {/* Header Section */}
           <div className="flex flex-col items-start p-6 bg-white rounded-lg shadow-lg">
             <div className="flex items-center">
-              <img
-                src={company.logo}
-                alt={`${company.company_name} Logo`}
-                className="h-16 w-16 object-contain rounded-full"
-              />
+              {company.logo ? (
+                <Image
+                  src={company.logo}
+                  alt={`${company.company_name} Logo`}
+                  width={80}
+                  height={80}
+                  className="rounded-full"
+                />
+              ) : (
+                <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span className="text-gray-400">No Logo</span>
+                </div>
+              )}
               <div className="ml-4">
                 <h1 className="text-3xl font-bold">{company.company_name}</h1>
                 <p className="text-lg text-gray-500">

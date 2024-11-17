@@ -57,7 +57,7 @@ const EmailVerification = () => {
       <div className="max-w-md w-full text-center m-5 mt-[-100px] lg:mt-[-350px] md:mt-[-325px]]">
         <h2 className="text-3xl font-semibold mb-4">Email Verification</h2>
         <p className="text-gray-600 mb-8">
-          We've sent a verification to <strong>{email || 'your email address'}</strong> to verify your email address and activate your account.
+          We&apos;ve sent a verification to <strong>{email || 'your email address'}</strong> to verify your email address and activate your account.
         </p>
 
         {/* Input Field for Email */}
