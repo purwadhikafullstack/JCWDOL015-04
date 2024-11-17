@@ -5,6 +5,8 @@ type User = {
   role: string;
 };
 
+
+
 declare namespace Express {
   export interface Request {
     user?: {
@@ -16,3 +18,12 @@ declare namespace Express {
   }
 }
 
+declare namespace Express {
+  export interface Request {
+    user?: {
+      user_id: number;
+      role: string;
+    };
+    assessment_id?: number;
+  }
+}

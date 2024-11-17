@@ -8,7 +8,7 @@ type FileNameCallback = (error: Error | null, filename: string) => void;
 
 export const uploader = (
   filePrefix: string,
-  fileType: 'resume' | 'profile_picture' | 'logo' | 'banner'
+  fileType: 'resume' | 'profile_picture' | 'logo' | 'banner' | 'payment'
 ) => {
   // Define default directories for each file type
   const directories = {
@@ -16,6 +16,7 @@ export const uploader = (
     profile_picture: path.join(__dirname, '../../public/profile_pictures'),
     logo: path.join(__dirname, '../../public/company_logos'),
     banner: path.join(__dirname, '../../public/company_banners'),
+    payment: path.join(__dirname, '../../public/payment-proof'),
   };
 
   // Get the directory based on the fileType
@@ -30,16 +31,22 @@ export const uploader = (
 
   const storage = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
+    destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
       ensureFolderExists(defaultDir);
+      console.log(`Saving file to: ${defaultDir}`);
       cb(null, defaultDir);
     },
     filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
+    filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
       const originalNameParts = file.originalname.split('.');
       const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
+      const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
       const newFileName = `${filePrefix}_${Date.now()}.${fileExtension}`;
+      console.log(`Generated filename: ${newFileName}`);
       cb(null, newFileName);
     },
   });
+  
   
 
   // File filter for validation based on the type
@@ -49,18 +56,22 @@ export const uploader = (
     cb: FileFilterCallback,
   ) => {
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    const fileExtension = file.mimetype;
+    const allowedDocumentTypes = ['application/pdf'];
   
-    // Allow profile_picture, logo, and banner with valid image types
     if (
       (fileType === 'profile_picture' || fileType === 'logo' || fileType === 'banner') &&
-      allowedImageTypes.includes(fileExtension)
+      allowedImageTypes.includes(file.mimetype)
     ) {
       cb(null, true);
+    } else if (fileType === 'resume' && allowedDocumentTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else if (fileType === 'payment' && allowedImageTypes.includes(file.mimetype)) {
+      cb(null, true);
     } else {
-      cb(null, false);
+      cb(new Error('Invalid file type'));
     }
-  };  
+  };
+  
 
   // Define max file size
   const maxSize = fileType === 'profile_picture' ? 1 * 1024 * 1024 : 5 * 1024 * 1024; // 1MB for profile pictures, 5MB for others
@@ -71,3 +82,4 @@ export const uploader = (
     limits: { fileSize: maxSize },
   });
 };
+

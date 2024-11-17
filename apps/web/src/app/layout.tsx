@@ -29,7 +29,7 @@ export default function RootLayout({
             <Footer />
           </div>
             <ToastContainer
-              position="bottom-right"
+              position="top-center"
               autoClose={3000}
               closeOnClick
               draggable

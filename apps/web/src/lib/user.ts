@@ -174,4 +174,8 @@ export const deleteUserAccount = async (email: string, password: string) => {
   }
 };
 
+
+
+
+
 export default base_url;

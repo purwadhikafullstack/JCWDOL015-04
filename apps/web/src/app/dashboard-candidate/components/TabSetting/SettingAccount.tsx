@@ -1,11 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { getUserInfo, updateUserInfo, deleteUserAccount } from '@/lib/user';
+import { getUserInfo, updateUserCredential, deleteUserAccount } from '@/lib/user';
+import useLogout from '@/lib/useLogout';
 import { toast } from 'react-toastify';
 
 const SettingAccount = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const logout = useLogout(); // Use the logout function
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
@@ -13,12 +16,10 @@ const SettingAccount = () => {
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showFinalDeleteConfirm, setShowFinalDeleteConfirm] = useState(false);
-  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [showLastDeleteConfirm, setShowLastDeleteConfirm] = useState(false);
 
   const [email, setEmail] = useState('');
   const [initialEmail, setInitialEmail] = useState(email);
-  const [phone, setPhone] = useState('');
-  const [initialPhone, setInitialPhone] = useState(phone);
 
   const [passwordFields, setPasswordFields] = useState({
     currentPassword: '',
@@ -34,9 +35,7 @@ const SettingAccount = () => {
       const { user, ok } = await getUserInfo();
       if (ok && user) {
         setEmail(user.email || '');
-        setPhone(user.phone || '');
         setInitialEmail(user.email || '');
-        setInitialPhone(user.phone || '');
       } else {
         toast.error('Failed to load account data');
       }
@@ -44,62 +43,60 @@ const SettingAccount = () => {
     fetchUserData();
   }, []);
 
-  const toggleEdit = () => {
-    if (
-      isEditing &&
-      (email !== initialEmail ||
-        phone !== initialPhone ||
-        passwordFields.newPassword ||
-        passwordFields.currentPassword ||
-        passwordFields.confirmPassword)
-    ) {
-      setShowSaveConfirm(true);
-    } else {
-      setIsEditing(!isEditing);
+  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    setShowPassword({ ...showPassword, [field]: !showPassword[field] });
+  };
+
+  const handleEmailSave = async () => {
+    if (email === initialEmail) {
+      toast.error('No changes detected in email.');
+      return;
+    }
+
+    const payload = { email };
+    const { result, ok } = await updateUserCredential(payload);
+
+    if (ok) {
+      toast.success('Email updated successfully!');
       setInitialEmail(email);
-      setInitialPhone(phone);
+      setIsEditingEmail(false);
+    } else {
+      toast.error(result.msg || 'Failed to update email');
+    }
+  };
+
+  const handlePasswordSave = async () => {
+    if (!passwordFields.currentPassword.trim()) {
+      toast.error('Current password is required to change the password.');
+      return;
+    }
+    if (!passwordFields.newPassword.trim() || !passwordFields.confirmPassword.trim()) {
+      toast.error('Both new password and confirm password are required.');
+      return;
+    }
+    if (passwordFields.newPassword !== passwordFields.confirmPassword) {
+      toast.error('New password and confirm password do not match.');
+      return;
+    }
+
+    const payload = {
+      currentPassword: passwordFields.currentPassword,
+      Newpassword: passwordFields.newPassword,
+      Confirmpassword: passwordFields.confirmPassword,
+    };
+
+    const { result, ok } = await updateUserCredential(payload);
+
+    if (ok) {
+      toast.success('Password updated successfully!');
       setPasswordFields({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
-    }
-  };
-
-  const togglePasswordVisibility = (field: keyof typeof showPassword) => {
-    setShowPassword({ ...showPassword, [field]: !showPassword[field] });
-  };
-
-  const handleSaveChanges = async () => {
-    if (passwordFields.newPassword) {
-      if (!passwordFields.currentPassword) {
-        toast.error('Current password is required to change the password.');
-        return;
-      }
-      if (passwordFields.newPassword !== passwordFields.confirmPassword) {
-        toast.error('New password and confirm password do not match.');
-        return;
-      }
-    }
-
-    setShowSaveConfirm(false);
-    setIsEditing(false);
-
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('phone', phone);
-    formData.append('currentPassword', passwordFields.currentPassword);
-    formData.append('Newpassword', passwordFields.newPassword);
-    formData.append('Confirmpassword', passwordFields.confirmPassword);
-
-    const { result, ok } = await updateUserInfo(formData);
-
-    if (ok) {
-      toast.success('Account updated successfully!');
-      setInitialEmail(email);
-      setInitialPhone(phone);
+      setIsEditingPassword(false);
     } else {
-      toast.error(result.msg || 'Failed to update account');
+      toast.error(result.msg || 'Failed to update password');
     }
   };
 
@@ -109,13 +106,19 @@ const SettingAccount = () => {
   };
 
   const handleFinalDeleteAccount = async () => {
+    setShowFinalDeleteConfirm(false);
+    setShowLastDeleteConfirm(true); // Show the final confirmation step
+  };
+
+  const handleLastDeleteAccount = async () => {
     const { result, ok } = await deleteUserAccount(deleteEmail, deletePassword);
     if (ok) {
       toast.success('Account deleted successfully!');
+      logout(); // Logout the user after successful account deletion
     } else {
       toast.error(result.msg || 'Failed to delete account');
     }
-    setShowFinalDeleteConfirm(false);
+    setShowLastDeleteConfirm(false);
   };
 
   return (
@@ -125,17 +128,6 @@ const SettingAccount = () => {
       </h3>
       <div>
         <div className="col-span-1 md:col-span-2">
-          <label className="block text-gray-600 mt-3">Phone</label>
-            <input
-              type="text"
-              className="input input-bordered w-full mt-2"
-              placeholder="Phone number.."
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={!isEditing}
-            />
-        </div>
-        <div className="col-span-1 md:col-span-2">
           <label className="block text-gray-600 mt-3">Email</label>
           <input
             type="email"
@@ -143,8 +135,17 @@ const SettingAccount = () => {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={!isEditing}
+            disabled={!isEditingEmail}
           />
+          <button
+            onClick={() => {
+              if (isEditingEmail) handleEmailSave();
+              else setIsEditingEmail(true);
+            }}
+            className="btn btn-primary mt-4"
+          >
+            {isEditingEmail ? 'Save Email' : 'Change Email'}
+          </button>
         </div>
       </div>
 
@@ -152,31 +153,42 @@ const SettingAccount = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {['Current Password', 'New Password', 'Confirm Password'].map(
           (label, index) => {
-            const field = label
-              .toLowerCase()
-              .replace(' ', '') as keyof typeof showPassword;
+            const fieldKey: keyof typeof passwordFields =
+              label === 'Current Password'
+                ? 'currentPassword'
+                : label === 'New Password'
+                ? 'newPassword'
+                : 'confirmPassword';
+
+            const showKey: 'current' | 'new' | 'confirm' =
+              label === 'Current Password'
+                ? 'current'
+                : label === 'New Password'
+                ? 'new'
+                : 'confirm';
+
             return (
               <div key={index}>
                 <label className="block text-gray-600">{label}</label>
                 <div className="relative">
                   <input
-                    type={showPassword[field] ? 'text' : 'password'}
+                    type={showPassword[showKey] ? 'text' : 'password'}
                     className="input input-bordered w-full mt-1"
                     placeholder={label}
-                    value={passwordFields[field as keyof typeof passwordFields]}
+                    value={passwordFields[fieldKey]}
                     onChange={(e) =>
                       setPasswordFields({
                         ...passwordFields,
-                        [field as keyof typeof passwordFields]: e.target.value,
+                        [fieldKey]: e.target.value,
                       })
                     }
-                    disabled={!isEditing}
+                    disabled={!isEditingPassword}
                   />
                   <span
                     className="absolute top-2 right-3 cursor-pointer"
-                    onClick={() => togglePasswordVisibility(field)}
+                    onClick={() => togglePasswordVisibility(showKey)}
                   >
-                    {showPassword[field] ? <FiEyeOff /> : <FiEye />}
+                    {showPassword[showKey] ? <FiEyeOff /> : <FiEye />}
                   </span>
                 </div>
               </div>
@@ -184,37 +196,31 @@ const SettingAccount = () => {
           },
         )}
       </div>
-
-      {showSaveConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div className="bg-white rounded-md shadow-lg p-6 border border-gray-300 max-w-sm text-center mx-auto">
-            <span className="block mb-4">
-              Are you sure you want to save changes to your account information?
-            </span>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => setShowSaveConfirm(false)}
-                className="btn btn-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveChanges}
-                className="btn btn-sm btn-primary"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <button
-        onClick={toggleEdit}
-        className={`btn w-full md:w-auto mt-6 ${isEditing ? 'btn-primary' : 'btn-primary'}`}
+        onClick={() => {
+          if (isEditingPassword) handlePasswordSave();
+          else setIsEditingPassword(true);
+        }}
+        className="btn btn-primary mt-4"
       >
-        {isEditing ? 'Save Changes' : 'Change Data'}
+        {isEditingPassword ? 'Save Password' : 'Change Password'}
       </button>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">Delete Your Account</h3>
+        <p className="text-gray-600 text-sm mt-2">
+          If you delete your HireMe account, you will no longer be able to get
+          information about the matched jobs, following employers, and job
+          alerts, shortlisted jobs, and more. You will be abandoned from all
+          the services of HireMe.com.
+        </p>
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="btn btn-error mt-4"
+        >
+          Close Account
+        </button>
+      </div>
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
@@ -271,28 +277,37 @@ const SettingAccount = () => {
                 onClick={handleFinalDeleteAccount}
                 className="btn btn-sm btn-error"
               >
-                Delete
+                Next
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold">Delete Your Account</h3>
-        <p className="text-gray-600 text-sm mt-2">
-          If you delete your HireMe account, you will no longer be able to get
-          information about the matched jobs, following employers, and job
-          alerts, shortlisted jobs and more. You will be abandoned from all the
-          services of HireMe.com.
-        </p>
-        <button
-          onClick={() => setShowDeleteConfirm(true)}
-          className="btn btn-error mt-4"
-        >
-          Close Account
-        </button>
-      </div>
+      {showLastDeleteConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+          <div className="bg-white rounded-md shadow-lg p-6 border border-gray-300 max-w-sm text-center mx-auto">
+            <span className="block mb-4">
+              Are you absolutely sure you want to delete your account? This
+              action cannot be undone.
+            </span>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowLastDeleteConfirm(false)}
+                className="btn btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLastDeleteAccount}
+                className="btn btn-sm btn-error"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
