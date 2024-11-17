@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css'; 
+import 'react-quill/dist/quill.snow.css';
 import { FiUpload } from 'react-icons/fi';
 import { fetchUserCompany, updateCompany } from '@/lib/company';
 import { toast } from 'react-toastify';
+import Image from 'next/image';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
@@ -14,7 +15,9 @@ const CompanyInfo = () => {
   const [logo, setLogo] = useState<string | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
-  const [selectedBannerFile, setSelectedBannerFile] = useState<File | null>(null);
+  const [selectedBannerFile, setSelectedBannerFile] = useState<File | null>(
+    null,
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [isEditing, setIsEditing] = useState(false);
   const quillEditorContent = useRef<string>('');
@@ -66,27 +69,27 @@ const CompanyInfo = () => {
 
   const handleSaveChanges = async () => {
     if (!isEditing) return;
-  
+
     if (!companyId) {
       toast.error('Company ID is not available');
       return;
     }
-  
+
     const formData = new FormData();
     formData.append('company_name', companyName);
     formData.append('aboutUs', quillEditorContent.current || aboutUs);
-  
+
     if (selectedLogoFile) {
       formData.append('logo', selectedLogoFile);
     }
-  
+
     if (selectedBannerFile) {
       formData.append('banner', selectedBannerFile);
     }
-  
+
     try {
       const { company, ok } = await updateCompany(companyId, formData);
-  
+
       if (ok) {
         setCompanyName(company?.company_name || '');
         setAboutUs(company?.aboutUs || '');
@@ -124,7 +127,13 @@ const CompanyInfo = () => {
               disabled={!isEditing}
             />
             {logo ? (
-              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
+              <Image
+                src={logo}
+                alt="Logo"
+                className="object-cover"
+                width={500}
+                height={500}
+              />
             ) : (
               <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                 <FiUpload size={24} />
@@ -136,8 +145,10 @@ const CompanyInfo = () => {
 
         {/* Banner Upload */}
         <div className="flex flex-col items-center">
-          <label className="block text-gray-600 mb-3 font-semibold">Banner Image</label>
-          <div className="relative w-full h-36 border-4 border-dashed border-green-400 rounded-lg overflow-hidden cursor-pointer">
+          <label className="block text-gray-600 mb-3 font-semibold">
+            Banner Image
+          </label>
+          <div className="relative w-full border-4 border-dashed border-green-400 rounded-lg overflow-hidden cursor-pointer">
             <input
               type="file"
               accept="image/*"
@@ -145,8 +156,15 @@ const CompanyInfo = () => {
               className="absolute inset-0 opacity-0 cursor-pointer"
               disabled={!isEditing}
             />
+
             {banner ? (
-              <img src={banner} alt="Banner" className="w-full h-full object-cover" />
+              <Image
+                src={banner}
+                alt="Banner"
+                className="object-cover"
+                width={600}
+                height={100}
+              />
             ) : (
               <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                 <FiUpload size={24} />
@@ -159,7 +177,9 @@ const CompanyInfo = () => {
 
       {/* Company Name */}
       <div className="mt-6">
-        <label className="block text-gray-600 mb-2 font-semibold">Company Name</label>
+        <label className="block text-gray-600 mb-2 font-semibold">
+          Company Name
+        </label>
         <input
           type="text"
           className="input input-bordered w-full"
@@ -172,7 +192,9 @@ const CompanyInfo = () => {
 
       {/* About Us Editor */}
       <div className="mt-6">
-        <label className="block text-gray-600 mb-2 font-semibold">About Us</label>
+        <label className="block text-gray-600 mb-2 font-semibold">
+          About Us
+        </label>
         <ReactQuill
           value={aboutUs}
           onChange={(value) => {
@@ -187,7 +209,10 @@ const CompanyInfo = () => {
       </div>
 
       {/* Edit/Save Button */}
-      <button onClick={isEditing ? handleSaveChanges : handleEditToggle} className="btn btn-primary mt-6">
+      <button
+        onClick={isEditing ? handleSaveChanges : handleEditToggle}
+        className="btn btn-primary mt-6"
+      >
         {isEditing ? 'Save Changes' : 'Edit'}
       </button>
     </div>
