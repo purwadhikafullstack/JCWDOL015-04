@@ -37,8 +37,8 @@ const DevMenu: React.FC = () => {
 
         const decodedToken = jwtDecode<DecodedToken>(token);
         if (decodedToken.role !== 'developer') {
-          toast.error('Access denied. Only candidates can view this page.');
-          router.push('/unauthorized'); // Redirect jika bukan role candidate
+          toast.error('Access denied. Only Developer can view this page.');
+          router.push('/sign-in'); // Redirect jika bukan role candidate
           return;
         }
 

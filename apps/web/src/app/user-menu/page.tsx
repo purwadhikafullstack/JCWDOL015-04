@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Sidebar from './menu/sidebar';
 import CustomerOverview from './menu/overview';
-import CustomerProfile from './menu/cusProfil';
 import AppliedJob from './menu/appliedjob';
 import CustomerPlans from './menu/subsPlan';
 import PlanBilling from './menu/plan-bill';
@@ -13,6 +12,7 @@ import { getToken } from '@/lib/server';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/types/iuser';
+import UserAssessment from './menu/skillAssessment';
 
 const CustomerMenu: React.FC = () => {
   const router = useRouter();
@@ -65,7 +65,7 @@ const CustomerMenu: React.FC = () => {
       case 'CustomerOverview':
         return <CustomerOverview />;
       case 'CustomerProfile':
-        return <CustomerProfile />;
+        return <UserAssessment />;
       case 'AppliedJob':
         return <AppliedJob />;
       case 'FavoriteJobs':

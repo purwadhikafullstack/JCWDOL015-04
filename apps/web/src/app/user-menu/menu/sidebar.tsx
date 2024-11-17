@@ -12,12 +12,12 @@ import {
 
 const menuItems = [
   { name: 'Overview', icon: <FaHome />, key: 'CustomerOverview' },
-  { name: 'Profile', icon: <FaUser />, key: 'CustomerProfile' },
   { name: 'Applied Jobs', icon: <FaBriefcase />, key: 'AppliedJob' },
   { name: 'Favorite Jobs', icon: <FaHeart />, key: 'FavoriteJobs' },
   { name: 'Subscription', icon: <FaCreditCard />, key: 'CustomerPlans' },
   { name: 'Plan & Billing', icon: <FaFileInvoice />, key: 'PlanBilling' },
   { name: 'CV Generator', icon: <FaFileAlt />, key: 'CVGenerator' },
+  { name: 'Skill Assessment', icon: <FaUser />, key: 'CustomerProfile' },
 ];
 
 interface SidebarProps {

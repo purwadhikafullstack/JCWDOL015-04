@@ -15,6 +15,8 @@ import { PaymentRouter } from './routers/payment.router';
 import { UserRouter } from './routers/user.router';
 import { CvRouter } from './routers/cv.router';
 import { PlanBillRouter } from './routers/userplan.router';
+import { AssessmentRouter } from './routers/assessment.router';
+import { CertificateRouter } from './routers/certificate.router';
 
 export default class App {
   private app: Express;
@@ -65,6 +67,8 @@ export default class App {
     const userRouter = new UserRouter();
     const CVRouter = new CvRouter();
     const userPlan = new PlanBillRouter();
+    const assessmentRouter = new AssessmentRouter();
+    const certificateRouter = new CertificateRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -77,6 +81,8 @@ export default class App {
     this.app.use('/api/payment', paymentRouter.getRouter());
     this.app.use('/api/cv', CVRouter.getRouter());
     this.app.use('/api/plan-bill', userPlan.getRouter());
+    this.app.use('/api/assessment', assessmentRouter.getRouter());
+    this.app.use('/api/certificate', certificateRouter.getRouter());
   }
 
   public start(): void {

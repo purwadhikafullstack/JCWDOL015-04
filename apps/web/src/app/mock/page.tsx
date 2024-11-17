@@ -1,6 +1,6 @@
 'use client';
 
-import ShareButton from "@/components/share/ShareButton";
+import ShareButton from "@/components/share/shareButton";
 
 
 
