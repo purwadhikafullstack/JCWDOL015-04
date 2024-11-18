@@ -5,6 +5,7 @@ import path from 'path';
 import { addDays } from 'date-fns';
 
 const prisma = new PrismaClient();
+const base_url = process.env.BASE_API_URL
 
 export class PaymentController {
   // Mengunggah bukti pembayaran
@@ -19,7 +20,7 @@ export class PaymentController {
       if (!req.file) throw new Error('No file uploaded'); // Jika file tidak diunggah, lemparkan error
 
       // Buat tautan publik untuk file yang diunggah
-      const link = `http://localhost:8000/api/public/payment-proof/${req.file.filename}`;
+      const link = `${base_url}/public/payment-proof/${req.file.filename}`;
 
       // Konversi subscription_type_id menjadi integer
       const subscription_type_id = parseInt(req.body.subscription_type_id, 10);

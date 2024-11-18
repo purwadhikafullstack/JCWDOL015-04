@@ -39,7 +39,7 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
           <img
             alt="Avatar"
             src={
-              profilePicture ||
+              profilePicture? profilePicture :
               'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
             }
           />
@@ -47,7 +47,7 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
       </div>
       <ul
         tabIndex={0}
-        className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
+        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
       >
         {/* Profile Button - Conditional on userRole */}
         <li>

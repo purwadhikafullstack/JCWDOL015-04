@@ -43,7 +43,7 @@ const MyJobs: React.FC = () => {
       if (userResponse.ok && userResponse.user) {
         const userId = userResponse.user.user_id;
         const recentJobs = await fetchRecentlyPostedJobs(userId);
-        const jobsData = recentJobs.jobs.map((job: any) => ({
+        const jobsData = (recentJobs.jobs || []).map((job: any) => ({
           id: job.job_id,
           title: job.job_title,
           type: job.jobType,

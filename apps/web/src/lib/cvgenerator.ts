@@ -1,7 +1,7 @@
 import { Cv, CvContent } from '@/types/cvgenerator';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+const base_url = process.env.BASE_URL_API
 
 export const getCvs = async (
   cv_id?: string,

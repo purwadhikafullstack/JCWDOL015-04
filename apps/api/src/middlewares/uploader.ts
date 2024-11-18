@@ -19,10 +19,8 @@ export const uploader = (
     payment: path.join(__dirname, '../../public/payment-proof'),
   };
 
-  // Get the directory based on the fileType
-  const defaultDir = directories[fileType];
 
-  // Check if the folder exists, if not, create it
+  const defaultDir = directories[fileType];
   const ensureFolderExists = (folderPath: string) => {
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true });
@@ -45,7 +43,6 @@ export const uploader = (
   });
   
 
-  // File filter for validation based on the type
   const fileFilter = (
     req: Request,
     file: Express.Multer.File,

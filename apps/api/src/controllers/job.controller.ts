@@ -22,6 +22,8 @@ export class JobController {
         jobCategory,
         jobEducationLevel,
         jobExperience,
+        responsibility,
+        jobExpired_at,
         companyId,
         is_active,
       } = req.body;
@@ -43,6 +45,8 @@ export class JobController {
         jobCategory,
         jobExperience,
         jobEducationLevel,
+        jobExpired_at,
+        responsibility,
         salary: salary ? parseFloat(salary) : null,
         is_active: is_active === 'true',
         company: { connect: { company_id: parseInt(companyId, 10) } },
@@ -221,12 +225,14 @@ export class JobController {
       const {
         job_title,
         description,
+        responsibility,
         location,
         country,
         salary,
         jobCategory,
         jobEducationLevel,
         jobExperience,
+        jobExpired_at,
         is_active,
       } = req.body;
       
@@ -247,12 +253,14 @@ export class JobController {
         data: {
           job_title,
           description,
+          responsibility,
           location,
           country,
           salary: salary ? parseFloat(salary) : job.salary,
           jobCategory,
           jobEducationLevel,
           jobExperience,
+          jobExpired_at,
           is_active: is_active !== undefined ? is_active : job.is_active,
         },
       });

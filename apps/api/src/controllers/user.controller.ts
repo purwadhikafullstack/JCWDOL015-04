@@ -96,12 +96,10 @@ export class UserController {
       });
     } catch (err) {
       console.error('Error during registration:', err);
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          msg: 'An error occurred during user registration.',
-        });
+      res.status(400).json({
+        status: 'error',
+        msg: 'An error occurred during user registration.',
+      });
     }
   }
 
@@ -109,64 +107,33 @@ export class UserController {
     try {
       const { email, password } = req.body;
 
-      // Mencari user berdasarkan email
       const existingUser = await prisma.user.findUnique({
         where: { email: email },
-        select: {
-          user_id: true,
-          role: true,
-          is_verified: true,
-          password: true,
-        },
       });
 
       if (!existingUser) throw new Error('Account not found!');
       if (!existingUser.is_verified) throw new Error('Account not verified!');
 
-      // Verifikasi password
       const isValidPass = await compare(password, existingUser.password);
+
       if (!isValidPass) throw new Error('Incorrect password!');
 
-      // Mendapatkan `company_id` pertama yang terkait dengan user ini (jika ada)
-      const userCompanies = await prisma.company.findFirst({
-        where: {
-          users: {
-            some: {
-              user_id: existingUser.user_id,
-            },
-          },
-        },
-        select: {
-          company_id: true,
-        },
-      });
-
-      // Membuat payload token dengan `company_id` opsional
-      const payload: { user_id: number; role: string; company_id?: number } = {
+      const payload = {
         user_id: existingUser.user_id,
         role: existingUser.role,
       };
-
-      if (userCompanies?.company_id) {
-        payload.company_id = userCompanies.company_id;
-      }
-
-      // Membuat token JWT
       const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '1d' });
-
-      // Menghapus password dari response
-      const { password: _, ...userWithoutPassword } = existingUser;
 
       res.status(200).send({
         status: 'ok',
         msg: 'Login success!',
         token,
-        user: userWithoutPassword,
+        user: existingUser,
       });
     } catch (err) {
       res.status(400).send({
         status: 'error',
-        msg: err instanceof Error ? err.message : String(err),
+        msg: err instanceof Error ? err.message : err,
       });
     }
   }
@@ -492,7 +459,6 @@ export class UserController {
     try {
       const { email } = req.body;
 
-      // Check if user exists
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         return res
@@ -500,14 +466,12 @@ export class UserController {
           .json({ status: 'error', msg: 'User not found!' });
       }
 
-      // Generate a reset token that expires in 15 minutes
       const payload = { id: user.user_id };
       const resetToken = sign(payload, process.env.SECRET_JWT!, {
         expiresIn: '15m',
       });
 
-      // Create reset link
-      const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+      const resetLink = `${base_fe_url}/reset-password?token=${resetToken}`;
 
       const templatePath = path.join(
         __dirname,
@@ -522,7 +486,6 @@ export class UserController {
         link: resetLink,
       });
 
-      // Send email
       await transporter.sendMail({
         from: process.env.MAIL_USER,
         to: email,
@@ -550,10 +513,8 @@ export class UserController {
           .json({ status: 'error', msg: 'Passwords do not match' });
       }
 
-      // Verify the token
       const decoded = verify(token, process.env.SECRET_JWT!) as { id: number };
 
-      // Fetch the user using decoded token data
       const user = await prisma.user.findUnique({
         where: { user_id: decoded.id },
       });
@@ -563,11 +524,9 @@ export class UserController {
           .json({ status: 'error', msg: 'User not found!' });
       }
 
-      // Hash the new password
       const salt = await genSalt(10);
       const hashedPassword = await hash(newPassword, salt);
 
-      // Update user password and respond
       await prisma.user.update({
         where: { user_id: user.user_id },
         data: { password: hashedPassword },
@@ -663,12 +622,12 @@ export class UserController {
       });
     }
   }
-  
+
   async getTotalUserSubscribe(req: Request, res: Response) {
     try {
       const userCount = await prisma.user.count({
         where: {
-          is_verified: true, 
+          is_verified: true,
         },
       });
       res.status(200).json({ status: 'ok', userCount });
@@ -703,7 +662,6 @@ export class UserController {
     }
   }
 
-  // Mendapatkan Riwayat Pembayaran Berdasarkan user_id
   async getUserPayments(req: Request, res: Response) {
     const user_id = req.user?.user_id;
 

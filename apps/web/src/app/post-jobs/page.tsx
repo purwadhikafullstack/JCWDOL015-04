@@ -215,8 +215,6 @@ const JobForm = ({ jobId }: { jobId?: number }) => {
             {jobId ? 'Update Job' : 'Post Job'}
           </button>
         </form>
-
-        <ToastContainer />
       </div>
     </ProtectedRoute>
   );

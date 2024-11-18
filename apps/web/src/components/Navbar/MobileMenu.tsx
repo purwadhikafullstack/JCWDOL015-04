@@ -8,7 +8,7 @@ interface MobileMenuProps {
   isLoggedIn: boolean;
   userRole: UserRole | null;
   onLogout: () => void;
-  onClose: () => void; // New prop for closing the menu from the parent
+  onClose: () => void;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
@@ -22,7 +22,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        onClose(); // Close the menu when clicking outside
+        onClose();
       }
     };
 
