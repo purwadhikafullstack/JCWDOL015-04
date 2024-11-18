@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { supabase } from '@/lib/supabaseClient';
 import { useAppDispatch } from '@/redux/hooks';
@@ -24,8 +24,7 @@ export const useSocialLogin = () => {
     toast.info('Google login is not yet implemented.');
   };
 
-  // Memoize processSocialLogin to avoid re-creation
-  const processSocialLogin = useCallback(async (session: any) => {
+  const processSocialLogin = async (session: any) => {
     if (!session) return;
 
     setLoading(true);
@@ -62,7 +61,7 @@ export const useSocialLogin = () => {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, router]);
+  };
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -76,7 +75,7 @@ export const useSocialLogin = () => {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [processSocialLogin]);
+  }, []);
 
   return { handleFacebookLogin, handleGoogleLogin, loading };
 };

@@ -4,7 +4,6 @@ import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import { fetchRecentlyPostedJobs, fetchTotalJobsCount } from '@/lib/job';
 import moment from 'moment';
-import Image from 'next/image';
 
 interface OverviewProps {
   setSelectedTab: (tab: string) => void;
@@ -111,12 +110,10 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
                         <div className="avatar">
                           <div className="mask mask-squircle h-12 w-12">
                             {job.logo ? (
-                              <Image
+                              <img
                                 src={job.logo}
-                                alt={`${job.job_title || 'Job'} Logo`}
-                                className="object-cover"
-                                width={100}
-                                height={100}
+                                alt={`${job.job_title} logo`}
+                                className="object-cover h-full w-full"
                               />
                             ) : (
                               <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-400">
@@ -196,9 +193,7 @@ const SummaryCard = ({
   };
 
   return (
-    <div
-      className={`p-6 ${color} rounded-lg flex items-center space-x-4 shadow-lg`}
-    >
+    <div className={`p-6 ${color} rounded-lg flex items-center space-x-4 shadow-lg`}>
       {icon}
       <div>
         <h2 className="text-2xl font-semibold">{formatNumber(count)}</h2>
@@ -207,5 +202,6 @@ const SummaryCard = ({
     </div>
   );
 };
+
 
 export default Overview;
