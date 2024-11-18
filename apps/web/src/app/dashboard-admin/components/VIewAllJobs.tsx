@@ -6,9 +6,12 @@ import { fetchRecentlyPostedJobs } from '@/lib/job';
 import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import moment from 'moment';
+import Link from 'next/link';
 
 const ViewAllJobsPosted = () => {
-  const [recentlyPostedJobs, setRecentlyPostedJobs] = useState<RecentlyPostedJob[]>([]);
+  const [recentlyPostedJobs, setRecentlyPostedJobs] = useState<
+    RecentlyPostedJob[]
+  >([]);
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 8;
 
@@ -18,7 +21,7 @@ const ViewAllJobsPosted = () => {
       if (userResponse.ok && userResponse.user) {
         const userId = userResponse.user.user_id;
         const recentJobs = await fetchRecentlyPostedJobs(userId);
-        setRecentlyPostedJobs(recentJobs.jobs || []); 
+        setRecentlyPostedJobs(recentJobs.jobs || []);
       } else {
         console.error('Failed to fetch user info');
       }
@@ -27,7 +30,6 @@ const ViewAllJobsPosted = () => {
     fetchData();
   }, []);
 
-  
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = recentlyPostedJobs.slice(indexOfFirstJob, indexOfLastJob);
@@ -105,10 +107,16 @@ const ViewAllJobsPosted = () => {
                     </span>
                   </td>
                   <td>
-                    <span>{moment(job.jobExpired_at).format('D MMM, YYYY')}</span>
+                    <span>
+                      {moment(job.jobExpired_at).format('D MMM, YYYY')}
+                    </span>
                   </td>
                   <td>
-                    <button className="btn btn-sm btn-primary">View Details</button>
+                    <Link href="/my-jobs">
+                      <button className="btn btn-sm btn-primary">
+                        View Details
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               ))

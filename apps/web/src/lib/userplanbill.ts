@@ -1,7 +1,7 @@
 import { PaymentTransaction, SubscriptionActive } from '@/types/userplanbill';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+const base_url = process.env.BASE_URL_API
 
 export const fetchUserPayments = async (): Promise<{
     data?: PaymentTransaction[];

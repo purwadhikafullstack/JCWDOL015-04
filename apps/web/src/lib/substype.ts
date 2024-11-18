@@ -2,7 +2,7 @@
 import { ISubsType } from '../types/substype';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+const base_url = process.env.BASE_URL_API
 
 interface SubstypeResponse {
   status: string;

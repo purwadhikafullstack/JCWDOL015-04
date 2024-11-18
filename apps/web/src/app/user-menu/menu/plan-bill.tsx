@@ -10,8 +10,7 @@ const CandidateDashboard: React.FC = () => {
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL_API || 'http://localhost:8000/api';
+  const base_url = process.env.BASE_API_URL
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -147,7 +146,7 @@ const CandidateDashboard: React.FC = () => {
                 <td className="px-4 py-2">
                   {pay.receipt ? (
                     <a
-                      href={`${baseUrl}/public/payment-proof/${pay.receipt}`}
+                      href={`${base_url}/public/payment-proof/${pay.receipt}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 underline"

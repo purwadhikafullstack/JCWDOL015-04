@@ -4,6 +4,7 @@ import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import { fetchRecentlyPostedJobs, fetchTotalJobsCount } from '@/lib/job';
 import moment from 'moment';
+import Link from 'next/link';
 
 interface OverviewProps {
   setSelectedTab: (tab: string) => void;
@@ -48,10 +49,6 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
     };
     fetchData();
   }, []);
-
-  const handleViewDetails = (job: RecentlyPostedJob) => {
-    setSelectedJob(job);
-  };
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -153,12 +150,11 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
                     </td>
 
                     <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => handleViewDetails(job)}
-                      >
+                    <Link href="/my-jobs">
+                      <button className="btn btn-sm btn-primary">
                         View Details
                       </button>
+                    </Link>
                     </td>
                   </tr>
                 ))

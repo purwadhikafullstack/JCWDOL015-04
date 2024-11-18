@@ -1,7 +1,7 @@
 import { Assessment } from '@/types/assessment';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+const base_url = process.env.BASE_API_URL
 
 export async function fetchAllAssessments(): Promise<Assessment[]> {
     const token = await getToken(); // Replace with your token retrieval logic
