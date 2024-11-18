@@ -37,7 +37,7 @@ const CTA = () => {
                 Become an Employer
               </h2>
               <p className="mb-6">
-                Connect with qualified candidates who fit your company&apos;s unique
+                Connect with qualified candidates who fit your company's unique
                 requirements. Post job openings, review applications, and build
                 your dream team.
               </p>

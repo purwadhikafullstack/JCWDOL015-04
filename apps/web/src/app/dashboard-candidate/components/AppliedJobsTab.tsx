@@ -7,7 +7,6 @@ import { getUserInfo } from '@/lib/user';
 import { RecentlyAppliedJob } from '@/types/job';
 import moment from 'moment';
 import { getStatusLabel } from '@/utils/format';
-import Image from 'next/image';
 
 const AppliedJobsTab = () => {
   const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<
@@ -77,12 +76,10 @@ const AppliedJobsTab = () => {
                       <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           {job.logo ? (
-                            <Image
+                            <img
                               src={job.logo}
-                              alt={`${job.job_title || 'Job'} Logo`}
-                              className="object-cover"
-                              width={100}
-                              height={100}
+                              alt={`${job.job_title} logo`}
+                              className="object-cover h-full w-full"
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-400">

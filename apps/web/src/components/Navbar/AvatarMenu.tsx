@@ -3,7 +3,6 @@ import React from 'react';
 import { UserRole } from '@/types/role';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 interface AvatarMenuProps {
   onLogout: () => void;
@@ -36,16 +35,13 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         role="button"
         className="btn btn-ghost btn-circle avatar"
       >
-        <div className="w-20 rounded-full">
-          <Image
+        <div className="w-10 rounded-full">
+          <img
             alt="Avatar"
             src={
               profilePicture ||
               'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
             }
-            width={200}
-            height={200}
-            className="object-cover"
           />
         </div>
       </div>
