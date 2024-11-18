@@ -4,6 +4,7 @@ import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import { fetchRecentlyPostedJobs, fetchTotalJobsCount } from '@/lib/job';
 import moment from 'moment';
+import Image from 'next/image';
 
 interface OverviewProps {
   setSelectedTab: (tab: string) => void;
@@ -110,8 +111,10 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
                         <div className="avatar">
                           <div className="mask mask-squircle h-12 w-12">
                             {job.logo ? (
-                              <img
+                              <Image
                                 src={job.logo}
+                                width={48}
+                                height={48}
                                 alt={`${job.job_title} logo`}
                                 className="object-cover h-full w-full"
                               />

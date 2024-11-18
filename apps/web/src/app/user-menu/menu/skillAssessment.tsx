@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,7 +21,7 @@ const UserAssessment: React.FC = () => {
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [isActiveSubscription, setIsActiveSubscription] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes countdown
+  const [timeLeft, setTimeLeft] = useState(30 * 60);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,6 +59,29 @@ const UserAssessment: React.FC = () => {
     checkStatus();
   }, [router]);
 
+  const handleAutoSubmit = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('assessmentToken');
+
+      if (!token) {
+        toast.error('Failed to auto-submit: Token is missing.');
+        return;
+      }
+
+      toast.warn('Time is up! Auto-submitting the assessment.');
+
+      const data = { responses: [], token }; // Submit token with empty data
+      await fetchSubmitAssessment(data);
+
+      toast.success('Assessment auto-submitted successfully.');
+      setQuestions(null); // Reset questions in state
+      router.push('/user-menu'); // Navigate to results or dashboard page
+    } catch (error: any) {
+      console.error('Error auto-submitting assessment:', error);
+      toast.error(error.message || 'Failed to auto-submit assessment.');
+    }
+  }, [router]);
+
   useEffect(() => {
     if (questions && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
@@ -68,7 +91,7 @@ const UserAssessment: React.FC = () => {
     if (timeLeft === 0) {
       handleAutoSubmit();
     }
-  }, [questions, timeLeft]);
+  }, [questions, timeLeft, handleAutoSubmit]);
 
   useEffect(() => {
     if (isActiveSubscription) {
@@ -94,8 +117,8 @@ const UserAssessment: React.FC = () => {
       setLoading(true);
       const { token, assessment } = await fetchStartAssessment(assessmentId);
 
-      localStorage.setItem('assessmentToken', token); // Simpan token
-      setQuestions(assessment.questions); // Simpan pertanyaan
+      localStorage.setItem('assessmentToken', token); // Save token
+      setQuestions(assessment.questions); // Save questions
       setTimeLeft(30 * 60); // Reset timer
 
       toast.success('Assessment started!');
@@ -113,39 +136,16 @@ const UserAssessment: React.FC = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('assessmentToken');
-      const data = { responses, token }; // Gunakan token saat submit
+      const data = { responses, token }; // Submit token with data
       await fetchSubmitAssessment(data);
-      setQuestions(null); // Reset setelah submit
+      setQuestions(null); // Reset questions after submit
       toast.success('Assessment submitted successfully!');
-      router.push('/user-menu'); // Redirect ke halaman utama
+      router.push('/user-menu'); // Navigate to main page
     } catch (error: any) {
       console.error('Error submitting assessment:', error);
       toast.error(error.message || 'Failed to submit assessment');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAutoSubmit = async () => {
-    try {
-      const token = localStorage.getItem('assessmentToken');
-
-      if (!token) {
-        toast.error('Failed to auto-submit: Token is missing.');
-        return;
-      }
-
-      toast.warn('Time is up! Auto-submitting the assessment.');
-
-      const data = { responses: [], token }; // Kirim token bersama data kosong
-      await fetchSubmitAssessment(data);
-
-      toast.success('Assessment auto-submitted successfully.');
-      setQuestions(null); // Hapus pertanyaan dari state
-      router.push('/user-menu'); // Arahkan ke halaman hasil atau dashboard
-    } catch (error: any) {
-      console.error('Error auto-submitting assessment:', error);
-      toast.error(error.message || 'Failed to auto-submit assessment.');
     }
   };
 

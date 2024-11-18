@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 interface Assessment {
@@ -5,7 +6,7 @@ interface Assessment {
   assessment_data: string;
   status: string;
   score: number;
-  type?: string; // Optional, for grouping
+  type?: string;
 }
 
 interface BadgeSystemProps {
@@ -13,7 +14,6 @@ interface BadgeSystemProps {
 }
 
 const BadgeSystem: React.FC<BadgeSystemProps> = ({ assessments }) => {
-  // Filter assessments with "passed" status
   const passedAssessments = assessments.filter(
     (assessment) => assessment.status === 'passed'
   );
@@ -28,7 +28,7 @@ const BadgeSystem: React.FC<BadgeSystemProps> = ({ assessments }) => {
 
   // Group assessments by type
   const groupedAssessments = passedAssessments.reduce((acc, assessment) => {
-    const type = assessment.type || 'General'; // Default type if none provided
+    const type = assessment.type || 'General';
     if (!acc[type]) acc[type] = [];
     acc[type].push(assessment);
     return acc;
@@ -47,11 +47,13 @@ const BadgeSystem: React.FC<BadgeSystemProps> = ({ assessments }) => {
                 className="flex flex-col items-center p-4 border rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow"
               >
                 <div className="relative">
-                  <img
+                  <Image
                     src={`/badges/${assessment.assessment_data
                       .toLowerCase()
                       .replace(/\s+/g, '-')}.png`}
                     alt={`${assessment.assessment_data} badge`}
+                    width={100}
+                    height={100}
                     className="w-24 h-24 object-cover rounded-full border-4 border-indigo-500"
                   />
                   <div className="absolute bottom-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-md">

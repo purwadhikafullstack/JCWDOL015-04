@@ -9,6 +9,7 @@ import { getUserInfo } from '@/lib/user';
 import { getStatusLabel } from '@/utils/format';
 import { RecentlyAppliedJob } from '@/types/job';
 import moment from 'moment';
+import Image from 'next/image';
 
 interface OverviewTabProps {
   setSelectedTab: (tab: string) => void;
@@ -108,8 +109,10 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
                         <div className="avatar">
                           <div className="mask mask-squircle h-12 w-12">
                             {job.logo ? (
-                              <img
+                              <Image
                                 src={job.logo}
+                                width={48}
+                                height={48}
                                 alt={`${job.job_title} logo`}
                                 className="object-cover h-full w-full"
                               />

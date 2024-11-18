@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { getStatusLabel } from '@/utils/format';
 import base_url from '@/lib/user';
+import Image from 'next/image';
 
 type Applicant = {
   id: number;
@@ -80,8 +81,10 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
       {applicants.map((applicant) => (
         <div key={applicant.id} className="border-b border-gray-300 py-4">
           <div className="flex items-center mb-3">
-            <img
+            <Image
               src={applicant.photoUrl || 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'}
+              width={64}
+              height={64}
               alt={`${applicant.name}'s photo`}
               className="w-16 h-16 rounded-full object-cover mr-4"
             />

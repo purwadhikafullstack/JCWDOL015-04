@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import JobFilterBar from './JobFilterBar';
 import { fetchJobs } from '@/services/jobService';
 import Card from '@/components/Card';
@@ -15,48 +15,45 @@ export default function JobListingsPage() {
   const jobsPerPage = 9; // Changed to limit to 9 cards per page
   const [sortOrder, setSortOrder] = useState('latest');
   const [locationAccessDenied, setLocationAccessDenied] = useState(false);
-
   const [location, setLocation] = useState<Location>(null);
 
   useEffect(() => {
     fetchUserLocation(setLocation, setLocationAccessDenied);
   }, []);
 
-  const loadJobs = async (
-    filters = {},
-    lat?: number,
-    lng?: number,
-    radius = 25
-  ) => {
-    try {
-      const jobFilters: { [key: string]: string | string[] } = {
-        ...filters,
-        dateRange: sortOrder,
-      };
+  const loadJobs = useCallback(
+    async (filters = {}, lat?: number, lng?: number, radius = 25) => {
+      try {
+        const jobFilters: { [key: string]: string | string[] } = {
+          ...filters,
+          dateRange: sortOrder,
+        };
 
-      if (lat !== undefined) jobFilters.lat = lat.toString();
-      if (lng !== undefined) jobFilters.lng = lng.toString();
-      jobFilters.radius = radius.toString();
+        if (lat !== undefined) jobFilters.lat = lat.toString();
+        if (lng !== undefined) jobFilters.lng = lng.toString();
+        jobFilters.radius = radius.toString();
 
-      const jobsData = await fetchJobs(sortOrder, jobFilters);
+        const jobsData = await fetchJobs(sortOrder, jobFilters);
 
-      const formattedJobs = jobsData.map((job) => ({
-        job_id: job.job_id,
-        job_title: job.job_title,
-        location: job.location,
-        salary: job.salary ? `$${Number(job.salary).toLocaleString()}` : null,
-        company: {
-          company_name: job.company.company_name,
-          logo: job.company.logo || null,
-        },
-      }));
+        const formattedJobs = jobsData.map((job) => ({
+          job_id: job.job_id,
+          job_title: job.job_title,
+          location: job.location,
+          salary: job.salary ? `$${Number(job.salary).toLocaleString()}` : null,
+          company: {
+            company_name: job.company.company_name,
+            logo: job.company.logo || null,
+          },
+        }));
 
-      setJobs(formattedJobs || []);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-      setJobs([]);
-    }
-  };
+        setJobs(formattedJobs || []);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        setJobs([]);
+      }
+    },
+    [sortOrder]
+  );
 
   useEffect(() => {
     if (location) {
@@ -64,7 +61,7 @@ export default function JobListingsPage() {
     } else {
       loadJobs();
     }
-  }, [sortOrder, location]);
+  }, [sortOrder, location, loadJobs]);
 
   const handleSearch = (filters: any) => {
     if (location) {

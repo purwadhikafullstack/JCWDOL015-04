@@ -9,6 +9,7 @@ import CompanyOverview from './CompanyOverview';
 import CompanyJobListings from './CompanyJobListings';
 import { industryOptions } from '@/utils/format';
 import DOMPurify from 'dompurify';
+import Image from 'next/image';
 
 const CompanyPage = () => {
   const { id } = useParams();
@@ -69,10 +70,12 @@ const CompanyPage = () => {
           {/* Header Section */}
           <div className="flex flex-col items-start p-6 bg-white rounded-lg shadow-lg">
             <div className="flex items-center">
-              <img
-                src={company.logo}
+            <Image
+                src={company.logo || '/default-logo.png'}
                 alt={`${company.company_name} Logo`}
-                className="h-16 w-16 object-contain rounded-full"
+                width={64}
+                height={64}
+                className="rounded-full"
               />
               <div className="ml-4">
                 <h1 className="text-3xl font-bold">{company.company_name}</h1>
