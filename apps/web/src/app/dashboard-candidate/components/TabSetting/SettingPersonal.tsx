@@ -2,6 +2,7 @@ import { FiUpload } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { getUserInfo, updateUserInfo } from '@/lib/user';
 import { toast } from 'react-toastify';
+import Image from 'next/image';
 
 const SettingPersonal = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -81,9 +82,11 @@ const SettingPersonal = () => {
               disabled={!isEditing}
             />
             {profileImage ? (
-              <img
+              <Image
                 src={profileImage}
                 alt="Profile"
+                width={236}
+                height={236}
                 className="w-full h-full object-cover"
               />
             ) : (

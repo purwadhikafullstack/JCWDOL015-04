@@ -7,6 +7,7 @@ import { FavoriteJob } from '@/types/job';
 import moment from 'moment';
 import Link from 'next/link';
 import { getUserInfo } from '@/lib/user';
+import Image from 'next/image';
 
 const FavoriteJobsTab = () => {
   const [favoriteJobs, setFavoriteJobs] = useState<FavoriteJob[]>([]);
@@ -65,8 +66,10 @@ const FavoriteJobsTab = () => {
                       <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           {favorite.job.company.logo ? (
-                            <img
+                            <Image
                               src={favorite.job.company.logo}
+                              width={48}
+                              height={48}
                               alt={`${favorite.job.company.company_name} logo`}
                               className="object-cover h-full w-full"
                             />
