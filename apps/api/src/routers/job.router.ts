@@ -26,6 +26,7 @@ export class JobRouter {
 
   this.router.post('/', verifyToken, checkAdminDev, this.jobController.createJob);
   this.router.patch('/:id', this.jobController.updateJob);
+  this.router.delete('/:id', this.jobController.deleteJob);
 
   }
 

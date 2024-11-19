@@ -4,6 +4,7 @@ import { verify } from 'jsonwebtoken';
 type IUser = {
   user_id: number;
   role: string;
+  company_id?: number;
 };
 
 export const verifyToken = async (
