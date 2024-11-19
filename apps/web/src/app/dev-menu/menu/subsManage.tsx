@@ -9,11 +9,12 @@ import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode'; // Ensure this is installed
 import { DecodedToken, IUserProfile } from '@/types/iuser';
 import { getToken } from '@/lib/server';
+import { UserRole } from '@/types/role';
 
 const SubsManage: React.FC = () => {
   const [plans, setPlans] = useState<ISubsType[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
-  const [userRole, setUserRole] = useState<IUserProfile['role'] | null>(null); // Use IUserProfile's role type
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     const fetchUserRole = async () => {

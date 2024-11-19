@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import JobFilterBar from './JobFilterBar';
 import { fetchJobs } from '@/services/jobService';
-import Card from '@/components/Card';
+import Card from '@/components/JobCard';
 import { JobCardProps } from '@/types/job';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { fetchUserLocation } from '@/services/locationService';
@@ -52,7 +52,7 @@ export default function JobListingsPage() {
         setJobs([]);
       }
     },
-    [sortOrder]
+    [sortOrder],
   );
 
   useEffect(() => {
@@ -104,7 +104,9 @@ export default function JobListingsPage() {
               <button
                 onClick={() => setSortOrder('latest')}
                 className={`p-2 rounded-md ${
-                  sortOrder === 'latest' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                  sortOrder === 'latest'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'
                 }`}
               >
                 Latest
@@ -112,7 +114,9 @@ export default function JobListingsPage() {
               <button
                 onClick={() => setSortOrder('oldest')}
                 className={`p-2 rounded-md ${
-                  sortOrder === 'oldest' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                  sortOrder === 'oldest'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'
                 }`}
               >
                 Oldest

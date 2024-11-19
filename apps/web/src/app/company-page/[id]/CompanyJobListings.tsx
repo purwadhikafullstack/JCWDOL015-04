@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getJobsByCompanyId } from '@/lib/company';
-import Card from '@/components/Card';
+import Card from '@/components/JobCard';
 import { Job, JobCardProps } from '@/types/job';
 
 interface CompanyJobListingsProps {
@@ -12,7 +12,7 @@ const CompanyJobListings = ({ companyId }: CompanyJobListingsProps) => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [jobsPerPage] = useState(3);
-  
+
   useEffect(() => {
     const fetchJobs = async () => {
       const { jobs: fetchedJobs, ok } = await getJobsByCompanyId(companyId);
@@ -21,7 +21,8 @@ const CompanyJobListings = ({ companyId }: CompanyJobListingsProps) => {
           job_id: job.job_id,
           job_title: job.job_title,
           location: job.location,
-          salary: job.salary !== undefined ? `$${job.salary.toLocaleString()}` : null,
+          salary:
+            job.salary !== undefined ? `$${job.salary.toLocaleString()}` : null,
           company: {
             company_name: job.company.company_name,
             logo: job.company.logo || null,
@@ -50,7 +51,9 @@ const CompanyJobListings = ({ companyId }: CompanyJobListingsProps) => {
         {currentJobs.length > 0 ? (
           currentJobs.map((job) => <Card key={job.job_id} job={job} />)
         ) : (
-          <p className="text-gray-500">No job listings available for this company.</p>
+          <p className="text-gray-500">
+            No job listings available for this company.
+          </p>
         )}
       </div>
       {/* Pagination Section */}

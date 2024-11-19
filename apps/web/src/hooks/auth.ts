@@ -14,8 +14,15 @@ export const useAuth = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const profile = await getUserInfo(); // Panggil API untuk mendapatkan profil pengguna
-        setUser(profile);
+        const profile = await getUserInfo();
+        if (profile && profile.user) {
+          setUser({
+            user_id: profile.user.user_id,
+            role: profile.user.role,
+          });
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         setUser(null);
       } finally {

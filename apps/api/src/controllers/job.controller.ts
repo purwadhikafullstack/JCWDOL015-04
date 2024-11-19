@@ -12,6 +12,8 @@ import {
 export class JobController {
   async createJob(req: Request, res: Response) {
     try {
+      console.log('Request Body:', req.body);
+
       const {
         job_title,
         description,
@@ -61,7 +63,9 @@ export class JobController {
     } catch (err) {
       res.status(400).json({
         msg: err instanceof Error ? err.message : 'An error occurred',
+        error: err, // Tambahkan log untuk error detail
       });
+      
     }
   }
 
@@ -442,6 +446,35 @@ export class JobController {
     } catch (error) {
       console.error('Error fetching total jobs count:', error);
       res.status(500).json({ msg: 'Failed to fetch total jobs count' });
+    }
+  }
+  
+  async deleteJob(req: Request, res: Response) {
+    try {
+      const jobId = parseInt(req.params.id, 10);
+  
+      console.log('Job ID to delete:', jobId);
+  
+      if (isNaN(jobId)) {
+        return res.status(400).json({ msg: 'Invalid job ID provided' });
+      }
+
+      const job = await prisma.job.findUnique({
+        where: { job_id: jobId },
+      });
+  
+      if (!job) {
+        return res.status(404).json({ msg: 'Job not found' });
+      }
+  
+      await prisma.job.delete({
+        where: { job_id: jobId },
+      });
+  
+      res.status(200).json({ status: 'ok', msg: 'Job deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      res.status(500).json({ status: 'error', msg: 'Failed to delete job' });
     }
   }
   
