@@ -93,6 +93,33 @@ const MyJobs: React.FC = () => {
     }
   };
 
+  const deleteJob = async (jobId: number) => {
+    const confirmDelete = confirm(
+      'Are you sure you want to delete this job? This action cannot be undone.',
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`${base_url}/jobs/${jobId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || 'Failed to delete the job.');
+      }
+
+      setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+      alert('Job successfully deleted!');
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      alert('Failed to delete the job. Please try again later.');
+    }
+  };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -141,6 +168,7 @@ const MyJobs: React.FC = () => {
                   <TableCell className="font-semibold">View Detail</TableCell>
                   <TableCell className="font-semibold">Selection Test</TableCell>
                   <TableCell className="font-semibold">View Applications</TableCell>
+                  <TableCell className="font-semibold">Delete</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -263,6 +291,16 @@ const MyJobs: React.FC = () => {
                             View Applications
                           </Button>
                         </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          className="hover:bg-red-50"
+                          onClick={() => deleteJob(job.id)}
+                        >
+                          Delete Job
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

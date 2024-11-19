@@ -22,54 +22,58 @@ type Question = {
 };
 
 const TestCreation = ({ params }: { params: { id: string } }) => {
-  const jobId = params.id; // Ambil jobId langsung dari params
-  const [questions, setQuestions] = useState<Question[]>(
-    Array.from({ length: 25 }, () => ({
-      questionId: undefined,
-      question: '',
-      options: ['', '', '', ''],
-      correctAnswer: '',
-    }))
-  );
-  const [loading, setLoading] = useState(true);
+    const jobId = params.id; // Ambil jobId langsung dari params
+    const [testId, setTestId] = useState<number | null>(null);
+    const [questions, setQuestions] = useState<Question[]>(
+      Array.from({ length: 25 }, () => ({
+        questionId: undefined,
+        question: '',
+        options: ['', '', '', ''],
+        correctAnswer: '',
+      }))
+    );
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchExistingQuestions = async () => {
-      try {
-        const response = await fetch(`${base_url}/preselection/get-questions/${jobId}`);
-        if (response.ok) {
-          const data = await response.json();
-          const existingQuestions = data.questions.map((q: any) => ({
-            questionId: q.questionId,
-            question: q.questionText,
-            options: q.options.map((opt: any) => opt.text),
-            correctAnswer: q.options[q.correctAnswer - 1]?.text || '',
-          }));
-
-          const totalQuestions = [...existingQuestions];
-          while (totalQuestions.length < 25) {
-            totalQuestions.push({
-              questionId: undefined,
-              question: '',
-              options: ['', '', '', ''],
-              correctAnswer: '',
-            });
+    useEffect(() => {
+        const fetchExistingTest = async () => {
+          try {
+            const response = await fetch(`${base_url}/preselection/get-questions/${jobId}`);
+            if (response.ok) {
+              const data = await response.json();
+              
+              setTestId(data.testId); // Simpan test_id
+    
+              const existingQuestions = data.questions.map((q: any) => ({
+                questionId: q.questionId || undefined,
+                question: q.questionText,
+                options: q.options.map((opt: any) => opt.text),
+                correctAnswer: q.options[q.correctAnswer - 1]?.text || '',
+              }));
+    
+              const totalQuestions = [...existingQuestions];
+              while (totalQuestions.length < 25) {
+                totalQuestions.push({
+                  questionId: undefined,
+                  question: '',
+                  options: ['', '', '', ''],
+                  correctAnswer: '',
+                });
+              }
+    
+              setQuestions(totalQuestions);
+            } else {
+              console.error('Failed to fetch existing questions');
+            }
+          } catch (error) {
+            console.error('Error fetching existing test:', error);
+          } finally {
+            setLoading(false);
           }
-
-          setQuestions(totalQuestions);
-        } else {
-          console.error('Failed to fetch existing questions');
-        }
-      } catch (error) {
-        console.error('Error fetching existing questions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchExistingQuestions();
-  }, [jobId]);
-
+        };
+    
+        fetchExistingTest();
+      }, [jobId]);
+  
   const handleQuestionChange = (index: number, value: string) => {
     const newQuestions = [...questions];
     newQuestions[index].question = value;
@@ -90,6 +94,11 @@ const TestCreation = ({ params }: { params: { id: string } }) => {
 
   const handleSubmit = async () => {
     try {
+      if (!testId) {
+        alert('Test ID tidak ditemukan. Pastikan tes ini terkait dengan job.');
+        return;
+      }
+
       const formattedQuestions = questions
         .filter(
           (q) =>
@@ -98,29 +107,40 @@ const TestCreation = ({ params }: { params: { id: string } }) => {
             q.correctAnswer.trim() !== '' &&
             q.options.includes(q.correctAnswer)
         )
-        .map((q) => ({
-          questionId: q.questionId || null,
-          questionText: q.question,
-          options: q.options.map((opt) => ({ text: opt })),
-          correctAnswer: q.options.indexOf(q.correctAnswer) + 1,
-        }));
-  
+        .map((q) => {
+          const formattedQuestion: any = {
+            questionText: q.question,
+            options: q.options.map((opt) => ({ text: opt })),
+            correctAnswer: q.options.indexOf(q.correctAnswer) + 1,
+          };
+
+          if (q.questionId !== undefined && q.questionId !== null) {
+            formattedQuestion.questionId = q.questionId;
+          }
+
+          return formattedQuestion;
+        });
+
       if (formattedQuestions.length === 0) {
         alert('Tidak ada soal valid untuk disimpan. Pastikan semua soal terisi dengan benar.');
         return;
       }
-  
+
+      const requestBody = {
+        test_id: testId,
+        questions: formattedQuestions,
+      };
+
+      console.log('Data yang dikirim ke API:', JSON.stringify(requestBody, null, 2));
+
       const response = await fetch(`${base_url}/preselection/add-question`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          testId: jobId,
-          questions: formattedQuestions,
-        }),
+        body: JSON.stringify(requestBody),
       });
-  
+
       if (response.ok) {
         alert('Tes berhasil disimpan!');
       } else {
@@ -133,7 +153,6 @@ const TestCreation = ({ params }: { params: { id: string } }) => {
       alert('Terjadi kesalahan saat menyimpan tes.');
     }
   };
-  
 
   if (loading) {
     return <Typography align="center">Memuat soal...</Typography>;

@@ -27,9 +27,9 @@ export class PreSelectionTestController {
 
   async addQuestion(req: Request, res: Response) {
     try {
-      const { testId, questions } = req.body;
+      const { test_id, questions } = req.body;
 
-      if (!testId || !Array.isArray(questions)) {
+      if (!test_id || !Array.isArray(questions)) {
         return res.status(400).json({
           msg: 'Test ID and questions are required',
         });
@@ -55,7 +55,7 @@ export class PreSelectionTestController {
           // Jika questionId tidak ada, buat pertanyaan baru
           await prisma.testQuestion.create({
             data: {
-              test_id: testId,
+              test_id: parseInt(test_id, 10),
               question_text: question.questionText,
               correct_answer: question.correctAnswer,
               options: {
@@ -69,9 +69,11 @@ export class PreSelectionTestController {
       }
 
       res.status(200).json({ msg: 'Questions added or updated successfully' });
-    } catch (error) {
-      console.error('Error adding/updating questions:', error);
-      res.status(500).json({ msg: 'Failed to add/update questions' });
+    } catch (err) {
+      res.status(400).json({
+        msg: err instanceof Error ? err.message : 'An error occurred',
+        error: err, 
+      });
     }
   }
 
@@ -142,28 +144,28 @@ export class PreSelectionTestController {
   async getQuestionsByJobId(req: Request, res: Response) {
     try {
       const { jobId } = req.params;
-
+  
       if (!jobId) {
         return res.status(400).json({ msg: 'Job ID is required' });
       }
-
+  
       const test = await prisma.preSelectionTest.findUnique({
         where: {
-          job_id: parseInt(jobId, 10),
+          job_id: parseInt(jobId, 10), // Cari berdasarkan job_id
         },
         include: {
           questions: {
             include: {
-              options: true,
+              options: true, // Sertakan opsi pertanyaan
             },
           },
         },
       });
-
+  
       if (!test) {
         return res.status(404).json({ msg: 'No test found for this job ID' });
       }
-
+  
       const questions = test.questions.map((question) => ({
         questionId: question.question_id,
         questionText: question.question_text,
@@ -173,13 +175,17 @@ export class PreSelectionTestController {
         })),
         correctAnswer: question.correct_answer,
       }));
-
-      res.status(200).json({ questions });
+  
+      res.status(200).json({
+        testId: test.test_id, // Tambahkan test_id ke respons
+        questions,
+      });
     } catch (error) {
       console.error('Error fetching questions by job ID:', error);
       res.status(500).json({ msg: 'Failed to fetch questions by job ID' });
     }
   }
+  
 
   async checkTest(req: Request, res: Response) {
     try {

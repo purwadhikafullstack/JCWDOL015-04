@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import Link from 'next/link';
+import { Typography, Paper, Select, MenuItem, FormControl, InputLabel, Button } from '@mui/material';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { getStatusLabel } from '@/utils/format';
@@ -17,6 +18,9 @@ type Applicant = {
   dateApplied: string;
   status: string;
   photoUrl?: string;
+  email: string;
+  resume?: string;
+  phone: string;
 };
 
 type AllApplicationsProps = {
@@ -29,14 +33,11 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
-        const response = await axios.get(
-          `${base_url}/applications/job/${jobId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('token')}`,
-            },
-          }
-        );
+        const response = await axios.get(`${base_url}/applications/job/${jobId}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        });
         setApplicants(response.data.applications);
       } catch (error) {
         console.error('Error fetching applicants:', error);
@@ -46,6 +47,15 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
 
     fetchApplicants();
   }, [jobId]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date);
+  };
 
   const handleStatusChange = async (applicantId: number, newStatus: string) => {
     try {
@@ -102,11 +112,27 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
               Education: {applicant.education}
             </Typography>
             <Typography className="text-xs text-gray-600">
-              Applied: {applicant.dateApplied}
+              Email: {applicant.email}
+            </Typography>
+            <Typography className="text-xs text-gray-600">
+              Phone: {applicant.phone}
+            </Typography>
+            <Typography className="text-xs text-gray-600">
+              Applied: {formatDate(applicant.dateApplied)}
             </Typography>
           </div>
 
-          <div className="flex justify-center mt-2">
+          {applicant.resume && (
+            <div className="text-center">
+              <Typography className="text-xs text-blue-600">
+                <a href={applicant.resume} target="_blank" rel="noopener noreferrer">
+                  View Resume
+                </a>
+              </Typography>
+            </div>
+          )}
+
+          <div className="flex justify-between items-center mt-2">
             <FormControl fullWidth>
               <InputLabel>Status</InputLabel>
               <Select
