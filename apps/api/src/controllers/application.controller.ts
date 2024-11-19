@@ -10,6 +10,9 @@ import fs from 'fs';
 import handlebars from 'handlebars';
 import { transporter } from '@/helpers/notmailer';
 
+export const base_url = process.env.BASE_API_URL;
+export const base_fe_url = process.env.BASE_FE_URL;
+
 export class ApplicationController {
   async createApplication(req: Request, res: Response) {
     try {
@@ -26,10 +29,9 @@ export class ApplicationController {
       }
 
       const resumePath = req.file
-        ? `/api/public/resumes/${req.file.filename}`
+        ? `${base_url}/public/resumes/${req.file.filename}`
         : null;
 
-      // Check if the user has already applied for this job
       const existingApplication = await prisma.application.findFirst({
         where: {
           user_id: userId,

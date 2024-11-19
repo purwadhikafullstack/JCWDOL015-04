@@ -12,15 +12,15 @@ import {
 import { useState } from 'react';
 import { FiShare2 } from 'react-icons/fi';
 
-export default function ShareButton({ slug }: { slug: string }) {
+export default function ShareButton({ id }: { id: number }): JSX.Element {
   const [customMessage, setCustomMessage] = useState('');
   const [isTextareaVisible, setIsTextareaVisible] = useState(false);
   const [showShareButtons, setShowShareButtons] = useState(false);
 
-  const base_url = process.env.BASE_URL_WEB;
-  // Construct the dynamic URL based on the page and slug
-  // const currentUrl = `${base_url}/${slug}`;
-  const currentUrl = 'purwadhika.com';
+  const base_url = process.env.NEXT_PUBLIC_BASE_WEB_URL;
+
+  const currentUrl = `${base_url}/job-page/${id}`;
+  // const currentUrl = 'purwadhika.com';
 
   const handleMainButtonClick = () => {
     setShowShareButtons(true);
@@ -36,8 +36,8 @@ export default function ShareButton({ slug }: { slug: string }) {
     <div className="relative">
       {/* Main Share Button */}
       {!showShareButtons && (
-        <div className='flex items-center'>
-          <p className='font-semibold mr-2'>Share this Job </p>
+        <div className="flex items-center">
+          <p className="font-semibold mr-2">Share this Job </p>
           <button
             className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full hover:bg-blue-600"
             onClick={handleMainButtonClick}
@@ -49,7 +49,10 @@ export default function ShareButton({ slug }: { slug: string }) {
 
       {/* Modal with Textarea and Share Buttons */}
       {isTextareaVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeModal}>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
           <div className="bg-white p-4 rounded-md shadow-md w-1/2">
             <button
               className="absolute top-4 right-4 font-bold text-xl text-black hover:text-gray-800"

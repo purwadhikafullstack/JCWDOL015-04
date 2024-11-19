@@ -8,7 +8,7 @@ export const fetchSubsDashboardData = async (): Promise<{
   error?: string;
 }> => {
   try {
-    const token = await getToken(); // Ambil token dari localStorage
+    const token = await getToken();
 
     if (!token) {
       throw new Error('No token found. Please log in.');

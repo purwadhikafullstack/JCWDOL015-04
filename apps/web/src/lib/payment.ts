@@ -8,7 +8,7 @@ export const uploadPaymentProof = async (data: {
   payment_proof: File;
 }) => {
   try {
-    const token = await getToken(); // Pastikan token valid
+    const token = await getToken();
     if (!token) {
       throw new Error('No token found');
     }
@@ -20,9 +20,9 @@ export const uploadPaymentProof = async (data: {
     const response = await fetch(`${base_url}/payment/upload`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`, // Kirim token untuk autentikasi
+        Authorization: `Bearer ${token}`,
       },
-      body: formData, // Gunakan FormData untuk file upload
+      body: formData,
     });
 
     if (!response.ok) {
