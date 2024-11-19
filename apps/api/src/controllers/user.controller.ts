@@ -23,7 +23,6 @@ export class UserController {
         company_email,
         country,
       } = req.body;
-      console.log('Request body:', req.body);
 
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
@@ -640,7 +639,6 @@ export class UserController {
   }
   async getUserSubscriptions(req: Request, res: Response) {
     const user_id = req.user?.user_id;
-    console.log('User ID in getUserSubscriptions:', req.user?.user_id);
 
     try {
       const subscriptions = await prisma.subscription.findMany({

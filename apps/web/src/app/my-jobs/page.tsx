@@ -81,8 +81,6 @@ const MyJobs: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log('Job status updated:', result);
-
       setJobs((prevJobs) =>
         prevJobs.map((job) =>
           job.id === jobId ? { ...job, status: newStatus } : job,

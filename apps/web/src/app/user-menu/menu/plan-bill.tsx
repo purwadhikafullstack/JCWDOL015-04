@@ -18,7 +18,6 @@ const CandidateDashboard: React.FC = () => {
             // Ambil data subscription aktif
             const { data: subscriptionsData, error: subscriptionsError } =
               await fetchUserSubscriptions();
-            console.log('Fetched subscriptions:', subscriptionsData); // Debug log
             if (subscriptionsError) {
               toast.error('Failed to fetch subscriptions');
               console.error('Subscriptions error:', subscriptionsError);
@@ -31,7 +30,6 @@ const CandidateDashboard: React.FC = () => {
             // Ambil data pembayaran
             const { data: paymentsData, error: paymentsError } =
               await fetchUserPayments();
-            console.log('Fetched payments:', paymentsData); // Debugging log
             if (paymentsError) {
               toast.error('Failed to fetch payments');
               console.error('Payments error:', paymentsError);

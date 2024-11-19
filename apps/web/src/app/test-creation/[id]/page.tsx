@@ -131,8 +131,6 @@ const TestCreation = ({ params }: { params: { id: string } }) => {
         questions: formattedQuestions,
       };
 
-      console.log('Data yang dikirim ke API:', JSON.stringify(requestBody, null, 2));
-
       const response = await fetch(`${base_url}/preselection/add-question`, {
         method: 'POST',
         headers: {

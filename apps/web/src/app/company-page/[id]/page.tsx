@@ -21,7 +21,6 @@ const CompanyPage = () => {
     const fetchData = async () => {
       try {
         const { company, ok } = await getCompanyById(id as string)
-        console.log("data", company?.aboutUs)
         if (ok && company) {
           setCompany(company);
         } else {

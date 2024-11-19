@@ -43,9 +43,8 @@ export default function JobForm() {
           if (response.company) {
             setFormData((prevData) => ({
               ...prevData,
-              companyId: String(response.company?.company_id || ''), // Set company_id
+              companyId: String(response.company?.company_id || ''),
             }));
-            console.log('Company ID:', response.company.company_id);
           } else {
             toast.error('Failed to fetch company info.');
           }
@@ -53,9 +52,8 @@ export default function JobForm() {
           if (response.user) {
             setFormData((prevData) => ({
               ...prevData,
-              userId: String(response.user?.user_id || ''), // Set user_id
+              userId: String(response.user?.user_id || ''), 
             }));
-            console.log('User ID:', response.user.user_id);
           } else {
             toast.error('Failed to fetch user info.');
           }
@@ -112,9 +110,6 @@ export default function JobForm() {
         jobCategory: formData.jobCategory.toLowerCase(),
         jobEducationLevel: formData.jobEducationLevel.toLowerCase(),
       };
-
-      console.log('Data to send:', dataToSend);
-
       await axios.post(`${base_url}/jobs`, dataToSend, config);
       toast.success('Job created successfully!');
 

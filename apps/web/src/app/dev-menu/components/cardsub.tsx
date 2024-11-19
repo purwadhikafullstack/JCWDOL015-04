@@ -72,12 +72,10 @@ const Card: React.FC<CardProps> = ({
     onChange(plan.subs_type_id, 'price', localPlan.price);
     onChange(plan.subs_type_id, 'features', localPlan.features);
 
-    setIsEditing(false); // Keluar dari mode edit
-    console.log('Changes saved for ISubsType ID:', plan.subs_type_id);
+    setIsEditing(false);
   };
 
   const handleDelete = () => {
-    console.log('Deleted ISubsType ID:', plan.subs_type_id);
     onDelete(plan.subs_type_id);
   };
 

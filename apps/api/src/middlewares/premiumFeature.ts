@@ -6,10 +6,6 @@ const prisma = new PrismaClient();
 export const checkActiveSubscription = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.user_id;
-
-    // Log userId untuk debugging
-    console.log("Checking subscription for userId:", userId);
-
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: No user ID found in request." });
     }
@@ -21,10 +17,6 @@ export const checkActiveSubscription = async (req: Request, res: Response, next:
         status: "active", // Pastikan hanya subscription aktif yang diterima
       },
     });
-
-    // Log hasil pencarian subscription
-    console.log("Active Subscription:", activeSubscription);
-
     if (!activeSubscription) {
       return res.status(403).json({
         message: "Access denied: No active subscription found.",

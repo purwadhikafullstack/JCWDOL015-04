@@ -37,11 +37,7 @@ export const getCompanyById = async (
   companyId: string,
 ): Promise<{ company: Company | null; ok: boolean }> => {
   try {
-    const token = getToken();
-    console.log(`Fetching company with ID: ${companyId}`);
-    console.log(`Authorization token: ${token}`);
-
-    const res = await fetch(`${base_url}/companies/${companyId}`, {
+    const token = getToken();    const res = await fetch(`${base_url}/companies/${companyId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

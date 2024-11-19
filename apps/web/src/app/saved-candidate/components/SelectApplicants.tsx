@@ -79,11 +79,6 @@ const SelectApplicants: React.FC<SelectApplicantsProps> = ({ companyId }) => {
     try {
       const interviewDateTime = new Date(`${interviewDate}T${interviewTime}:00`).toISOString();
   
-      console.log('Sending data to backend:', {
-        interviewDate: interviewDate,
-        interviewTime: interviewDateTime, 
-      });
-  
       await axios.patch(
         `${base_url}/applications/${selectedApplicant.id}/interview-schedule`,
         {

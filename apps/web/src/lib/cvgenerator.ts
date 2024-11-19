@@ -27,12 +27,11 @@ export const getCvs = async (
     });
 
     if (!response.ok) {
-      console.error('API Error:', response.status, response.statusText); // Tambahkan log error
+      console.error('API Error:', response.status, response.statusText); 
       throw new Error(`Network response was not ok: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Raw Data:', data); // Debug data mentah dari API
     return { cvs: data.cvs || null, ok: true };
   } catch (error) {
     console.error('Error fetching CVs:', error);

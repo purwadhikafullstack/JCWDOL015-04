@@ -151,7 +151,6 @@ export const fetchRecentlyPostedJobs = async (userId: number) => {
       },
     });
     const result = await res.json();
-    console.log(result);
     return { jobs: result.jobs, ok: res.ok };
   } catch (error) {
     console.error('Error fetching recently posted jobs:', error);

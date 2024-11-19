@@ -108,7 +108,6 @@ const CompanyInfo = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-  console.log('aboutUs:', aboutUs);
   return (
     <div className="p-6 space-y-6">
       <h3 className="text-xl font-semibold mb-4">Company Info</h3>

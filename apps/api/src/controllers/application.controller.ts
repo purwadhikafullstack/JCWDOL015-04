@@ -237,8 +237,6 @@ export class ApplicationController {
     const jobId = parseInt(req.params.jobId, 10); 
   
     try {
-      console.log('Received Job ID:', req.params.jobId);
-      console.log('Parsed Job ID:', jobId);
   
       if (isNaN(jobId)) {
         console.warn('Invalid Job ID:', jobId);
@@ -354,10 +352,7 @@ export class ApplicationController {
     try {
       const { applicationId } = req.params;
       const { interviewDate, interviewTime } = req.body;
-  
-      console.log('Application ID:', applicationId);
-      console.log('Interview Date:', interviewDate);
-      console.log('Interview Time:', interviewTime);
+
   
       if (!applicationId || !interviewDate || !interviewTime) {
         return res

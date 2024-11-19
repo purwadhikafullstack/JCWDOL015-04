@@ -25,16 +25,10 @@ const SubsManage: React.FC = () => {
           console.error('Token not found or is null.');
           return;
         }
-    
-        console.log('Retrieved token:', token); // Debugging log
-    
         try {
-          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // Decode token with updated interface
-          console.log('Decoded token:', decodedToken); // Debugging log
-    
+          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
           if (decodedToken.role) {
-            setUserRole(decodedToken.role); // Set the role
-            console.log('User role set:', decodedToken.role);
+            setUserRole(decodedToken.role);
           } else {
             console.error('Role not found in decoded token.');
             toast.error('Failed to retrieve user role from token.');

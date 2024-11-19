@@ -12,7 +12,6 @@ import {
 export class JobController {
   async createJob(req: Request, res: Response) {
     try {
-      console.log('Request Body:', req.body);
 
       const {
         job_title,
@@ -224,8 +223,6 @@ export class JobController {
   async updateJob(req: Request, res: Response) {
     try {
       const jobId = parseInt(req.params.id, 10); 
-      console.log('Job ID from params:', jobId); 
-      console.log('Request Body:', req.body);
       const {
         job_title,
         description,
@@ -368,8 +365,6 @@ export class JobController {
         },
       });
 
-      console.log('Favorites found:', favorites);
-
       res.status(200).json({
         status: 'ok',
         favorites,
@@ -427,7 +422,6 @@ export class JobController {
   async getTotalJobsCount(req: Request, res: Response) {
     try {
       const userId = req.user?.user_id;
-      console.log("User ID from token:", userId);
   
       if (!userId) {
         return res.status(400).json({ msg: 'User ID is required' });
@@ -452,8 +446,7 @@ export class JobController {
   async deleteJob(req: Request, res: Response) {
     try {
       const jobId = parseInt(req.params.id, 10);
-  
-      console.log('Job ID to delete:', jobId);
+
   
       if (isNaN(jobId)) {
         return res.status(400).json({ msg: 'Invalid job ID provided' });
