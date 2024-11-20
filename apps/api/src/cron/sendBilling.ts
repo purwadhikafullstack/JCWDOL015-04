@@ -23,7 +23,6 @@ const formatDecimalToNumber = (value: Decimal | null): number => {
 
 // Schedule a cron job to run daily at 12:00 AM
 cron.schedule("0 0 * * *", async () => {
-  console.log("Running daily cron job to send billing emails...");
 
   try {
     // Get users whose subscription ends tomorrow
@@ -69,7 +68,6 @@ Your Company Team`,
       };
 
       await transporter.sendMail(emailOptions);
-      console.log(`Billing email sent to ${subscription.user.email}`);
     }
   } catch (error) {
     console.error("Error sending billing emails:", error);

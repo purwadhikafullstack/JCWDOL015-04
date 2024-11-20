@@ -1,14 +1,14 @@
 import { DashboardData } from '@/types/subsDashboard';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
+const base_url = process.env.BASE_URL_API
 
 export const fetchSubsDashboardData = async (): Promise<{
   data?: DashboardData;
   error?: string;
 }> => {
   try {
-    const token = await getToken(); // Ambil token dari localStorage
+    const token = await getToken();
 
     if (!token) {
       throw new Error('No token found. Please log in.');

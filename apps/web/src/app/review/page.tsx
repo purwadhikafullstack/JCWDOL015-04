@@ -72,9 +72,6 @@ const ReviewsPage: React.FC<{ params: { companyId: string } }> = ({
       careerOpportunitiesRating: ratings.careerOpportunities,
       company_id: 1,
     };
-
-    console.log('live payload being sent:', payload);
-
     try {
       const newReview = await createReview(payload);
       toast.success('Review created successfully!');

@@ -97,7 +97,6 @@ export class CompanyController {
         address,
         description,
       } = req.body;
-      console.log(req.body);
 
       const logoUrl = req.files?.logo?.[0]
         ? `${base_url}/public/company_logos/${req.files.logo[0].filename}`
@@ -106,7 +105,6 @@ export class CompanyController {
       const bannerUrl = req.files?.banner?.[0]
         ? `${base_url}/public/company_banners/${req.files.banner[0].filename}`
         : undefined;
-      console.log('aboutUs', aboutUs);
       const updatedCompany = await prisma.company.update({
         where: { company_id: parseInt(req.params.id) },
         data: {

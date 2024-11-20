@@ -6,7 +6,7 @@ export class UserPlanController {
     async getUserSubscriptions(req: Request, res: Response) {
       try {
         const { user_id } = req.user!;
-        console.log('User ID in getUserSubscriptions:', user_id); // Debugging log
+
   
         if (!user_id) {
           return res.status(400).json({ status: 'error', msg: 'Invalid user ID' });
@@ -34,7 +34,6 @@ export class UserPlanController {
     async getUserPayments(req: Request, res: Response) {
       try {
         const { user_id } = req.user!;
-        console.log('User ID in getUserPayments:', user_id); // Debugging log
   
         if (!user_id) {
           return res.status(400).json({ status: 'error', msg: 'Invalid user ID' });

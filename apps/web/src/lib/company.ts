@@ -37,11 +37,7 @@ export const getCompanyById = async (
   companyId: string,
 ): Promise<{ company: Company | null; ok: boolean }> => {
   try {
-    const token = getToken();
-    console.log(`Fetching company with ID: ${companyId}`);
-    console.log(`Authorization token: ${token}`);
-
-    const res = await fetch(`${base_url}/companies/${companyId}`, {
+    const token = getToken();    const res = await fetch(`${base_url}/companies/${companyId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -75,15 +71,14 @@ export const getJobsByCompanyId = async (
   }
 };
 
-export const fetchUserCompany = async (): Promise<{ company: Company | null; ok: boolean }> => {
+export const fetchUserCompany = async (): Promise<{ company: Company | null; user: { user_id: number } | null; ok: boolean }> => {
   const token = await getToken();
 
   if (!token) {
-    return { company: null, ok: false };
+    return { company: null, user: null, ok: false };
   }
 
   try {
-
     const res = await fetch(`${base_url}/companies/user`, {
       method: 'GET',
       headers: {
@@ -97,9 +92,13 @@ export const fetchUserCompany = async (): Promise<{ company: Company | null; ok:
     }
 
     const result = await res.json();
-    return { company: result.company, ok: true };
+    const company = result.company || null;
+    const user = company?.users?.[0] || null;
+
+    return { company, user, ok: true };
   } catch (error) {
-    return { company: null, ok: false };
+    console.error('Error:', error);
+    return { company: null, user: null, ok: false };
   }
 };
 

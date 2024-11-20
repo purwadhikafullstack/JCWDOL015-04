@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import CompanyFilterBar from './CompanyFilterBar';
 import CompanyCard from '@/components/CompanyCard';
 import { getFilteredCompanies } from '@/services/companyService';
@@ -19,32 +19,35 @@ export default function CompanyPage() {
     fetchUserLocation(setLocation, setLocationAccessDenied);
   }, []);
 
-  const loadCompanies = async (
-    filters: { search: string } = { search: '' },
-    lat?: number,
-    lng?: number,
-    radius = 25,
-  ) => {
-    try {
-      const companyFilters: {
-        search: string;
-        [key: string]: string | string[];
-      } = {
-        ...filters,
-        dateRange: sortOrder,
-      };
+  const loadCompanies = useCallback(
+    async (
+      filters: { search: string } = { search: '' },
+      lat?: number,
+      lng?: number,
+      radius = 25,
+    ) => {
+      try {
+        const companyFilters: {
+          search: string;
+          [key: string]: string | string[];
+        } = {
+          ...filters,
+          dateRange: sortOrder,
+        };
 
-      if (lat !== undefined) companyFilters.lat = lat.toString();
-      if (lng !== undefined) companyFilters.lng = lng.toString();
-      companyFilters.radius = radius.toString();
+        if (lat !== undefined) companyFilters.lat = lat.toString();
+        if (lng !== undefined) companyFilters.lng = lng.toString();
+        companyFilters.radius = radius.toString();
 
-      const data = await getFilteredCompanies(companyFilters);
-      setCompanies(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching companies:', error);
-      setCompanies([]);
-    }
-  };
+        const data = await getFilteredCompanies(companyFilters);
+        setCompanies(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        setCompanies([]);
+      }
+    },
+    [sortOrder],
+  );
 
   useEffect(() => {
     if (location) {
@@ -52,7 +55,7 @@ export default function CompanyPage() {
     } else {
       loadCompanies();
     }
-  }, [sortOrder, location]);
+  }, [sortOrder, location, loadCompanies]);
 
   const handleSearch = (filters: {
     search: string;

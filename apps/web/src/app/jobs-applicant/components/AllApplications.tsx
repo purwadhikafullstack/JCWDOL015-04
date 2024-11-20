@@ -2,11 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import Link from 'next/link';
+import { Typography, Paper, Select, MenuItem, FormControl, InputLabel, Button } from '@mui/material';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { getStatusLabel } from '@/utils/format';
 import base_url from '@/lib/user';
+import Image from 'next/image';
 
 type Applicant = {
   id: number;
@@ -17,6 +19,9 @@ type Applicant = {
   dateApplied: string;
   status: string;
   photoUrl?: string;
+  email: string;
+  resume?: string;
+  phone: string;
 };
 
 type AllApplicationsProps = {
@@ -29,14 +34,11 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
-        const response = await axios.get(
-          `${base_url}/applications/job/${jobId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('token')}`,
-            },
-          }
-        );
+        const response = await axios.get(`${base_url}/applications/job/${jobId}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        });
         setApplicants(response.data.applications);
       } catch (error) {
         console.error('Error fetching applicants:', error);
@@ -46,6 +48,15 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
 
     fetchApplicants();
   }, [jobId]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date);
+  };
 
   const handleStatusChange = async (applicantId: number, newStatus: string) => {
     try {
@@ -80,8 +91,10 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
       {applicants.map((applicant) => (
         <div key={applicant.id} className="border-b border-gray-300 py-4">
           <div className="flex items-center mb-3">
-            <img
+            <Image
               src={applicant.photoUrl || 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'}
+              width={64}
+              height={64}
               alt={`${applicant.name}'s photo`}
               className="w-16 h-16 rounded-full object-cover mr-4"
             />
@@ -102,11 +115,27 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
               Education: {applicant.education}
             </Typography>
             <Typography className="text-xs text-gray-600">
-              Applied: {applicant.dateApplied}
+              Email: {applicant.email}
+            </Typography>
+            <Typography className="text-xs text-gray-600">
+              Phone: {applicant.phone}
+            </Typography>
+            <Typography className="text-xs text-gray-600">
+              Applied: {formatDate(applicant.dateApplied)}
             </Typography>
           </div>
 
-          <div className="flex justify-center mt-2">
+          {applicant.resume && (
+            <div className="text-center">
+              <Typography className="text-xs text-blue-600">
+                <a href={applicant.resume} target="_blank" rel="noopener noreferrer">
+                  View Resume
+                </a>
+              </Typography>
+            </div>
+          )}
+
+          <div className="flex justify-between items-center mt-2">
             <FormControl fullWidth>
               <InputLabel>Status</InputLabel>
               <Select

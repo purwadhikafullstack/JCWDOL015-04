@@ -18,8 +18,6 @@ export class FavoriteJobController {
         },
       });
 
-      console.log('Favorites found:', favorites);
-
       res.status(200).json({
         status: 'ok',
         favorites,
@@ -35,9 +33,6 @@ export class FavoriteJobController {
       const jobIdString = req.query.jobId as string;
       const jobId = parseInt(jobIdString, 10);
       const userId = req.user?.user_id;
-
-      console.log('Parsed jobId:', jobId);
-      console.log('Parsed userId:', userId);
 
       if (!userId) {
         return res.status(400).json({ msg: 'User ID is required' });

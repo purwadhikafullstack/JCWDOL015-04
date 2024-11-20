@@ -19,10 +19,8 @@ export const uploader = (
     payment: path.join(__dirname, '../../public/payment-proof'),
   };
 
-  // Get the directory based on the fileType
-  const defaultDir = directories[fileType];
 
-  // Check if the folder exists, if not, create it
+  const defaultDir = directories[fileType];
   const ensureFolderExists = (folderPath: string) => {
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true });
@@ -31,23 +29,18 @@ export const uploader = (
 
   const storage = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {
-
       ensureFolderExists(defaultDir);
-      console.log(`Saving file to: ${defaultDir}`);
       cb(null, defaultDir);
     },
     filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
       const originalNameParts = file.originalname.split('.');
       const fileExtension = originalNameParts[originalNameParts.length - 1].toLowerCase();
       const newFileName = `${filePrefix}_${Date.now()}.${fileExtension}`;
-      console.log(`Generated filename: ${newFileName}`);
       cb(null, newFileName);
     },
   });
   
-  
 
-  // File filter for validation based on the type
   const fileFilter = (
     req: Request,
     file: Express.Multer.File,

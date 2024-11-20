@@ -4,6 +4,8 @@ import { getUserInfo } from '@/lib/user';
 import { RecentlyPostedJob } from '@/types/job';
 import { fetchRecentlyPostedJobs, fetchTotalJobsCount } from '@/lib/job';
 import moment from 'moment';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface OverviewProps {
   setSelectedTab: (tab: string) => void;
@@ -48,10 +50,6 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
     };
     fetchData();
   }, []);
-
-  const handleViewDetails = (job: RecentlyPostedJob) => {
-    setSelectedJob(job);
-  };
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -110,8 +108,10 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
                         <div className="avatar">
                           <div className="mask mask-squircle h-12 w-12">
                             {job.logo ? (
-                              <img
+                              <Image
                                 src={job.logo}
+                                width={48}
+                                height={48}
                                 alt={`${job.job_title} logo`}
                                 className="object-cover h-full w-full"
                               />
@@ -153,12 +153,11 @@ const Overview = ({ setSelectedTab }: OverviewProps) => {
                     </td>
 
                     <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => handleViewDetails(job)}
-                      >
+                    <Link href="/my-jobs">
+                      <button className="btn btn-sm btn-primary">
                         View Details
                       </button>
+                    </Link>
                     </td>
                   </tr>
                 ))

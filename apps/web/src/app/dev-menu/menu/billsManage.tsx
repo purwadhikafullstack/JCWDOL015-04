@@ -5,8 +5,9 @@ import { DashboardMetrics, Transaction } from '@/types/payment';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-
 import { toast } from 'react-toastify';
+
+const base_url = process.env.BASE_API_URL
 
 const BillsManage: React.FC = () => {
   const router = useRouter();
@@ -158,7 +159,7 @@ const BillsManage: React.FC = () => {
                 <td className="px-4 py-2 text-center">
                   {tx.receipt ? (
                     <a
-                      href={`http://localhost:8000/api/public/payment-proof/${tx.receipt}`}
+                      href={`${base_url}/public/payment-proof/${tx.receipt}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 underline"

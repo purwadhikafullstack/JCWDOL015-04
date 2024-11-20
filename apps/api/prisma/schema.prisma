@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum for User role
 enum UserRole {
   normal
   candidate
@@ -14,86 +18,105 @@ enum UserRole {
   developer
 }
 
+// Enum for Application Status
 enum ApplicationStatus {
+  active
+  under_review
+  interview
   pending
   accepted
+  hired
   rejected
 }
 
+// Enum for Interview Status
 enum InterviewStatus {
   scheduled
   completed
   canceled
 }
 
+// Enum for Subscription Status (naufal)
 enum SubscriptionStatus {
   active
   inactive
 }
 
+// Enum for Assessment Status (naufal)
 enum AssessmentStatus {
   passed
   failed
 }
 
+// Enum for Question Type
 enum QuestionType {
   multiple_choice
   true_false
   open_ended
 }
 
+// Enum for Difficulty Level
 enum DifficultyLevel {
   easy
   medium
   hard
 }
 
+// Enum for Notification Type
 enum NotificationType {
   application
   interview
   subscription
 }
 
+// Enum for Proficiency Level
 enum ProficiencyLevel {
   beginner
   intermediate
   advanced
 }
 
+// Enum for Log Status
 enum LogStatus {
   success
   failure
 }
 
+// Enum for Report Status
 enum ReportStatus {
   pending
   resolved
   dismissed
 }
 
+// Enum for Device Type
 enum DeviceType {
   desktop
   mobile
   tablet
 }
 
+// Enum for Transaction Status (naufal)
 enum TransactionStatus {
   pending
   completed
   failed
 }
 
+// Enum for Payment Method
 enum PaymentMethod {
   bank_transfer
   credit_card
   paypal
 }
 
+// Enum for Interview Type
 enum InterviewType {
   in_person
   virtual
 }
 
+// Enum for Education
 enum EducationLevel {
   HIGH_SCHOOL
   ASSOCIATES
@@ -107,12 +130,14 @@ enum EducationLevel {
   POSTGRADUATE
 }
 
+// Enum for Gender
 enum Gender {
   MALE
   FEMALE
   OTHER
 }
 
+// Enum for Job Type
 enum JobType {
   fullTime
   partTime
@@ -120,17 +145,19 @@ enum JobType {
   contractor
 }
 
+// Enum for Country Code
 enum CountryCode {
-  ID
-  SG
-  MY
-  US
-  GB
-  DE
-  JP
-  CN
+  ID // Indonesia
+  SG // Singapore
+  MY // Malaysia
+  US // United States
+  GB // United Kingdom
+  DE // Germany
+  JP // Japan
+  CN // China
 }
 
+// Enum for Job education
 enum JobEducationLevel {
   high_school
   intermediate
@@ -140,6 +167,7 @@ enum JobEducationLevel {
   doctor_degree
 }
 
+// Enum for Job Experience
 enum JobExperience {
   entry_level
   mid_level
@@ -147,6 +175,7 @@ enum JobExperience {
   expert
 }
 
+// Enum for Job Category
 enum JobCategory {
   software_engineering
   data_science
@@ -170,134 +199,176 @@ enum JobCategory {
   public_relations
 }
 
+enum IndustryType {
+  TECHNOLOGY
+  FINANCE
+  HEALTHCARE
+  EDUCATION
+  RETAIL
+  HOSPITALITY
+  TRANSPORTATION
+  CONSTRUCTION
+  REAL_ESTATE
+  CONSULTING
+  GOVERNMENT
+  ENERGY
+  TELECOMMUNICATIONS
+  ENTERTAINMENT
+  AGRICULTURE
+  MANUFACTURING
+  INSURANCE
+  LEGAL
+  MARKETING
+  ADVERTISING
+  MEDIA
+  NON_PROFIT
+  RESEARCH
+  AUTOMOTIVE
+  PHARMACEUTICALS
+}
+
+// User model
 model User {
-  user_id                Int                      @id @default(autoincrement())
-  email                  String                   @unique
-  password               String
-  role                   UserRole
-  first_name             String
-  last_name              String
-  profile_picture        String?
-  phone                  String?
-  website                String?
-  linkedin               String?
-  github                 String?
-  twitter                String?
-  facebook               String?
-  instagram              String?
-  title                  String?
-  education              EducationLevel?
-  biography              String?                  @db.Text
-  skills                 String?
-  languages              String?
-  nationality            String?
-  country                CountryCode?
-  location               String?
-  gender                 Gender?
-  DateOfBirth            DateTime?
-  tempat_lahir           String?
-  resume                 String?
-  years_of_experience    Int?
-  created_at             DateTime                 @default(now())
-  updated_at             DateTime                 @updatedAt
-  is_verified            Boolean
+  user_id             Int             @id @default(autoincrement())
+  email               String          @unique
+  password            String
+  role                UserRole
+  first_name          String
+  last_name           String
+  profile_picture     String?
+  phone               String?
+  website             String?
+  linkedin            String?
+  github              String?
+  twitter             String?
+  facebook            String?
+  instagram           String?
+  title               String?
+  education           EducationLevel?
+  biography           String?         @db.Text()
+  skills              String?
+  languages           String?
+  nationality         String?
+  country             CountryCode?
+  location            String?
+  gender              Gender?
+  tempat_lahir        String?
+  DateOfBirth         DateTime?
+  resume              String?
+  years_of_experience Int?
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+  is_verified         Boolean
 
   // Relations
-  adminLogs              AdminLog[]
-  applications           Application[]
-  CV                     CV[]
-  companies              Company[]                @relation("UserCompanies")
-  featureUsage           FeatureUsage[]
-  jobs                   Job[]
-  jobReports             JobReport[]
-  jobSaves               JobSave[]
-  jobViews               JobView[]
-  notifications          Notification[]
-  paymentTransactions    PaymentTransaction[]
-  reviews                Review[]
-  subscriptions          Subscription[]
-  subscriptionTypes      SubscriptionType[]
-  userAssessmentResponses UserAssessmentResponse[]
-  userSkills             UserSkill[]
-  skillAssessments       SkillAssessment[]
-  favorites              Favorite[]
-  testResults            TestResult[]
-  answers                TestAnswer[]
-}
-
+  applications            Application[]
+  companies               Company[]                @relation("UserCompanies")
+  skillAssessments        SkillAssessment[]
+  reviews                 Review[]
+  notifications           Notification[]
+  subscriptions           Subscription[]
+  userSkills              UserSkill[]
+  adminLogs               AdminLog[]
+  jobReports              JobReport[]
+  jobViews                JobView[]
+  jobSaves                JobSave[]
+  paymentTransactions     PaymentTransaction[]
+  UserAssessmentResponses UserAssessmentResponse[]
+  jobs                    Job[]
+  Favorite                Favorite[]
+  testResults             TestResult[]
+  answers                 TestAnswer[]
+  CV                      CV[]
+  featureUsage            FeatureUsage[]
+  SubscriptionType        SubscriptionType[]
 
   @@index([email])
 }
 
+// Company model
 model Company {
-  company_id      Int         @id @default(autoincrement())
+  company_id      Int           @id @default(autoincrement())
   company_name    String
-  email           String      @unique
+  email           String        @unique
   phone           String?
-  address         String?
+  aboutUs         String?       @db.Text()
   website         String?
-  created_at      DateTime    @default(now())
-  updated_at      DateTime    @updatedAt
-  description     String?     @db.Text
-  logo            String?
-  IndustryType    String?
-  TeamSize        Int?
-  aboutUs         String?     @db.Text
-  banner          String?
-  yearOfEstablish DateTime?
-  country         CountryCode
-  facebook        String?
-  instagram       String?
   linkedin        String?
+  instagram       String?
   twitter         String?
-  jobs            Job[]
-  reviews         Review[]
-  users           User[]      @relation("UserCompanies")
+  facebook        String?
+  yearOfEstablish String?
+  IndustryType    IndustryType?
+  TeamSize        String?
+  country         CountryCode
+  address         String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  description     String?       @db.Text()
+  logo            String?
+  banner          String?
+
+  // Relations
+  jobs    Job[]
+  reviews Review[]
+  users   User[]   @relation("UserCompanies")
 
   @@index([email])
 }
 
+// Job model
 model Job {
   job_id            Int                @id @default(autoincrement())
   job_title         String
-  description       String             @db.Text
+  description       String             @db.Text()
+  responsibility    String?            @db.Text()
+  country           CountryCode
   location          String?
   salary            Int?
-  created_at        DateTime           @default(now())
-  updated_at        DateTime           @updatedAt
-  is_active         Boolean
-  jobExpired_at     DateTime?
-  company_id        Int
-  userUser_id       Int?
-  user_id           Int?               // Alternate field for user relation
-  country           CountryCode
-  jobExperience     JobExperience?
   jobType           JobType?
   jobCategory       JobCategory?
   jobEducationLevel JobEducationLevel?
-  responsibility    String?            @db.Text
+  jobExperience     JobExperience?
+  jobExpired_at     DateTime?
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  is_active         Boolean
 
   // Relations
-  company           Company            @relation(fields: [company_id], references: [company_id])
-  user              User?              @relation(fields: [userUser_id], references: [user_id]) // Retaining user relation
-  applications      Application[]
-  jobReports        JobReport[]
-  jobSaves          JobSave[]
-  jobViews          JobView[]
-  Favorite          Favorite[]
-  preSelectionTest  PreSelectionTest?
-  testResults       TestResult[]
-}
-
+  company          Company           @relation(fields: [company_id], references: [company_id])
+  company_id       Int
+  applications     Application[]
+  jobReports       JobReport[]
+  jobViews         JobView[]
+  jobSaves         JobSave[]
+  user             User?             @relation(fields: [user_id], references: [user_id])
+  user_id          Int?
+  Favorite         Favorite[]
+  preSelectionTest PreSelectionTest?
+  testResults      TestResult[]
 
   @@index([company_id])
   @@index([is_active, jobCategory])
-  @@index([userUser_id], map: "Job_userUser_id_fkey")
+  @@index([user_id], map: "Job_userUser_id_fkey")
 }
 
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  job_id     Int
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+  job  Job  @relation(fields: [job_id], references: [job_id])
+
+  @@unique([user_id, job_id])
+}
+
+// Application model
 model Application {
   application_id   Int               @id @default(autoincrement())
   resume           String?
+  coverLetter      String?           @db.Text()
   expected_salary  Decimal?
   status           ApplicationStatus
   applied_at       DateTime          @default(now())
@@ -305,20 +376,24 @@ model Application {
   interview_date   DateTime?
   interview_time   DateTime?
   interview_status InterviewStatus?
-  job_id           Int
-  user_id          Int
-  coverLetter      String?           @db.Text
-  job              Job               @relation(fields: [job_id], references: [job_id])
-  user             User              @relation(fields: [user_id], references: [user_id])
-  interview        Interview[]
+
+  // Relations
+  job       Job         @relation(fields: [job_id], references: [job_id])
+  job_id    Int
+  user      User        @relation(fields: [user_id], references: [user_id])
+  user_id   Int
+  interview Interview[]
 
   @@index([job_id])
   @@index([user_id])
 }
 
+// Notification model
 model Notification {
   notification_id Int              @id @default(autoincrement())
+  user            User             @relation(fields: [user_id], references: [user_id])
   user_id         Int
+  subject         String?
   message         String
   is_read         Boolean
   type            NotificationType
@@ -326,13 +401,14 @@ model Notification {
   link            String?
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt
-  user            User             @relation(fields: [user_id], references: [user_id])
 
   @@index([user_id])
 }
 
+// UserSkill model
 model UserSkill {
   user_skill_id       Int               @id @default(autoincrement())
+  user                User              @relation(fields: [user_id], references: [user_id])
   user_id             Int
   skill_name          String
   years_of_experience Int?
@@ -342,11 +418,11 @@ model UserSkill {
   is_verified         Boolean
   created_at          DateTime          @default(now())
   updated_at          DateTime          @updatedAt
-  user                User              @relation(fields: [user_id], references: [user_id])
 
   @@index([user_id])
 }
 
+// AdminLog model
 model AdminLog {
   log_id           Int        @id @default(autoincrement())
   action           String
@@ -356,16 +432,19 @@ model AdminLog {
   user_agent       String?
   status           LogStatus?
   affected_user_id Int?
+  admin            User       @relation(fields: [admin_id], references: [user_id])
   admin_id         Int
   affected_job_id  Int?
-  admin            User       @relation(fields: [admin_id], references: [user_id])
 
   @@index([admin_id])
 }
 
+// JobReport model
 model JobReport {
   report_id       Int          @id @default(autoincrement())
+  job             Job          @relation(fields: [job_id], references: [job_id])
   job_id          Int
+  user            User         @relation(fields: [user_id], references: [user_id])
   user_id         Int
   reason          String
   status          ReportStatus
@@ -374,16 +453,17 @@ model JobReport {
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   resolution_date DateTime?
-  job             Job          @relation(fields: [job_id], references: [job_id])
-  user            User         @relation(fields: [user_id], references: [user_id])
 
   @@index([job_id])
   @@index([user_id])
 }
 
+// JobView model
 model JobView {
   view_id     Int         @id @default(autoincrement())
+  job         Job         @relation(fields: [job_id], references: [job_id])
   job_id      Int
+  user        User?       @relation(fields: [user_id], references: [user_id])
   user_id     Int?
   viewed_at   DateTime    @default(now())
   ip_address  String?
@@ -392,16 +472,16 @@ model JobView {
   device_type DeviceType?
   referrer    String?
   session_id  String?
-  job         Job         @relation(fields: [job_id], references: [job_id])
-  user        User?       @relation(fields: [user_id], references: [user_id])
 
   @@index([job_id])
-  @@index([user_id], map: "JobView_user_id_fkey")
 }
 
+// JobSave model
 model JobSave {
   save_id         Int       @id @default(autoincrement())
+  job             Job       @relation(fields: [job_id], references: [job_id])
   job_id          Int
+  user            User      @relation(fields: [user_id], references: [user_id])
   user_id         Int
   saved_at        DateTime  @default(now())
   is_favorite     Boolean
@@ -410,30 +490,77 @@ model JobSave {
   reminder_set    Boolean
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
-  job             Job       @relation(fields: [job_id], references: [job_id])
-  user            User      @relation(fields: [user_id], references: [user_id])
 
   @@index([job_id])
   @@index([user_id])
 }
 
+// Interview model
 model Interview {
   interview_id     Int             @id @default(autoincrement())
+  application      Application     @relation(fields: [application_id], references: [application_id])
   application_id   Int
   scheduled_time   DateTime
   status           InterviewStatus
-  feedback         String?         @db.Text
+  feedback         String?         @db.Text()
   interviewer_name String?
   interview_link   String?
   interview_type   InterviewType?
   created_at       DateTime        @default(now())
   updated_at       DateTime        @updatedAt
-  application      Application     @relation(fields: [application_id], references: [application_id])
 
   @@index([application_id])
 }
 
-// SubscriptionType model
+model PreSelectionTest {
+  test_id   Int            @id @default(autoincrement())
+  job_id    Int            @unique
+  questions TestQuestion[]
+  answers   TestAnswer[]
+  job       Job            @relation(fields: [job_id], references: [job_id])
+}
+
+model TestQuestion {
+  question_id      Int              @id @default(autoincrement())
+  test_id          Int
+  question_text    String
+  options          TestOption[]
+  correct_answer   Int
+  preSelectionTest PreSelectionTest @relation(fields: [test_id], references: [test_id])
+  answers          TestAnswer[]
+}
+
+model TestResult {
+  result_id    Int      @id @default(autoincrement())
+  user_id      Int
+  job_id       Int
+  score        Int
+  completed_at DateTime @default(now())
+  job          Job      @relation(fields: [job_id], references: [job_id])
+  user         User     @relation(fields: [user_id], references: [user_id])
+}
+
+model TestOption {
+  option_id    Int          @id @default(autoincrement())
+  question_id  Int
+  option_text  String
+  testQuestion TestQuestion @relation(fields: [question_id], references: [question_id])
+}
+
+model TestAnswer {
+  answer_id       Int      @id @default(autoincrement())
+  user_id         Int
+  question_id     Int
+  test_id         Int
+  selected_option Int
+  is_correct      Boolean
+  answered_at     DateTime @default(now())
+
+  user             User             @relation(fields: [user_id], references: [user_id])
+  preSelectionTest PreSelectionTest @relation(fields: [test_id], references: [test_id])
+  testQuestion     TestQuestion     @relation(fields: [question_id], references: [question_id])
+}
+
 model SubscriptionType {
   subs_type_id       Int                  @id @default(autoincrement())
   type               String
@@ -449,7 +576,6 @@ model SubscriptionType {
   @@index([User_id], map: "SubscriptionType_User_id_fkey")
 }
 
-// Subscription model
 model Subscription {
   subscription_id      Int                  @id @default(autoincrement())
   start_date           DateTime?
@@ -470,7 +596,6 @@ model Subscription {
   @@index([subscription_type_id], map: "Subscription_subscription_type_id_fkey")
 }
 
-// Review model
 model Review {
   review_id                 Int      @id @default(autoincrement())
   rating                    Decimal?
@@ -492,7 +617,6 @@ model Review {
   @@index([user_id])
 }
 
-// SkillAssessment model
 model SkillAssessment {
   assessment_id   Int              @id @default(autoincrement())
   badge           String?
@@ -504,15 +628,15 @@ model SkillAssessment {
   assessment_date DateTime?
   feedback        String?
 
+  // Relations
   user          User                     @relation(fields: [user_id], references: [user_id])
   user_id       Int
   questions     AssessmentQuestion[]
-  userResponses UserAssessmentResponse[]
+  userResponses UserAssessmentResponse[] // Back-reference to UserAssessmentResponse
 
   @@index([user_id, status])
 }
 
-// AssessmentQuestion model
 model AssessmentQuestion {
   question_id            Int                      @id @default(autoincrement())
   question_text          String                   @db.Text
@@ -530,7 +654,6 @@ model AssessmentQuestion {
   @@index([assessment_id])
 }
 
-// AssessmentAnswer model
 model AssessmentAnswer {
   answer_id              Int                      @id @default(autoincrement())
   answer_text            String
@@ -544,13 +667,13 @@ model AssessmentAnswer {
   @@index([question_id])
 }
 
-// UserAssessmentResponse model
 model UserAssessmentResponse {
   response_id Int      @id @default(autoincrement())
   answer_text String?  @db.Text()
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
+  // Relations
   user            User               @relation(fields: [user_id], references: [user_id])
   user_id         Int
   question        AssessmentQuestion @relation(fields: [question_id], references: [question_id])
@@ -565,7 +688,6 @@ model UserAssessmentResponse {
   @@index([assessment_id])
 }
 
-// FeatureUsage model
 model FeatureUsage {
   id           Int      @id @default(autoincrement())
   user_id      Int
@@ -576,7 +698,6 @@ model FeatureUsage {
   @@index([user_id, feature_name])
 }
 
-// CV model
 model CV {
   cv_id      Int      @id @default(autoincrement())
   user_id    Int
@@ -589,7 +710,6 @@ model CV {
   @@index([user_id])
 }
 
-// PaymentTransaction model
 model PaymentTransaction {
   transaction_id       Int               @id @default(autoincrement())
   user_id              Int
@@ -609,58 +729,4 @@ model PaymentTransaction {
   @@index([user_id])
   @@index([subscription_id], map: "PaymentTransaction_subscription_id_fkey")
   @@index([subscription_type_id], map: "PaymentTransaction_subscription_type_id_fkey")
-}
-
-// PreSelectionTest model
-model PreSelectionTest {
-  test_id          Int               @id @default(autoincrement())
-  job_id           Int               @unique
-  questions        TestQuestion[]
-  answers          TestAnswer[]
-  job              Job               @relation(fields: [job_id], references: [job_id])
-}
-
-// TestQuestion model
-model TestQuestion {
-  question_id      Int               @id @default(autoincrement())
-  test_id          Int
-  question_text    String
-  options          TestOption[]      
-  correct_answer   Int               
-  preSelectionTest PreSelectionTest  @relation(fields: [test_id], references: [test_id])
-  answers          TestAnswer[]
-}
-
-// TestResult model
-model TestResult {
-  result_id        Int               @id @default(autoincrement())
-  user_id          Int
-  job_id           Int
-  score            Int              
-  completed_at     DateTime          @default(now())
-  job              Job               @relation(fields: [job_id], references: [job_id])
-  user             User              @relation(fields: [user_id], references: [user_id])
-}
-
-// TestOption model
-model TestOption {
-  option_id        Int               @id @default(autoincrement())
-  question_id      Int
-  option_text      String
-  testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
-}
-
-// TestAnswer model
-model TestAnswer {
-  answer_id        Int               @id @default(autoincrement())
-  user_id          Int               
-  question_id      Int               
-  test_id          Int               
-  selected_option  Int              
-  is_correct       Boolean           
-  answered_at      DateTime          @default(now()) 
-
-  user             User              @relation(fields: [user_id], references: [user_id])
-  preSelectionTest PreSelectionTest  @relation(fields: [test_id], references: [test_id])
-  testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
 }

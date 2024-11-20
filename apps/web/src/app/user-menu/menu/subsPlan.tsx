@@ -99,9 +99,6 @@ const CustomerPlans: React.FC = () => {
   };
 
   const handleSubmitPaymentProof = async () => {
-    console.log('Selected Plan:', selectedPlan);
-    console.log('Selected File:', selectedFile);
-  
     if (!selectedPlan || !selectedFile) {
       toast.error('Plan and payment proof are required!');
       return;
@@ -114,7 +111,6 @@ const CustomerPlans: React.FC = () => {
       });
   
       if (result.ok) {
-        console.log('Upload result:', result.data);
         toast.success('Payment proof uploaded successfully!');
         handleCloseModal();
       } else {

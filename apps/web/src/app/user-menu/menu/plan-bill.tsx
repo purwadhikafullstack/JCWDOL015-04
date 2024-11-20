@@ -10,8 +10,7 @@ const CandidateDashboard: React.FC = () => {
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL_API || 'http://localhost:8000/api';
+  const base_url = process.env.BASE_API_URL
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -19,7 +18,6 @@ const CandidateDashboard: React.FC = () => {
             // Ambil data subscription aktif
             const { data: subscriptionsData, error: subscriptionsError } =
               await fetchUserSubscriptions();
-            console.log('Fetched subscriptions:', subscriptionsData); // Debug log
             if (subscriptionsError) {
               toast.error('Failed to fetch subscriptions');
               console.error('Subscriptions error:', subscriptionsError);
@@ -32,7 +30,6 @@ const CandidateDashboard: React.FC = () => {
             // Ambil data pembayaran
             const { data: paymentsData, error: paymentsError } =
               await fetchUserPayments();
-            console.log('Fetched payments:', paymentsData); // Debugging log
             if (paymentsError) {
               toast.error('Failed to fetch payments');
               console.error('Payments error:', paymentsError);
@@ -147,7 +144,7 @@ const CandidateDashboard: React.FC = () => {
                 <td className="px-4 py-2">
                   {pay.receipt ? (
                     <a
-                      href={`${baseUrl}/public/payment-proof/${pay.receipt}`}
+                      href={`${base_url}/public/payment-proof/${pay.receipt}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 underline"

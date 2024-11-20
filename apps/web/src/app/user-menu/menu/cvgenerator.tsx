@@ -44,7 +44,6 @@ export default function CvDashboard() {
   }, [router]);
 
   useEffect(() => {
-    console.log('Current CV state:', cv); // Debug state CV
   }, [cv]);
   
 
@@ -52,7 +51,6 @@ export default function CvDashboard() {
     setLoading(true);
     try {
       const response = await getCvs();
-      console.log('API Response:', response); // Debug respons API
       if (response.ok && response.cvs && Array.isArray(response.cvs) && response.cvs.length > 0) {
         setCv(response.cvs[0]);
       } else {

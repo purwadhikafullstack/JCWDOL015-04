@@ -10,6 +10,9 @@ import fs from 'fs';
 import handlebars from 'handlebars';
 import { transporter } from '@/helpers/notmailer';
 
+export const base_url = process.env.BASE_API_URL;
+export const base_fe_url = process.env.BASE_FE_URL;
+
 export class ApplicationController {
   async createApplication(req: Request, res: Response) {
     try {
@@ -26,10 +29,9 @@ export class ApplicationController {
       }
 
       const resumePath = req.file
-        ? `/api/public/resumes/${req.file.filename}`
+        ? `${base_url}/public/resumes/${req.file.filename}`
         : null;
 
-      // Check if the user has already applied for this job
       const existingApplication = await prisma.application.findFirst({
         where: {
           user_id: userId,
@@ -232,11 +234,9 @@ export class ApplicationController {
   }
 
   async getApplicationsByJobId(req: Request, res: Response) {
-    try {
-      // Gunakan req.params.jobId, sesuai dengan rute
-      const jobId = parseInt(req.params.jobId, 10);
+    const jobId = parseInt(req.params.jobId, 10); 
   
-      console.log('Parsed Job ID:', jobId); // Log untuk debugging
+    try {
   
       if (isNaN(jobId)) {
         console.warn('Invalid Job ID:', jobId);
@@ -246,13 +246,27 @@ export class ApplicationController {
       const applications = await prisma.application.findMany({
         where: { job_id: jobId },
         include: {
-          user: true,
-          job: true,
+          user: {
+            select: {
+              first_name: true,
+              last_name: true,
+              years_of_experience: true,
+              education: true,
+              profile_picture: true,
+              email: true,
+              phone: true,
+            },
+          },
+          job: {
+            select: {
+              job_title: true,
+            },
+          },
         },
       });
   
       if (applications.length === 0) {
-        console.warn('No applications found for job ID:', jobId);
+        console.warn(`Applications not found for job ID: ${jobId}`);
         return res.status(404).json({ msg: 'No applications found for this job' });
       }
   
@@ -260,22 +274,23 @@ export class ApplicationController {
         applications: applications.map((app) => ({
           id: app.application_id,
           name: `${app.user.first_name} ${app.user.last_name}`,
-          position: app.job?.job_title,
+          position: app.job.job_title,
+          email: app.user.email,
+          phone: app.user.phone,
           experience: app.user.years_of_experience,
           education: app.user.education,
           dateApplied: app.applied_at,
+          resume: app.resume,
           status: app.status,
           photoUrl: app.user.profile_picture,
         })),
       });
     } catch (error) {
-      console.error('Error fetching applications:', error);
-      res.status(500).json({ msg: 'Failed to fetch applications' });
+      const err = error as Error; // Casting ke tipe Error
+      console.error('Error fetching applications for Job ID:', jobId, err.message);
+      res.status(500).json({ msg: 'Failed to fetch applications', error: err.message });
     }
   }
-  
-  
-  
   
 
   async getInterviewApplicantsByCompany(req: Request, res: Response) {
@@ -337,46 +352,21 @@ export class ApplicationController {
     try {
       const { applicationId } = req.params;
       const { interviewDate, interviewTime } = req.body;
+
   
       if (!applicationId || !interviewDate || !interviewTime) {
-        return res.status(400).json({ msg: 'Application ID, interview date, and time are required' });
+        return res
+          .status(400)
+          .json({ msg: 'Application ID, interview date, and time are required' });
       }
   
       const updatedApplication = await prisma.application.update({
         where: { application_id: Number(applicationId) },
         data: {
           interview_date: new Date(interviewDate),
-          interview_time: interviewTime, 
-          status: 'interview', 
+          interview_time: interviewTime,
+          status: 'interview',
         },
-        include: {
-          user: true,
-          job: true,
-        },
-      });
-  
-      const user = updatedApplication.user;
-      const job = updatedApplication.job;
-  
-      const templatePath = path.join(
-        __dirname,
-        '../templates/interviewSchedule.hbs',
-      );
-      const templateSource = fs.readFileSync(templatePath, 'utf-8');
-      const compiledTemplate = handlebars.compile(templateSource);
-  
-      const emailHtml = compiledTemplate({
-        name: `${user.first_name} ${user.last_name}`,
-        jobTitle: job.job_title,
-        interviewDate,
-        interviewTime,
-      });
-  
-      await transporter.sendMail({
-        from: process.env.MAIL_USER,
-        to: user.email,
-        subject: 'Interview Schedule Updated',
-        html: emailHtml,
       });
   
       res.status(200).json({
@@ -385,9 +375,11 @@ export class ApplicationController {
       });
     } catch (error) {
       console.error('Error updating interview schedule:', error);
-      res.status(500).json({ msg: 'Failed to update interview schedule' });
+      res.status(500).json({ msg: 'Failed to update interview schedule', error });
     }
   }
+  
+  
   
   
 }

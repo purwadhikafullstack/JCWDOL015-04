@@ -3,6 +3,7 @@ import React from 'react';
 import { UserRole } from '@/types/role';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface AvatarMenuProps {
   onLogout: () => void;
@@ -36,10 +37,12 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         className="btn btn-ghost btn-circle avatar"
       >
         <div className="w-10 rounded-full">
-          <img
+          <Image
             alt="Avatar"
+            width={40}
+            height={40}
             src={
-              profilePicture ||
+              profilePicture? profilePicture :
               'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
             }
           />
@@ -47,7 +50,7 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
       </div>
       <ul
         tabIndex={0}
-        className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
+        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
       >
         {/* Profile Button - Conditional on userRole */}
         <li>

@@ -9,11 +9,12 @@ import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode'; // Ensure this is installed
 import { DecodedToken, IUserProfile } from '@/types/iuser';
 import { getToken } from '@/lib/server';
+import { UserRole } from '@/types/role';
 
 const SubsManage: React.FC = () => {
   const [plans, setPlans] = useState<ISubsType[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
-  const [userRole, setUserRole] = useState<IUserProfile['role'] | null>(null); // Use IUserProfile's role type
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -24,16 +25,10 @@ const SubsManage: React.FC = () => {
           console.error('Token not found or is null.');
           return;
         }
-    
-        console.log('Retrieved token:', token); // Debugging log
-    
         try {
-          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // Decode token with updated interface
-          console.log('Decoded token:', decodedToken); // Debugging log
-    
+          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
           if (decodedToken.role) {
-            setUserRole(decodedToken.role); // Set the role
-            console.log('User role set:', decodedToken.role);
+            setUserRole(decodedToken.role);
           } else {
             console.error('Role not found in decoded token.');
             toast.error('Failed to retrieve user role from token.');

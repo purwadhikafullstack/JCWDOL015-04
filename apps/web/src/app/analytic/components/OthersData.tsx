@@ -25,7 +25,6 @@ const OtherData: React.FC = () => {
       try {
         const response = await fetch(`${base_url}/analytics/other-data`);
         const result = await response.json();
-        console.log('Fetched Data:', result);
 
         setData({
           userRetentionRate: result.userRetentionRate || 0,

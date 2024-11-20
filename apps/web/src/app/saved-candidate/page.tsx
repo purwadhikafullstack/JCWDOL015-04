@@ -84,7 +84,7 @@ const SchedulePage: React.FC = () => {
           Interview Schedule Management
         </Typography>
 
-        <SelectApplicants companyId={companyId} onSchedule={handleOpenDialog} />
+        <SelectApplicants companyId={companyId}/>
         <InterviewSchedules 
           schedules={schedules} 
           onEdit={(schedule) => handleOpenDialog(applicants.find(app => app.id === schedule.applicantId)!)} 

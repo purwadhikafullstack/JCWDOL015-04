@@ -10,6 +10,7 @@ import CompanyInfo from './CompanyInfo';
 import ApplyModal from './ApplyModal';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import ShareButton from '@/components/share/ShareButton';
 
 const JobPage = () => {
   const { id } = useParams();
@@ -94,6 +95,7 @@ const JobPage = () => {
                   {job.responsibility}
                 </p>
               </section>
+              <ShareButton id={job.job_id}/>
             </div>
 
             {/* Sidebar Section */}
