@@ -28,10 +28,10 @@ const DevMenu: React.FC = () => {
   useEffect(() => {
     const validateUser = async () => {
       try {
-        const token = await getToken(); // Ambil token dari localStorage
+        const token = await getToken(); 
         if (!token) {
           toast.error('User not logged in.');
-          router.push('/sign-in'); // Redirect ke halaman login jika token tidak ditemukan
+          router.push('/sign-in'); 
           return;
         }
 

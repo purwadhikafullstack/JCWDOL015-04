@@ -178,31 +178,36 @@ model User {
   first_name             String
   last_name              String
   profile_picture        String?
+  phone                  String?
+  website                String?
+  linkedin               String?
+  github                 String?
+  twitter                String?
+  facebook               String?
+  instagram              String?
+  title                  String?
+  education              EducationLevel?
+  biography              String?                  @db.Text
+  skills                 String?
+  languages              String?
+  nationality            String?
+  country                CountryCode?
+  location               String?
+  gender                 Gender?
+  DateOfBirth            DateTime?
+  tempat_lahir           String?
+  resume                 String?
+  years_of_experience    Int?
   created_at             DateTime                 @default(now())
   updated_at             DateTime                 @updatedAt
   is_verified            Boolean
-  DateOfBirth            DateTime?
-  biography              String?                  @db.Text
-  education              EducationLevel?
-  gender                 Gender?
-  languages              String?
-  location               String?
-  nationality            String?
-  phone                  String?
-  resume                 String?
-  skills                 String?
-  title                  String?
-  website                String?
-  years_of_experience    Int?
-  facebook               String?
-  github                 String?
-  instagram              String?
-  linkedin               String?
-  twitter                String?
+
+  // Relations
   adminLogs              AdminLog[]
   applications           Application[]
   CV                     CV[]
-  FeatureUsage           FeatureUsage[]
+  companies              Company[]                @relation("UserCompanies")
+  featureUsage           FeatureUsage[]
   jobs                   Job[]
   jobReports             JobReport[]
   jobSaves               JobSave[]
@@ -211,11 +216,15 @@ model User {
   paymentTransactions    PaymentTransaction[]
   reviews                Review[]
   subscriptions          Subscription[]
-  SubscriptionType       SubscriptionType[]
-  UserAssessmentResponse UserAssessmentResponse[]
+  subscriptionTypes      SubscriptionType[]
+  userAssessmentResponses UserAssessmentResponse[]
   userSkills             UserSkill[]
-  companies              Company[]                @relation("UserCompanies")
-  SkillAssessment        SkillAssessment[]
+  skillAssessments       SkillAssessment[]
+  favorites              Favorite[]
+  testResults            TestResult[]
+  answers                TestAnswer[]
+}
+
 
   @@index([email])
 }
@@ -257,21 +266,29 @@ model Job {
   created_at        DateTime           @default(now())
   updated_at        DateTime           @updatedAt
   is_active         Boolean
+  jobExpired_at     DateTime?
   company_id        Int
   userUser_id       Int?
+  user_id           Int?               // Alternate field for user relation
   country           CountryCode
   jobExperience     JobExperience?
   jobType           JobType?
   jobCategory       JobCategory?
   jobEducationLevel JobEducationLevel?
   responsibility    String?            @db.Text
-  jobExpired_at     DateTime?
-  applications      Application[]
+
+  // Relations
   company           Company            @relation(fields: [company_id], references: [company_id])
-  User              User?              @relation(fields: [userUser_id], references: [user_id])
+  user              User?              @relation(fields: [userUser_id], references: [user_id]) // Retaining user relation
+  applications      Application[]
   jobReports        JobReport[]
   jobSaves          JobSave[]
   jobViews          JobView[]
+  Favorite          Favorite[]
+  preSelectionTest  PreSelectionTest?
+  testResults       TestResult[]
+}
+
 
   @@index([company_id])
   @@index([is_active, jobCategory])
@@ -286,6 +303,7 @@ model Application {
   applied_at       DateTime          @default(now())
   updated_at       DateTime          @updatedAt
   interview_date   DateTime?
+  interview_time   DateTime?
   interview_status InterviewStatus?
   job_id           Int
   user_id          Int
@@ -415,6 +433,7 @@ model Interview {
   @@index([application_id])
 }
 
+// SubscriptionType model
 model SubscriptionType {
   subs_type_id       Int                  @id @default(autoincrement())
   type               String
@@ -430,6 +449,7 @@ model SubscriptionType {
   @@index([User_id], map: "SubscriptionType_User_id_fkey")
 }
 
+// Subscription model
 model Subscription {
   subscription_id      Int                  @id @default(autoincrement())
   start_date           DateTime?
@@ -450,6 +470,7 @@ model Subscription {
   @@index([subscription_type_id], map: "Subscription_subscription_type_id_fkey")
 }
 
+// Review model
 model Review {
   review_id                 Int      @id @default(autoincrement())
   rating                    Decimal?
@@ -471,6 +492,7 @@ model Review {
   @@index([user_id])
 }
 
+// SkillAssessment model
 model SkillAssessment {
   assessment_id   Int              @id @default(autoincrement())
   badge           String?
@@ -482,15 +504,15 @@ model SkillAssessment {
   assessment_date DateTime?
   feedback        String?
 
-  // Relations
   user          User                     @relation(fields: [user_id], references: [user_id])
   user_id       Int
   questions     AssessmentQuestion[]
-  userResponses UserAssessmentResponse[] // Back-reference to UserAssessmentResponse
+  userResponses UserAssessmentResponse[]
 
   @@index([user_id, status])
 }
 
+// AssessmentQuestion model
 model AssessmentQuestion {
   question_id            Int                      @id @default(autoincrement())
   question_text          String                   @db.Text
@@ -508,6 +530,7 @@ model AssessmentQuestion {
   @@index([assessment_id])
 }
 
+// AssessmentAnswer model
 model AssessmentAnswer {
   answer_id              Int                      @id @default(autoincrement())
   answer_text            String
@@ -521,13 +544,13 @@ model AssessmentAnswer {
   @@index([question_id])
 }
 
+// UserAssessmentResponse model
 model UserAssessmentResponse {
   response_id Int      @id @default(autoincrement())
   answer_text String?  @db.Text()
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  // Relations
   user            User               @relation(fields: [user_id], references: [user_id])
   user_id         Int
   question        AssessmentQuestion @relation(fields: [question_id], references: [question_id])
@@ -542,6 +565,7 @@ model UserAssessmentResponse {
   @@index([assessment_id])
 }
 
+// FeatureUsage model
 model FeatureUsage {
   id           Int      @id @default(autoincrement())
   user_id      Int
@@ -552,6 +576,7 @@ model FeatureUsage {
   @@index([user_id, feature_name])
 }
 
+// CV model
 model CV {
   cv_id      Int      @id @default(autoincrement())
   user_id    Int
@@ -564,6 +589,7 @@ model CV {
   @@index([user_id])
 }
 
+// PaymentTransaction model
 model PaymentTransaction {
   transaction_id       Int               @id @default(autoincrement())
   user_id              Int
@@ -583,4 +609,58 @@ model PaymentTransaction {
   @@index([user_id])
   @@index([subscription_id], map: "PaymentTransaction_subscription_id_fkey")
   @@index([subscription_type_id], map: "PaymentTransaction_subscription_type_id_fkey")
+}
+
+// PreSelectionTest model
+model PreSelectionTest {
+  test_id          Int               @id @default(autoincrement())
+  job_id           Int               @unique
+  questions        TestQuestion[]
+  answers          TestAnswer[]
+  job              Job               @relation(fields: [job_id], references: [job_id])
+}
+
+// TestQuestion model
+model TestQuestion {
+  question_id      Int               @id @default(autoincrement())
+  test_id          Int
+  question_text    String
+  options          TestOption[]      
+  correct_answer   Int               
+  preSelectionTest PreSelectionTest  @relation(fields: [test_id], references: [test_id])
+  answers          TestAnswer[]
+}
+
+// TestResult model
+model TestResult {
+  result_id        Int               @id @default(autoincrement())
+  user_id          Int
+  job_id           Int
+  score            Int              
+  completed_at     DateTime          @default(now())
+  job              Job               @relation(fields: [job_id], references: [job_id])
+  user             User              @relation(fields: [user_id], references: [user_id])
+}
+
+// TestOption model
+model TestOption {
+  option_id        Int               @id @default(autoincrement())
+  question_id      Int
+  option_text      String
+  testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
+}
+
+// TestAnswer model
+model TestAnswer {
+  answer_id        Int               @id @default(autoincrement())
+  user_id          Int               
+  question_id      Int               
+  test_id          Int               
+  selected_option  Int              
+  is_correct       Boolean           
+  answered_at      DateTime          @default(now()) 
+
+  user             User              @relation(fields: [user_id], references: [user_id])
+  preSelectionTest PreSelectionTest  @relation(fields: [test_id], references: [test_id])
+  testQuestion     TestQuestion      @relation(fields: [question_id], references: [question_id])
 }

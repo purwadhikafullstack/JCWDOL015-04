@@ -18,6 +18,8 @@ import { NotificationRouter } from './routers/notification.router';
 import { ApplicationRouter } from './routers/application.router';
 import { FavoriteJobRouter } from './routers/favoriteJob.router';
 import { CompanyRouter } from './routers/company.router';
+import { PreSelectionTestRouter } from './routers/preselection.router';
+import { AnalyticsRouter } from './routers/analytic.router';
 import { base_fe_url } from './controllers/user.controller';
 import { CvRouter } from './routers/cv.router';
 import { PlanBillRouter } from './routers/userplan.router';
@@ -35,7 +37,7 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
+    this.app.use(cors({ origin: `http://localhost:3000`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
     this.app.use('/api/public', express.static('public'));
@@ -80,6 +82,9 @@ export default class App {
     const userPlan = new PlanBillRouter();
     const assessmentRouter = new AssessmentRouter();
     const certificateRouter = new CertificateRouter();
+    const preSelectionTestRouter = new PreSelectionTestRouter();
+    const analyticsRouter = new AnalyticsRouter();
+
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -99,6 +104,8 @@ export default class App {
     this.app.use('/api/plan-bill', userPlan.getRouter());
     this.app.use('/api/assessment', assessmentRouter.getRouter());
     this.app.use('/api/certificate', certificateRouter.getRouter());
+    this.app.use('/api/preselection', preSelectionTestRouter.getRouter());
+    this.app.use('/api/analytics', analyticsRouter.getRouter());
   }
 
   public start(): void {

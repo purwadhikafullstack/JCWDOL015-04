@@ -215,6 +215,9 @@ export class JobController {
 
   async updateJob(req: Request, res: Response) {
     try {
+      const jobId = parseInt(req.params.id, 10); 
+      console.log('Job ID from params:', jobId); 
+      console.log('Request Body:', req.body);
       const {
         job_title,
         description,
@@ -226,7 +229,7 @@ export class JobController {
         jobExperience,
         is_active,
       } = req.body;
-      const jobId = parseInt(req.params.jobId, 10);
+      
 
       if (isNaN(jobId)) {
         return res
