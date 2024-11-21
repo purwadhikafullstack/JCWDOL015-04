@@ -1,7 +1,7 @@
 import { DashboardMetrics, IConfirmPayment, ISubsPayment } from '@/types/payment';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API
+const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
 export const uploadPaymentProof = async (data: {
   subs_type_id: number;

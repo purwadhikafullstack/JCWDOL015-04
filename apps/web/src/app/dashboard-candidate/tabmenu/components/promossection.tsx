@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const PromoSection: React.FC = () => {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between p-6 md:p-10">
+    <div className="flex flex-col md:flex-row items-center justify-between p-2 md:p-4">
       {/* Bagian Teks */}
       <div className="md:w-1/2 text-center md:text-left mb-6 md:mb-0">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">

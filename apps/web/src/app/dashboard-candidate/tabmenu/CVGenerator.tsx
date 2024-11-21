@@ -7,12 +7,14 @@ import { Cv } from '@/types/cvgenerator';
 import { downloadCv, getCvs } from '@/lib/cvgenerator';
 import { checkSubscriptionStatus } from '@/lib/subsDashboard';
 import { getToken } from '@/lib/server';
-import ResumeForm from '../components/resumeform';
+import ResumeForm from './components/resumeform';
 
 export default function CvDashboard() {
   const [cv, setCv] = useState<Cv | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isActiveSubscription, setIsActiveSubscription] = useState<boolean | null>(null);
+  const [isActiveSubscription, setIsActiveSubscription] = useState<
+    boolean | null
+  >(null);
   const [isCreating, setIsCreating] = useState(false); // State untuk menampilkan form
   const router = useRouter();
 
@@ -35,7 +37,7 @@ export default function CvDashboard() {
 
         // Redirect to CustomerPlans after 3 seconds
         setTimeout(() => {
-          router.push('/user-menu?tab=CustomerPlans');
+          router.push('/dashboard-candidate?tab=Subscription');
         }, 3000);
       }
     };
@@ -43,15 +45,18 @@ export default function CvDashboard() {
     checkStatus();
   }, [router]);
 
-  useEffect(() => {
-  }, [cv]);
-  
+  useEffect(() => {}, [cv]);
 
   const fetchCv = async () => {
     setLoading(true);
     try {
       const response = await getCvs();
-      if (response.ok && response.cvs && Array.isArray(response.cvs) && response.cvs.length > 0) {
+      if (
+        response.ok &&
+        response.cvs &&
+        Array.isArray(response.cvs) &&
+        response.cvs.length > 0
+      ) {
         setCv(response.cvs[0]);
       } else {
         setCv(null);
@@ -64,8 +69,6 @@ export default function CvDashboard() {
       setLoading(false);
     }
   };
-  
-  
 
   const handleCreateCv = () => {
     setIsCreating(true); // Tampilkan form
@@ -82,10 +85,10 @@ export default function CvDashboard() {
         toast.error('No CV selected for download.');
         return;
       }
-  
+
       // Panggil fungsi downloadCv
       const result = await downloadCv(cv.cv_id.toString());
-  
+
       if (result.ok && result.file) {
         // Buat URL blob untuk file
         const url = window.URL.createObjectURL(result.file);
@@ -95,7 +98,7 @@ export default function CvDashboard() {
         document.body.appendChild(a);
         a.click();
         a.remove();
-  
+
         toast.success('CV downloaded successfully!');
       } else {
         toast.error('Failed to download CV. Please try again.');
@@ -105,7 +108,6 @@ export default function CvDashboard() {
       toast.error('An unexpected error occurred while downloading CV.');
     }
   };
-  
 
   return (
     <div className="p-6">
@@ -117,7 +119,6 @@ export default function CvDashboard() {
         <>
           {isCreating ? (
             <ResumeForm onResumeCreated={handleFormSubmit} />
-
           ) : cv ? (
             <div>
               <h2 className="text-lg font-bold mb-4">Your CV</h2>

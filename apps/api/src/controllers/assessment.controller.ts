@@ -32,13 +32,13 @@ export class AssessmentController {
         data: {
           user_id,
           assessment_data,
-          status: 'failed', // Default to failed
           questions: {
             create: questions.map((q: any) => ({
               question_text: q.question_text,
-              question_type: q.question_type || 'multiple_choice', // Default type
-              is_active: true, // Set is_active to true by default
-              difficulty_level: q.difficulty_level || 'medium', // Default difficulty
+              question_type: q.question_type || 'multiple_choice',
+              is_active: true,
+              difficulty_level: q.difficulty_level || 'medium',
+              points: q.points || 1, // Default points
               answers: {
                 create: q.answers.map((a: any) => ({
                   answer_text: a.answer_text,
@@ -86,23 +86,6 @@ export class AssessmentController {
     try {
       const { assessment_id } = req.params;
 
-      // Hapus jawaban terkait
-      await this.prisma.assessmentAnswer.deleteMany({
-        where: {
-          question: {
-            assessment_id: parseInt(assessment_id, 10),
-          },
-        },
-      });
-
-      // Hapus pertanyaan terkait
-      await this.prisma.assessmentQuestion.deleteMany({
-        where: {
-          assessment_id: parseInt(assessment_id, 10),
-        },
-      });
-
-      // Hapus data assessment
       await this.prisma.skillAssessment.delete({
         where: { assessment_id: parseInt(assessment_id, 10) },
       });
@@ -114,12 +97,20 @@ export class AssessmentController {
     }
   }
 
-  public async getUserAssessments(req: Request, res: Response): Promise<void> {
+  public async startAssessment(req: Request, res: Response): Promise<void> {
     try {
-      const { user_id } = req.params;
+      const user_id = req.user?.user_id;
 
-      const assessments = await this.prisma.skillAssessment.findMany({
-        where: { user_id: parseInt(user_id, 10) },
+      if (!user_id) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      const { assessment_id } = req.params;
+
+      // Temukan assessment beserta pertanyaan dan jawabannya
+      const assessment = await this.prisma.skillAssessment.findUnique({
+        where: { assessment_id: parseInt(assessment_id, 10) },
         include: {
           questions: {
             include: {
@@ -129,71 +120,43 @@ export class AssessmentController {
         },
       });
 
-      res.status(200).json({ assessments });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error', error });
-    }
-  }
-
-  public async startAssessment(req: Request, res: Response): Promise<void> {
-    try {
-      const user_id = req.user?.user_id;
-  
-      if (!user_id) {
-        res.status(401).json({ message: 'Unauthorized' });
-        return;
-      }
-  
-      const { assessment_id } = req.params;
-  
-      // Cari assessment berdasarkan assessment_id dan sertakan pertanyaan serta jawabannya
-      const assessment = await this.prisma.skillAssessment.findUnique({
-        where: { assessment_id: parseInt(assessment_id, 10) },
-        include: {
-          questions: {
-            include: {
-              answers: true, // Sertakan jawaban untuk setiap pertanyaan
-            },
-          },
-        },
-      });
-  
       if (!assessment) {
         res.status(404).json({ message: 'Assessment not found' });
         return;
       }
-  
-      // Update assessment_date ke waktu sekarang
-      await this.prisma.skillAssessment.update({
-        where: { assessment_id: parseInt(assessment_id, 10) },
-        data: {
-          assessment_date: new Date(),
-        },
+
+      // Masukkan semua data ke `UserAssessmentResponse`
+      const responses = assessment.questions.map((question) => ({
+        user_id,
+        question_id: question.question_id,
+        assessment_id: parseInt(assessment_id, 10),
+        created_at: new Date(),
+        updated_at: new Date(),
+        answer_id: null, // Belum ada jawaban
+        answer_text: null, // Belum ada jawaban teks
+      }));
+
+      // Batch insert ke `UserAssessmentResponse`
+      await this.prisma.userAssessmentResponse.createMany({
+        data: responses,
       });
-  
-      // Buat token dengan JWT
+
+      // Buat token JWT untuk sesi assessment
       const token = jwt.sign(
         {
           user_id,
-          assessment_id: parseInt(assessment_id, 10), // Gunakan assessment_id langsung
+          assessment_id: parseInt(assessment_id, 10),
         },
         process.env.SECRET_JWT!,
-        { expiresIn: '30m' }, // Token berlaku 30 menit
+        { expiresIn: '30m' },
       );
-  
-      // Kirim respons dengan token, informasi assessment, pertanyaan, dan jawaban
+
+      // Kirimkan respons
       res.status(200).json({
         message: 'Assessment started',
-        token, // Token untuk validasi saat submit
-        time_limit: 30, // Batas waktu dalam menit
-        assessment: {
-          assessment_id,
-          assessment_data: assessment.assessment_data,
-          user_id: assessment.user_id,
-          assessment_date: assessment.assessment_date,
-          questions: assessment.questions, // Sertakan pertanyaan dan jawabannya
-        },
+        token,
+        time_limit: 30,
+        assessment,
       });
     } catch (error) {
       console.error('Error starting assessment:', error);
@@ -203,7 +166,6 @@ export class AssessmentController {
       });
     }
   }
-  
 
   public async submitAssessment(req: Request, res: Response): Promise<void> {
     try {
@@ -213,12 +175,10 @@ export class AssessmentController {
         return;
       }
 
-      // Ekstrak token dari header
       const token = authHeader.split(' ')[1];
       let decodedToken: { user_id: number; assessment_id: number };
 
       try {
-        // Verifikasi token JWT
         decodedToken = jwt.verify(token, process.env.SECRET_JWT!) as {
           user_id: number;
           assessment_id: number;
@@ -228,20 +188,16 @@ export class AssessmentController {
         return;
       }
 
-      const user_id = decodedToken.user_id;
-      const assessment_id = decodedToken.assessment_id;
+      const { user_id, assessment_id } = decodedToken;
 
-      const {
-        responses,
-      }: {
-        responses: Array<{
-          question_id: number;
-          answer_id: number;
-          answer_text: string;
-        }>;
-      } = req.body;
+      const { responses } = req.body;
 
-      // Validasi assessment berdasarkan token
+      // Validasi responses
+      if (!Array.isArray(responses) || responses.length === 0) {
+        res.status(400).json({ message: "Invalid or missing responses." });
+        return;
+      }
+
       const assessment = await this.prisma.skillAssessment.findUnique({
         where: { assessment_id },
         include: { questions: true },
@@ -252,7 +208,10 @@ export class AssessmentController {
         return;
       }
 
-      const totalQuestions = assessment.questions.length;
+      const totalQuestions = Array.isArray(assessment.questions)
+        ? assessment.questions.length
+        : 0;
+
       const pointsPerQuestion = totalQuestions > 0 ? 100 / totalQuestions : 0;
 
       let totalScore = 0;
@@ -279,25 +238,25 @@ export class AssessmentController {
 
       const isPassed = totalScore >= 75;
 
-      await this.prisma.skillAssessment.update({
-        where: { assessment_id },
+      // Tentukan badge berdasarkan data assessment
+      const badge = isPassed ? 'Passed Skill Assessment by HIRE-ME' : null;
+
+      // Simpan skor dan badge di UserAssessmentScore
+      const userAssessmentScore = await this.prisma.userAssessmentScore.create({
         data: {
+          user_id,
+          assessment_id,
           score: Math.round(totalScore),
+          status: isPassed ? 'passed' : 'failed',
+          badge,
+          unique_code: crypto.randomUUID(), // Menghasilkan kode unik
         },
       });
-
-      if (isPassed) {
-        await this.prisma.skillAssessment.update({
-          where: { assessment_id },
-          data: {
-            badge: `Expert in ${assessment.assessment_data}`,
-          },
-        });
-      }
 
       res.status(200).json({
         message: isPassed ? 'Assessment passed' : 'Assessment failed',
         score: Math.round(totalScore),
+        badge: userAssessmentScore.badge,
       });
     } catch (error) {
       console.error('Error submitting assessment:', error);

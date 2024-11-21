@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-import PromoSection from '../components/promossection';
-import CustomerCard from '../components/cusCardPlan';
 import { ISubsType } from '@/types/substype';
 import { getSubstypes } from '@/lib/substype';
 import { uploadPaymentProof } from '@/lib/payment';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/types/iuser';
 import { getToken } from '@/lib/server';
+import PromoSection from './components/promossection';
+import CustomerCard from './components/cusCardPlan';
 
 const banks = [
   { name: 'Bank Mandiri', account: '1400012345678' },
@@ -130,7 +130,7 @@ const CustomerPlans: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center p-6 md:p-10 relative">
+    <div className="flex flex-col items-center p-2 md:p-4 relative">
       <PromoSection />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

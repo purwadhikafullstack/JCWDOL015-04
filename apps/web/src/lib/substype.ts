@@ -2,7 +2,7 @@
 import { ISubsType } from '../types/substype';
 import { getToken } from './server';
 
-const base_url = process.env.BASE_URL_API
+const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
 interface SubstypeResponse {
   status: string;
@@ -65,6 +65,8 @@ export const updateSubsType = async (
     });
 
     const result = await response.json();
+    console.log(result);
+    
 
     return {
       ok: response.ok,

@@ -1,20 +1,24 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Card from '../components/cardsub';
-import { getSubstypes, updateSubsType, createSubsType, deleteSubsType } from '@/lib/substype';
+import {
+  getSubstypes,
+  updateSubsType,
+  createSubsType,
+  deleteSubsType,
+} from '@/lib/substype';
 import { ISubsType } from '@/types/substype';
 // Import interfaces
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode'; // Ensure this is installed
 import { DecodedToken, IUserProfile } from '@/types/iuser';
 import { getToken } from '@/lib/server';
-import { UserRole } from '@/types/role';
+import Card from './components/cardsub';
 
 const SubsManage: React.FC = () => {
   const [plans, setPlans] = useState<ISubsType[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [userRole, setUserRole] = useState<IUserProfile['role'] | null>(null); // Use IUserProfile's role type
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -25,10 +29,16 @@ const SubsManage: React.FC = () => {
           console.error('Token not found or is null.');
           return;
         }
+
+        console.log('Retrieved token:', token); // Debugging log
+
         try {
-          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
+          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // Decode token with updated interface
+          console.log('Decoded token:', decodedToken); // Debugging log
+
           if (decodedToken.role) {
-            setUserRole(decodedToken.role);
+            setUserRole(decodedToken.role); // Set the role
+            console.log('User role set:', decodedToken.role);
           } else {
             console.error('Role not found in decoded token.');
             toast.error('Failed to retrieve user role from token.');
@@ -42,22 +52,29 @@ const SubsManage: React.FC = () => {
         toast.error('Failed to verify user role.');
       }
     };
-    
 
     fetchUserRole();
 
     const fetchPlans = async () => {
       try {
         const response = await getSubstypes();
-        if (response.ok && response.substypes && Array.isArray(response.substypes.subscriptionstypeAll)) {
+        if (
+          response.ok &&
+          response.substypes &&
+          Array.isArray(response.substypes.subscriptionstypeAll)
+        ) {
           setPlans(response.substypes.subscriptionstypeAll);
         } else {
           console.error('Failed to fetch plans');
-          toast.error('Failed to fetch plans: Invalid data structure or empty response');
+          toast.error(
+            'Failed to fetch plans: Invalid data structure or empty response',
+          );
         }
       } catch (error) {
         console.error('Error fetching plans:', error);
-        toast.error(`Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+        toast.error(
+          `Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+        );
       }
     };
 
@@ -65,29 +82,29 @@ const SubsManage: React.FC = () => {
   }, []);
 
   const handlePlanChange = async (id: number, name: string, value: any) => {
-    if (userRole !== 'developer') {
-      toast.error('You do not have permission to edit plans.');
-      return;
-    }
-
+    console.log('Updated plan:', { id, name, value }); // Log perubahan
     const updatedPlans = plans.map((plan) =>
-      plan.subs_type_id === id ? { ...plan, [name]: value } : plan
+      plan.subs_type_id === id ? { ...plan, [name]: value } : plan,
     );
     setPlans(updatedPlans);
 
-    const updatedPlan = updatedPlans.find(plan => plan.subs_type_id === id);
+    const updatedPlan = updatedPlans.find((plan) => plan.subs_type_id === id);
+    console.log('Sending updated plan to backend:', updatedPlan); // Log data yang dikirim
+
     if (updatedPlan) {
       try {
         const response = await updateSubsType(id, updatedPlan);
         if (response.ok) {
           toast.success('Plan updated successfully');
         } else {
-          console.error('Failed to update plan');
+          console.error('Failed to update plan on backend:', response.error);
           toast.error('Failed to update plan: Invalid response from server');
         }
       } catch (error) {
         console.error('Error updating plan:', error);
-        toast.error(`Failed to update plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+        toast.error(
+          `Failed to update plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+        );
       }
     }
   };
@@ -95,22 +112,29 @@ const SubsManage: React.FC = () => {
   const fetchPlans = async () => {
     try {
       const response = await getSubstypes();
-      if (response.ok && response.substypes && Array.isArray(response.substypes.subscriptionstypeAll)) {
+      if (
+        response.ok &&
+        response.substypes &&
+        Array.isArray(response.substypes.subscriptionstypeAll)
+      ) {
         setPlans(response.substypes.subscriptionstypeAll);
       } else {
         console.error('Failed to fetch plans');
-        toast.error('Failed to fetch plans: Invalid data structure or empty response');
+        toast.error(
+          'Failed to fetch plans: Invalid data structure or empty response',
+        );
       }
     } catch (error) {
       console.error('Error fetching plans:', error);
-      toast.error(`Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+      toast.error(
+        `Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+      );
     }
   };
-  
+
   useEffect(() => {
     fetchPlans(); // Fetch plans on component mount
   }, []);
-  
 
   const handleAddPlan = async () => {
     const newPlan: ISubsType = {
@@ -121,36 +145,42 @@ const SubsManage: React.FC = () => {
       features: [],
       is_recomend: false,
     };
-  
+
     try {
       const response = await createSubsType(newPlan);
       if (response.ok && response.data) {
-        setPlans([...plans, { ...response.data, features: response.data.features || [] }]);
+        setPlans([
+          ...plans,
+          { ...response.data, features: response.data.features || [] },
+        ]);
         toast.success('New plan created successfully');
-  
+
         setTimeout(() => {
-          fetchPlans(); 
-        }, 1000); 
+          fetchPlans();
+        }, 1000);
       } else {
         console.error('Failed to create plan');
         toast.error('Failed to create new plan: Invalid response from server');
       }
     } catch (error) {
       console.error('Error creating plan:', error);
-      toast.error(`Failed to create new plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+      toast.error(
+        `Failed to create new plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+      );
     }
   };
-
 
   const handleDeletePlan = async (id: number) => {
     if (userRole !== 'developer') {
       toast.error('You do not have permission to delete plans.');
       return;
     }
-  
-    const confirmDelete = window.confirm('Are you sure you want to delete this plan?');
+
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this plan?',
+    );
     if (!confirmDelete) return;
-  
+
     try {
       const response = await deleteSubsType(id);
       if (response.ok) {
@@ -162,14 +192,18 @@ const SubsManage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error deleting plan:', error);
-      toast.error(`Failed to delete plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+      toast.error(
+        `Failed to delete plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+      );
     }
   };
 
   return (
     <div className="flex flex-col md:flex-row">
       <main className="flex-1 p-6 md:p-10">
-        <h1 className="text-2xl font-semibold mb-4">Dev Subscription Setting</h1>
+        <h1 className="text-2xl font-semibold mb-4">
+          Dev Subscription Setting
+        </h1>
         <div className="flex justify-between mb-6">
           <label className="flex cursor-pointer gap-2">
             <span className="font-medium">View Mode</span>
@@ -197,7 +231,9 @@ const SubsManage: React.FC = () => {
               plan={plan}
               onChange={handlePlanChange}
               isEditingAll={isEditingAll}
-              onRecommend={(id) => handlePlanChange(id, 'is_recomend', !plan.is_recomend)}
+              onRecommend={(id) =>
+                handlePlanChange(id, 'is_recomend', !plan.is_recomend)
+              }
               onDelete={handleDeletePlan}
               onToggleEdit={() => {}}
             />

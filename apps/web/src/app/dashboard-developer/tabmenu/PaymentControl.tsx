@@ -29,7 +29,7 @@ const BillsManage: React.FC = () => {
         const decodedToken = jwtDecode<DecodedToken>(token);
         if (decodedToken.role !== 'developer') {
           toast.error('Access denied. Only candidates can view this page.');
-          router.push('/unauthorized'); // Redirect jika bukan role candidate
+          router.push('/sign-in'); // Redirect jika bukan role candidate
           return;
         }
 
@@ -102,7 +102,7 @@ const BillsManage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Developer Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6">Developer Payment Control</h1>
 
       {/* Metrics Section */}
       <div className="grid grid-cols-4 gap-4 mb-8">

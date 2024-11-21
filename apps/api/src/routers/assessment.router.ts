@@ -3,6 +3,7 @@ import { AssessmentController } from '@/controllers/assessment.controller';
 import { verifyToken } from '@/middlewares/token';
 import { checkDeveloperRole } from '@/middlewares/checkRole';
 import { verifyAssessmentToken } from '@/middlewares/tokenassessment';
+import { checkFeatureLimit } from '@/middlewares/premiumFeature';
 
 export class AssessmentRouter {
   private router: Router;
@@ -32,16 +33,9 @@ export class AssessmentRouter {
       ),
     );
     this.router.get(
-      '/user/:user_id',
-      verifyToken,
-      this.assessmentController.getUserAssessments.bind(
-        this.assessmentController,
-      ),
-    );
-    this.router.get(
       '/all',
       verifyToken,
-      
+
       this.assessmentController.getAllAssessments.bind(
         this.assessmentController,
       ),
@@ -49,6 +43,7 @@ export class AssessmentRouter {
     this.router.get(
       '/start/:assessment_id',
       verifyToken,
+      checkFeatureLimit,
       this.assessmentController.startAssessment.bind(this.assessmentController),
     );
     this.router.post(

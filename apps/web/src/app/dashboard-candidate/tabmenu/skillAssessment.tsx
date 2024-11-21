@@ -11,15 +11,17 @@ import {
 } from '@/lib/assessment';
 import { fetchGenerateCertificate } from '@/lib/certif';
 import { Assessment, Question } from '@/types/assessment';
-import SkillAssessmentList from '../components/UassessmentList';
-import AssessmentCard from '../components/UassessmentCard';
+import SkillAssessmentList from './components/UassessmentList';
+import AssessmentCard from './components/UassessmentCard';
 import { getToken } from '@/lib/server';
 import { checkSubscriptionStatus } from '@/lib/subsDashboard';
 
 const UserAssessment: React.FC = () => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [questions, setQuestions] = useState<Question[] | null>(null);
-  const [isActiveSubscription, setIsActiveSubscription] = useState<boolean | null>(null);
+  const [isActiveSubscription, setIsActiveSubscription] = useState<
+    boolean | null
+  >(null);
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30 * 60);
   const router = useRouter();
@@ -44,7 +46,7 @@ const UserAssessment: React.FC = () => {
 
           // Redirect to CustomerPlans after 3 seconds
           setTimeout(() => {
-            router.push('/user-menu?tab=CustomerPlans');
+            router.push('/dashboard-candidate?tab=Subscription');
           }, 3000);
         }
       } catch (error) {
@@ -75,7 +77,7 @@ const UserAssessment: React.FC = () => {
 
       toast.success('Assessment auto-submitted successfully.');
       setQuestions(null); // Reset questions in state
-      router.push('/user-menu'); // Navigate to results or dashboard page
+      router.push('/dashboard-candidate'); // Navigate to results or dashboard page
     } catch (error: any) {
       console.error('Error auto-submitting assessment:', error);
       toast.error(error.message || 'Failed to auto-submit assessment.');
@@ -140,7 +142,7 @@ const UserAssessment: React.FC = () => {
       await fetchSubmitAssessment(data);
       setQuestions(null); // Reset questions after submit
       toast.success('Assessment submitted successfully!');
-      router.push('/user-menu'); // Navigate to main page
+      router.push('/dashboard-candidate'); // Navigate to main page
     } catch (error: any) {
       console.error('Error submitting assessment:', error);
       toast.error(error.message || 'Failed to submit assessment');
@@ -173,33 +175,59 @@ const UserAssessment: React.FC = () => {
   };
 
   if (isActiveSubscription === null) {
-    return <p>Checking subscription status...</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600 font-semibold">Checking subscription status...</p>
+        </div>
+      </div>
+    );
   }
-
+  
   if (!isActiveSubscription) {
-    return <p>Redirecting to subscription page...</p>;
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-center">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Skill Assessment & Certificate</h2>
+        <p className="text-red-500 font-medium">
+          You need an active subscription to access this feature. Redirecting to subscription plans...
+        </p>
+      </div>
+    );
   }
-
+  
   return (
     <div className="p-6 max-w-4xl mx-auto">
       {!questions ? (
         <div>
-          <SkillAssessmentList
-            assessments={assessments}
-            onStart={handleStartAssessment}
-            loading={loading}
-          />
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-4">Generate Certificate</h2>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Skill Assessments</h1>
+          {assessments.length > 0 ? (
+            <SkillAssessmentList
+              assessments={assessments}
+              onStart={handleStartAssessment}
+              loading={loading}
+            />
+          ) : (
+            <div className="text-center text-gray-600">
+              <p>No assessments available at the moment.</p>
+            </div>
+          )}
+          <div className="mt-10">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Generate Certificates</h2>
             {assessments
               .filter((assessment) => assessment.status === 'passed')
               .map((assessment) => (
-                <div key={assessment.assessment_id} className="mb-4 p-4 border rounded-lg">
-                  <p>Assessment: {assessment.assessment_data}</p>
+                <div
+                  key={assessment.assessment_id}
+                  className="bg-white shadow rounded-lg p-4 mb-4 border"
+                >
+                  <p className="text-lg font-medium text-gray-700">
+                    Assessment: <span className="font-semibold">{assessment.assessment_data}</span>
+                  </p>
                   <p>Score: {assessment.score}</p>
                   <button
                     onClick={() => handleGenerateCertificate(assessment.assessment_id)}
-                    className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                   >
                     Generate Certificate
                   </button>
@@ -208,12 +236,18 @@ const UserAssessment: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div>
-          <p className="text-red-500 font-semibold">
+        <div className="bg-white shadow rounded-lg p-6">
+          <p className="text-red-500 font-medium text-lg">
             Time Remaining: {Math.floor(timeLeft / 60)}:
             {timeLeft % 60 < 10 ? '0' : ''}
             {timeLeft % 60}
           </p>
+          <div className="relative w-full h-2 bg-gray-200 rounded mt-2">
+            <div
+              className="absolute h-full bg-blue-500 rounded"
+              style={{ width: `${(timeLeft / (30 * 60)) * 100}%` }}
+            ></div>
+          </div>
           <AssessmentCard
             questions={questions}
             onSubmit={handleSubmitAssessment}
@@ -223,6 +257,7 @@ const UserAssessment: React.FC = () => {
       )}
     </div>
   );
+  
 };
 
 export default UserAssessment;

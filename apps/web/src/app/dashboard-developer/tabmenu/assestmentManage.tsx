@@ -10,8 +10,8 @@ import {
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Assessment } from '@/types/assessment';
-import AssessmentForm from '../components/assessmentForm';
-import AssessmentList from '../components/assessmentList';
+import AssessmentForm from './components/assessmentForm';
+import AssessmentList from './components/assessmentList';
 
 const DeveloperAssessment: React.FC = () => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -66,7 +66,9 @@ const DeveloperAssessment: React.FC = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Developer Assessment Management</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Developer Assessment Management
+      </h1>
 
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
