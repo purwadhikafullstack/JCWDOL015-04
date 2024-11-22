@@ -67,7 +67,7 @@ export interface IUserProfile {
 }
 export interface DecodedToken {
   user_id: number;
-  role: UserRole; 
+  role: UserRole; // Role is directly at the top level
   iat: number;
   exp: number;
 }

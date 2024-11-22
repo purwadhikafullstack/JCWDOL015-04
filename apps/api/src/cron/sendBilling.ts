@@ -64,7 +64,7 @@ Amount due: Rp ${new Intl.NumberFormat("id-ID", {
         }).format(amount)}
 
 Thank you,
-Your Company Team`,
+HIRE-ME`,
       };
 
       await transporter.sendMail(emailOptions);

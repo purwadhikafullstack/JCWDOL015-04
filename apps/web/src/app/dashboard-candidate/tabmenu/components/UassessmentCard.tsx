@@ -28,14 +28,21 @@ const AssessmentCard: React.FC<AssessmentCardProps> = ({ questions, onSubmit, lo
   };
 
   return (
-    <div>
+    <div className="bg-white shadow rounded-lg p-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Assessment</h1>
       {questions.map((question) => (
-        <div key={question.question_id} className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">{question.question_text}</h3>
-          <ul>
+        <div
+          key={question.question_id}
+          className="mb-6 p-4 border rounded-lg bg-gray-50 shadow-sm hover:shadow-md transition"
+        >
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">{question.question_text}</h3>
+          <ul className="space-y-3">
             {question.answers.map((answer) => (
-              <li key={answer.answer_id} className="mb-2">
-                <label htmlFor={`answer_${answer.answer_id}`} className="flex items-center">
+              <li key={answer.answer_id}>
+                <label
+                  htmlFor={`answer_${answer.answer_id}`}
+                  className="flex items-center cursor-pointer group"
+                >
                   <input
                     id={`answer_${answer.answer_id}`}
                     type="radio"
@@ -43,9 +50,11 @@ const AssessmentCard: React.FC<AssessmentCardProps> = ({ questions, onSubmit, lo
                     onChange={() =>
                       handleAnswer(question.question_id, answer.answer_id, answer.answer_text)
                     }
-                    className="mr-2"
+                    className="mr-3 h-4 w-4 text-blue-500 border-gray-300 focus:ring-blue-500"
                   />
-                  {answer.answer_text}
+                  <span className="text-gray-600 group-hover:text-blue-500 transition">
+                    {answer.answer_text}
+                  </span>
                 </label>
               </li>
             ))}
@@ -53,7 +62,9 @@ const AssessmentCard: React.FC<AssessmentCardProps> = ({ questions, onSubmit, lo
         </div>
       ))}
       <button
-        className={`bg-blue-500 text-white px-4 py-2 rounded ${loading ? 'opacity-50' : ''}`}
+        className={`mt-6 w-full bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition ${
+          loading ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
         onClick={handleSubmit}
         disabled={loading}
       >

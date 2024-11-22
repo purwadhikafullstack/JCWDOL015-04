@@ -6,15 +6,17 @@ import { getToken } from '@/lib/server';
 import base_url from '@/lib/user';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/types/iuser';
-import Sidebar from './components/Sidebar';
-import OverviewTab from './components/OverviewTab';
-import { useSearchParams } from 'next/navigation';
+import Sidebar from './tabmenu/Sidebar';
+import OverviewTab from './tabmenu/OverviewTab';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import PaymentControl from './components/PaymentControl';
-import SubSetting from './components/SubSetting';
-import SettingAccount from './components/SettingAccount';
+import PaymentControl from './tabmenu/PaymentControl';
+import SubSetting from './tabmenu/SubSetting';
+import SettingAccount from './tabmenu/SettingAccount';
+import DeveloperAssessment from './tabmenu/assestmentManage';
 
 const AdminDashboard = () => {
+  const router = useRouter()
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'overview';
   const [selectedTab, setSelectedTab] = useState(initialTab);
@@ -28,8 +30,15 @@ const AdminDashboard = () => {
 
         const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
         const userId = decodedToken.user_id;
+        const userRole = decodedToken.role;
 
         if (!userId) throw new Error('User ID not found in token');
+
+        // Cek apakah role bukan 'developer'
+        if (userRole !== 'developer') {
+          router.push('/sign-in');
+          return;
+        }
 
         const response = await fetch(`${base_url}/user/${userId}`, {
           method: 'GET',
@@ -52,20 +61,22 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [router]); 
 
   const renderTabContent = () => {
     switch (selectedTab) {
       case 'overview':
-        return <OverviewTab setSelectedTab={setSelectedTab} />;
+        return <OverviewTab />;
       case 'paymentControl':
         return <PaymentControl />;
-        case 'subscriptionSettings':
-          return <SubSetting />;
-        case 'accountSettings':
-          return <SettingAccount />;
-        default:
-        return <OverviewTab setSelectedTab={setSelectedTab} />;
+      case 'subscriptionSettings':
+        return <SubSetting />;
+      case 'assessmentManage':
+        return <DeveloperAssessment />;
+      case 'accountSettings':
+        return <SettingAccount />;
+      default:
+        return <OverviewTab />;
     }
   };
 

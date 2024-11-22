@@ -1,8 +1,7 @@
+import { FaBook } from 'react-icons/fa';
 import {
   FiHome,
-  FiFileText,
   FiBriefcase,
-  FiSettings,
   FiCreditCard,
   FiUser,
 } from 'react-icons/fi';
@@ -32,6 +31,12 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
         onClick={() => setSelectedTab('subscriptionSettings')}
       >
         <FiBriefcase size={20} className="mr-2" /> Subscription Settings
+      </li>
+      <li
+        className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'assessmentManage' ? 'text-blue-500 font-semibold' : ''}`}
+        onClick={() => setSelectedTab('assessmentManage')}
+      >
+        <FaBook size={20} className="mr-2" /> Skill Assessment
       </li>
       <li
         className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'accountSettings' ? 'text-blue-500 font-semibold' : ''}`}

@@ -1,6 +1,6 @@
 import { getToken } from "./server";
 
-const base_url = process.env.BASE_URL_API
+const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
 /**
  * Fetch to generate a certificate by assessment ID
