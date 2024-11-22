@@ -1,4 +1,4 @@
-import { Cv, CvContent } from '@/types/cvgenerator';
+import { Cv, ResumeContent } from '@/types/cvgenerator';
 import { getToken } from './server';
 
 const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
@@ -42,7 +42,7 @@ export const getCvs = async (
 
 export const createCv = async (
   template: string,
-  content: CvContent,
+  content: ResumeContent,
 ): Promise<{
   cv: Cv | null;
   ok: boolean;

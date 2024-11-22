@@ -6,20 +6,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Cv } from '@/types/cvgenerator';
 import { downloadCv, getCvs } from '@/lib/cvgenerator';
 import { checkSubscriptionStatus } from '@/lib/subsDashboard';
-import { getToken } from '@/lib/server';
 import ResumeForm from './components/resumeform';
+import { getToken } from '@/lib/server';
 
 export default function CvDashboard() {
-  const [cv, setCv] = useState<Cv | null>(null);
-  const [loading, setLoading] = useState(false);
   const [isActiveSubscription, setIsActiveSubscription] = useState<
     boolean | null
   >(null);
-  const [isCreating, setIsCreating] = useState(false); // State untuk menampilkan form
+  const [cv, setCv] = useState<Cv | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const checkStatus = async () => {
+    const checkSubscription = async () => {
       const token = await getToken();
       if (!token) {
         toast.error('Unauthorized: No token found');
@@ -34,138 +35,126 @@ export default function CvDashboard() {
       } else {
         toast.error('You do not have an active subscription.');
         setIsActiveSubscription(false);
-
-        // Redirect to CustomerPlans after 3 seconds
-        setTimeout(() => {
-          router.push('/dashboard-candidate?tab=Subscription');
-        }, 3000);
       }
+      fetchCv();
     };
 
-    checkStatus();
+    checkSubscription();
   }, [router]);
-
-  useEffect(() => {}, [cv]);
 
   const fetchCv = async () => {
     setLoading(true);
     try {
-      const response = await getCvs();
-      if (
-        response.ok &&
-        response.cvs &&
-        Array.isArray(response.cvs) &&
-        response.cvs.length > 0
-      ) {
-        setCv(response.cvs[0]);
+      const result = await getCvs();
+      if (result.ok && result.cvs && result.cvs.length > 0) {
+        setCv(result.cvs[0]);
       } else {
         setCv(null);
-        toast.info('You do not have any CV.');
       }
-    } catch (e) {
-      console.error('Error during fetchCv:', e);
-      toast.error('An error occurred while fetching CV');
+    } catch (error) {
+      console.error('Error fetching CV:', error);
+      toast.error('An error occurred while fetching CV.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateCv = () => {
-    setIsCreating(true); // Tampilkan form
+  const handleCreate = () => {
+    setIsCreating(true);
+  };
+
+  const handleUpdate = () => {
+    setIsUpdating(true);
+  };
+
+  const handleCancel = () => {
+    setIsCreating(false);
+    setIsUpdating(false);
   };
 
   const handleFormSubmit = () => {
-    setIsCreating(false); // Sembunyikan form setelah submit
-    fetchCv(); // Refresh CV list
+    setIsCreating(false);
+    setIsUpdating(false);
+    fetchCv();
   };
 
-  const handleDownloadCv = async () => {
+  const handleDownload = async () => {
+    if (!cv) {
+      toast.error('No CV available for download.');
+      return;
+    }
+
     try {
-      if (!cv || !cv.cv_id) {
-        toast.error('No CV selected for download.');
-        return;
-      }
-
-      // Panggil fungsi downloadCv
       const result = await downloadCv(cv.cv_id.toString());
-
       if (result.ok && result.file) {
-        // Buat URL blob untuk file
         const url = window.URL.createObjectURL(result.file);
         const a = document.createElement('a');
         a.href = url;
         a.download = `cv-${cv.cv_id}.pdf`;
-        document.body.appendChild(a);
         a.click();
-        a.remove();
-
-        toast.success('CV downloaded successfully!');
       } else {
-        toast.error('Failed to download CV. Please try again.');
+        toast.error('Failed to download CV.');
       }
     } catch (error) {
       console.error('Error downloading CV:', error);
-      toast.error('An unexpected error occurred while downloading CV.');
+      toast.error('An unexpected error occurred.');
     }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">CV Generator</h1>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <h1 className="text-2xl font-bold mb-6">CV Generator</h1>
 
-      {isActiveSubscription === null ? (
-        <p>Loading subscription status...</p>
-      ) : isActiveSubscription ? (
-        <>
-          {isCreating ? (
-            <ResumeForm onResumeCreated={handleFormSubmit} />
-          ) : cv ? (
-            <div>
-              <h2 className="text-lg font-bold mb-4">Your CV</h2>
-              <div className="border p-4 rounded mb-4">
-                <p>
-                  <strong>Full Name:</strong> {cv.content.fullName}
-                </p>
-                <p>
-                  <strong>Summary:</strong> {cv.content.summary}
-                </p>
-                <p>
-                  <strong>Template:</strong> {cv.template}
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={handleCreateCv}
-                >
-                  Update CV
-                </button>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                  onClick={handleDownloadCv}
-                >
-                  Download CV
-                </button>
-              </div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : isCreating || isUpdating ? (
+          <ResumeForm
+            onResumeCreated={handleFormSubmit}
+            onCancel={handleCancel}
+            initialData={isUpdating ? cv?.content : null}
+          />
+        ) : cv ? (
+          <div className="space-y-4">
+            <div className="p-4 border rounded bg-gray-50">
+              <h2 className="font-bold text-lg">Your CV</h2>
+              <p>
+                <strong>Full Name:</strong> {cv.content.fullName}
+              </p>
+              <p>
+                <strong>Summary:</strong> {cv.content.summary}
+              </p>
+              <p>
+                <strong>Template:</strong> {cv.template}
+              </p>
             </div>
-          ) : (
-            <div>
-              <p className="text-red-500 mb-4">Anda belum memiliki CV.</p>
+            <div className="flex gap-4">
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={handleCreateCv}
+                onClick={handleUpdate}
               >
-                Create CV
+                Update CV
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                onClick={handleDownload}
+              >
+                Download CV
               </button>
             </div>
-          )}
-        </>
-      ) : (
-        <p className="text-red-500">
-          You need an active subscription to access CV Generator. Redirecting to
-          subscription plans...
-        </p>
-      )}
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-red-500 mb-4">No CV available.</p>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={handleCreate}
+            >
+              Create CV
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

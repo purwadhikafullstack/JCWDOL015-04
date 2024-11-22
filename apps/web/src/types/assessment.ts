@@ -48,3 +48,13 @@ export type Assessment = {
   user_id: number;
   questions?: Question[];
 };
+
+export interface UserAssessmentScore {
+  score_id: number;
+  badge: string;
+  score: number;
+  status: string;
+  unique_code: string;
+  created_at: string; 
+  assessment_data: string; 
+}

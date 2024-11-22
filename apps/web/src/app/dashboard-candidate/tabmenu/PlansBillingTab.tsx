@@ -5,7 +5,7 @@ import { PaymentTransaction, SubscriptionActive } from '@/types/userplanbill';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-const CandidateDashboard: React.FC = () => {
+const PlansBillingDashboard: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<SubscriptionActive[]>([]);
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,4 +173,4 @@ const CandidateDashboard: React.FC = () => {
   );
 };
 
-export default CandidateDashboard;
+export default PlansBillingDashboard;

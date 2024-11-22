@@ -86,7 +86,7 @@ export const checkFeatureLimit = async (req: Request, res: Response, next: NextF
       await prisma.featureUsage.create({
         data: {
           user_id: userId,
-          feature_name: "YourFeatureName",
+          feature_name: "Skill Assessment",
         },
       });
     }

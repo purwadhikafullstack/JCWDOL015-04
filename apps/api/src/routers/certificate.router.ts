@@ -15,14 +15,7 @@ export class CertificateRouter {
   private initializeRoutes(): void {
     // Generate certificate - Requires authentication
     this.router.get(
-      "/generate/:assessment_id",
-      verifyToken,
-      this.certificateController.generateCertificate.bind(
-        this.certificateController
-      )
-    );
-    this.router.get(
-      "/",
+      "/generate/:score_id",
       verifyToken,
       this.certificateController.generateCertificate.bind(
         this.certificateController

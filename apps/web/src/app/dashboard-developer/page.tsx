@@ -7,13 +7,13 @@ import base_url from '@/lib/user';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/types/iuser';
 import Sidebar from './tabmenu/Sidebar';
-import OverviewTab from './tabmenu/OverviewTab';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import PaymentControl from './tabmenu/PaymentControl';
-import SubSetting from './tabmenu/SubSetting';
 import SettingAccount from './tabmenu/SettingAccount';
 import DeveloperAssessment from './tabmenu/assestmentManage';
+import Dashboard from './tabmenu/OverviewTab';
+import SubsManage from './tabmenu/SubSetting';
+import BillsManage from './tabmenu/PaymentControl';
 
 const AdminDashboard = () => {
   const router = useRouter()
@@ -63,27 +63,39 @@ const AdminDashboard = () => {
     fetchData();
   }, [router]); 
 
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setSelectedTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: string) => {
+    setSelectedTab(tab);
+    router.push(`/dashboard-developer?tab=${tab}`);
+  };
+
   const renderTabContent = () => {
     switch (selectedTab) {
       case 'overview':
-        return <OverviewTab />;
+        return <Dashboard />;
       case 'paymentControl':
-        return <PaymentControl />;
+        return <BillsManage />;
       case 'subscriptionSettings':
-        return <SubSetting />;
+        return <SubsManage />;
       case 'assessmentManage':
         return <DeveloperAssessment />;
       case 'accountSettings':
         return <SettingAccount />;
       default:
-        return <OverviewTab />;
+        return <Dashboard/>;
     }
   };
 
   return (
     <ProtectedRoute requiredRole="developer">
       <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
-        <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+        <Sidebar selectedTab={selectedTab} setSelectedTab={handleTabChange} />
         <main className="p-4">{renderTabContent()}</main>
       </div>
     </ProtectedRoute>

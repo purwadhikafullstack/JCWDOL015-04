@@ -53,6 +53,13 @@ export class AssessmentRouter {
         this.assessmentController,
       ),
     );
+    this.router.get(
+      '/user-score',
+      verifyToken,
+      this.assessmentController.getUserAssessmentScore.bind(
+        this.assessmentController,
+      ),
+    );
   }
 
   getRouter(): Router {

@@ -1,4 +1,3 @@
-// src/lib/substype.ts
 import { ISubsType } from '../types/substype';
 import { getToken } from './server';
 

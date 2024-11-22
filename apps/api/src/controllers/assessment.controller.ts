@@ -194,7 +194,7 @@ export class AssessmentController {
 
       // Validasi responses
       if (!Array.isArray(responses) || responses.length === 0) {
-        res.status(400).json({ message: "Invalid or missing responses." });
+        res.status(400).json({ message: 'Invalid or missing responses.' });
         return;
       }
 
@@ -241,16 +241,23 @@ export class AssessmentController {
       // Tentukan badge berdasarkan data assessment
       const badge = isPassed ? 'Passed Skill Assessment by HIRE-ME' : null;
 
+      // Data untuk UserAssessmentScore
+      const assessmentScoreData: any = {
+        user_id,
+        assessment_id,
+        score: Math.round(totalScore),
+        status: isPassed ? 'passed' : 'failed',
+        badge,
+      };
+
+      // Tambahkan `unique_code` hanya jika lulus
+      if (isPassed) {
+        assessmentScoreData.unique_code = crypto.randomUUID();
+      }
+
       // Simpan skor dan badge di UserAssessmentScore
       const userAssessmentScore = await this.prisma.userAssessmentScore.create({
-        data: {
-          user_id,
-          assessment_id,
-          score: Math.round(totalScore),
-          status: isPassed ? 'passed' : 'failed',
-          badge,
-          unique_code: crypto.randomUUID(), // Menghasilkan kode unik
-        },
+        data: assessmentScoreData,
       });
 
       res.status(200).json({
@@ -260,6 +267,47 @@ export class AssessmentController {
       });
     } catch (error) {
       console.error('Error submitting assessment:', error);
+      res.status(500).json({
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : error,
+      });
+    }
+  }
+
+  public async getUserAssessmentScore(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const { user_id } = req.user || {}; // Ambil user_id dari req.user (diatur oleh middleware autentikasi)
+
+      if (!user_id) {
+        res.status(401).json({ message: 'Unauthorized. User ID not found.' });
+        return;
+      }
+
+      // Ambil data skor milik pengguna
+      const userAssessmentScores =
+        await this.prisma.userAssessmentScore.findMany({
+          where: { user_id }, // Batasi hanya data milik pengguna
+          include: {
+            skillAssessment: true, // Sertakan data relasi skillAssessment
+          },
+        });
+
+      if (!userAssessmentScores || userAssessmentScores.length === 0) {
+        res
+          .status(404)
+          .json({ message: 'No assessment scores found for this user.' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'User assessment scores retrieved successfully.',
+        scores: userAssessmentScores,
+      });
+    } catch (error) {
+      console.error('Error fetching user assessment scores:', error);
       res.status(500).json({
         message: 'Internal server error',
         error: error instanceof Error ? error.message : error,

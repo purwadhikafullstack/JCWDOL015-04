@@ -10,13 +10,13 @@ import Sidebar from './tabmenu/Sidebar';
 import OverviewTab from './tabmenu/OverviewTab';
 import AppliedJobsTab from './tabmenu/AppliedJobsTab';
 import FavoriteJobsTab from './tabmenu/FavoriteJobsTab';
-import PlansBillingTab from './tabmenu/PlansBillingTab';
 import SettingsTab from './tabmenu/SettingsTab';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import CVGeneratorTab from './tabmenu/CVGenerator';
 import UserAssessment from './tabmenu/skillAssessment';
 import CustomerPlans from './tabmenu/SubscriptionTab';
+import CvDashboard from './tabmenu/CVGenerator';
+import PlansBillingDashboard from './tabmenu/PlansBillingTab';
 
 const CandidateDashboard = () => {
   const router = useRouter()
@@ -87,11 +87,11 @@ const CandidateDashboard = () => {
       case 'favoriteJobs':
         return <FavoriteJobsTab />;
       case 'CVGenerator':
-        return <CVGeneratorTab />;
+        return <CvDashboard />;
       case 'Subscription':
         return <CustomerPlans />;
       case 'plansBilling':
-        return <PlansBillingTab />;
+        return <PlansBillingDashboard />;
       case 'userAssessment':
         return <UserAssessment />;
       case 'settings':
