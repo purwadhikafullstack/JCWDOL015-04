@@ -60,6 +60,12 @@ export class AssessmentRouter {
         this.assessmentController,
       ),
     );
+    this.router.get(
+      '/user-score/badge/:user_id',
+      this.assessmentController.getUserBadgesById.bind(
+        this.assessmentController,
+      ),
+    );
   }
 
   getRouter(): Router {

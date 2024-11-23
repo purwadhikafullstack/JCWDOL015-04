@@ -164,7 +164,6 @@ const UserAssessment: React.FC = () => {
       setUserScores(scores);
     } catch (error: any) {
       console.error('Error loading user scores:', error);
-      toast.error(error.message || 'Failed to load user scores');
     } finally {
       setLoading(false);
     }

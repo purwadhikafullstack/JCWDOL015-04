@@ -314,4 +314,53 @@ export class AssessmentController {
       });
     }
   }
+  public async getUserBadgesById(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const { user_id } = req.params; // Ambil user_id dari parameter URL
+  
+      if (!user_id) {
+        res.status(400).json({ message: 'Bad Request. User ID is required.' });
+        return;
+      }
+      // Query ke database untuk mengambil badge dengan status 'passed'
+      const passedBadges = await this.prisma.userAssessmentScore.findMany({
+        where: {
+          user_id: parseInt(user_id), // Konversi user_id ke integer
+          status: 'passed', // Hanya data dengan status 'passed'
+        },
+        select: {
+          badge: true, // Ambil hanya field badge
+          skillAssessment: {
+            select: {
+              assessment_data: true, // Opsional: jika data assessment diperlukan
+            },
+          },
+        },
+      });
+      // Jika tidak ada badge ditemukan
+      if (!passedBadges || passedBadges.length === 0) {
+        res.status(404).json({
+          message: `No badges found for user with ID ${user_id}.`,
+        });
+        return;
+      }
+      // Respons jika badge ditemukan
+      res.status(200).json({
+        message: 'User badges retrieved successfully.',
+        badges: passedBadges.map((badge) => ({
+          badge: badge.badge,
+          assessment_data: badge.skillAssessment?.assessment_data || null,
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching user badges:', error);
+      res.status(500).json({
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : error,
+      });
+    }
+  }
 }

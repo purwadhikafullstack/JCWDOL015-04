@@ -35,6 +35,10 @@ export default function CvDashboard() {
       } else {
         toast.error('You do not have an active subscription.');
         setIsActiveSubscription(false);
+
+        setTimeout(() => {
+          router.push('/dashboard-candidate?tab=Subscription');
+        }, 3000);
       }
       fetchCv();
     };
@@ -100,6 +104,33 @@ export default function CvDashboard() {
       toast.error('An unexpected error occurred.');
     }
   };
+
+  if (isActiveSubscription === null) {
+    return (
+      <div className="flex justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600 font-semibold">
+            Checking subscription status...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isActiveSubscription) {
+    return (
+      <div className="flex flex-col justify-center text-center">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">
+          CV Generator
+        </h2>
+        <p className="text-red-500 font-medium">
+          You need an active subscription to access this feature. Redirecting to
+          subscription plans...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">

@@ -1,71 +1,47 @@
-import Image from 'next/image';
-import React from 'react';
+import { fetchUserBadgesById } from "@/lib/assessment";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import badge from '@/assets/badge.gif'
 
-interface Assessment {
-  assessment_id: string;
-  assessment_data: string;
-  status: string;
-  score: number;
-  type?: string;
-}
+const BadgeSystem: React.FC<{ userId: string | number }> = ({ userId }) => {
+  const [badges, setBadges] = useState<{ badge: string; assessment_data: string | null }[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-interface BadgeSystemProps {
-  assessments: Assessment[];
-}
+  useEffect(() => {
+    const loadBadges = async () => {
+      try {
+        const data = await fetchUserBadgesById(userId); // Fetch badges by user ID
+        setBadges(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to load badges");
+      }
+    };
 
-const BadgeSystem: React.FC<BadgeSystemProps> = ({ assessments }) => {
-  const passedAssessments = assessments.filter(
-    (assessment) => assessment.status === 'passed'
-  );
+    loadBadges();
+  }, [userId]);
 
-  if (passedAssessments.length === 0) {
-    return (
-      <div className="text-center text-gray-500">
-        <p>No badges earned yet. Keep working hard!</p>
-      </div>
-    );
-  }
 
-  // Group assessments by type
-  const groupedAssessments = passedAssessments.reduce((acc, assessment) => {
-    const type = assessment.type || 'General';
-    if (!acc[type]) acc[type] = [];
-    acc[type].push(assessment);
-    return acc;
-  }, {} as Record<string, Assessment[]>);
+
+  if (error) return null; 
 
   return (
-    <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-6 text-center text-indigo-600">Achievements</h2>
-      {Object.keys(groupedAssessments).map((type) => (
-        <div key={type} className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">{type} Badges</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {groupedAssessments[type].map((assessment) => (
-              <div
-                key={assessment.assessment_id}
-                className="flex flex-col items-center p-4 border rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="relative">
-                  <Image
-                    src={`/badges/${assessment.assessment_data
-                      .toLowerCase()
-                      .replace(/\s+/g, '-')}.png`}
-                    alt={`${assessment.assessment_data} badge`}
-                    width={100}
-                    height={100}
-                    className="w-24 h-24 object-cover rounded-full border-4 border-indigo-500"
-                  />
-                  <div className="absolute bottom-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-md">
-                    Earned!
-                  </div>
-                </div>
-                <h4 className="mt-4 text-center text-lg font-medium text-gray-800">
-                  {assessment.assessment_data}
-                </h4>
-                <p className="text-sm text-gray-600">Score: {assessment.score}</p>
-              </div>
-            ))}
+    <div className="grid grid-cols-3 gap-4">
+      {badges.map((badgeData, index) => (
+        <div
+          key={index}
+          className="group relative flex flex-col items-center"
+        > 
+          {/* Badge icon */}
+          <Image
+            src={badge} // Ganti sesuai struktur file badge Anda
+            alt={badgeData.badge}
+            width={40}
+            height={40}
+          />
+
+          {/* Tooltip on hover */}
+          <div className="w-28 absolute bottom-5 left-12 transform -translate-x-2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+            {badgeData.badge}
           </div>
         </div>
       ))}
@@ -74,21 +50,3 @@ const BadgeSystem: React.FC<BadgeSystemProps> = ({ assessments }) => {
 };
 
 export default BadgeSystem;
-
-// INI BUAT MANGGIL STATUS
-// const loadAssessments = async () => {
-//     try {
-//       setLoading(true);
-//       const data = await fetchAllAssessments();
-//       setAssessments(data);
-//     } catch (error: any) {
-//       console.error('Error loading assessments:', error);
-//       toast.error(error.message || 'Failed to load assessments');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     loadAssessments(); // Panggil loadAssessments saat komponen dirender
-//   }, []);

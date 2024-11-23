@@ -202,3 +202,21 @@ export async function fetchUserScores(): Promise<UserAssessmentScore[]> {
     assessment_data: score.skillAssessment.assessment_data || "No Data",
   }));
 }
+
+export async function fetchUserBadgesById(userId: string | number): Promise<{ badge: string; assessment_data: string | null }[]> {
+
+  const response = await fetch(`${base_url}/assessment/user-score/badge/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to fetch user badges");
+  }
+
+  const data = await response.json();
+  return data.badges;
+}

@@ -27,11 +27,8 @@ export async function fetchGenerateCertificate(scoreId: number): Promise<Blob> {
   return await response.blob(); // Mengembalikan Blob untuk file PDF
 }
 
-/**
- * Fetch to verify a certificate by unique code
- * @param {string} uniqueCode - The unique code for the certificate
- */
 export async function fetchVerifyCertificate(uniqueCode: string): Promise<any> {
+
   const response = await fetch(`${base_url}/certificate/verify?code=${uniqueCode}`, {
     method: "GET",
   });
@@ -43,3 +40,4 @@ export async function fetchVerifyCertificate(uniqueCode: string): Promise<any> {
 
   return await response.json(); // Mengembalikan data JSON
 }
+

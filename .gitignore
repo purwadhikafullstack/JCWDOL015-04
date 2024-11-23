@@ -40,4 +40,4 @@ dist
 
 .env
 
-apps/api/prisma/
+apps/api/prisma/migrations
