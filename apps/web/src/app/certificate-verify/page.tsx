@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchVerifyCertificate } from '@/lib/certif';
 
@@ -22,46 +22,51 @@ const VerifyCertificatePage: React.FC = () => {
   const [error, setError] = useState('');
   const [validation, setValidation] = useState<string | null>(null);
 
-  // Ambil kode dari URL dan otomatis jalankan verifikasi
-  useEffect(() => {
-    const queryCode = searchParams.get('code'); // Ambil parameter 'code' dari query string
-    if (queryCode) {
-      setCode(queryCode); // Isi state code dengan nilai dari query string
-      handleVerifyCertificate(queryCode, false); // Jalankan verifikasi otomatis
-    }
-  }, [searchParams]);
-
-  const handleVerifyCertificate = async (
-    inputCode?: string,
-    updateParams = true,
-  ) => {
-    const certificateCode = inputCode || code; // Gunakan kode dari parameter atau state
-    if (!certificateCode.trim()) {
-      setError('Certificate code cannot be empty.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setCertificateData(null);
-
-    try {
-      if (updateParams) {
-        // Update URL params sesuai kode
-        router.push(`/certificate-verify?code=${certificateCode}`);
+  // Bungkus handleVerifyCertificate dengan useCallback
+  const handleVerifyCertificate = useCallback(
+    async (inputCode?: string, updateParams = true) => {
+      const certificateCode = inputCode || code;
+      if (!certificateCode.trim()) {
+        setError('Certificate code cannot be empty.');
+        return;
       }
-      const data = await fetchVerifyCertificate(certificateCode);
-      setCertificateData(data.certificate);
-      setValidation(data.message);
-    } catch (error: any) {
-      console.error('Error verifying certificate:', error.message);
-      setError(
-        'Invalid or expired certificate. Please check the code and try again.',
-      );
-    } finally {
-      setLoading(false);
+
+      console.log('Submitting certificate code:', certificateCode);
+
+      setLoading(true);
+      setError('');
+      setCertificateData(null);
+
+      try {
+        if (updateParams) {
+          router.push(`/certificate-verify?code=${certificateCode}`);
+        }
+        const data = await fetchVerifyCertificate(certificateCode);
+        console.log('API Response:', data);
+        setCertificateData(data.certificate);
+        setValidation(data.message);
+      } catch (error: any) {
+        console.error('Error verifying certificate:', error.message);
+        setError(
+          'Invalid or expired certificate. Please check the code and try again.',
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [code, router],
+  );
+
+  // Gunakan useEffect untuk auto-fetch berdasarkan URL params
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const queryCode = searchParams.get('code');
+    if (queryCode) {
+      setCode(queryCode);
+      handleVerifyCertificate(queryCode, false);
     }
-  };
+  }, [searchParams, handleVerifyCertificate]);
 
   return (
     <div className="p-6 max-w-4xl mx-auto bg-gray-50 rounded shadow-md">
