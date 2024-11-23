@@ -31,8 +31,6 @@ const VerifyCertificatePage: React.FC = () => {
         return;
       }
 
-      console.log('Submitting certificate code:', certificateCode);
-
       setLoading(true);
       setError('');
       setCertificateData(null);
@@ -42,7 +40,6 @@ const VerifyCertificatePage: React.FC = () => {
           router.push(`/certificate-verify?code=${certificateCode}`);
         }
         const data = await fetchVerifyCertificate(certificateCode);
-        console.log('API Response:', data);
         setCertificateData(data.certificate);
         setValidation(data.message);
       } catch (error: any) {

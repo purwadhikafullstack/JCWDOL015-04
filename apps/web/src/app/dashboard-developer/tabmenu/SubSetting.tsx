@@ -30,15 +30,12 @@ const SubsManage: React.FC = () => {
           return;
         }
 
-        console.log('Retrieved token:', token); // Debugging log
 
         try {
           const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // Decode token with updated interface
-          console.log('Decoded token:', decodedToken); // Debugging log
 
           if (decodedToken.role) {
             setUserRole(decodedToken.role); // Set the role
-            console.log('User role set:', decodedToken.role);
           } else {
             console.error('Role not found in decoded token.');
             toast.error('Failed to retrieve user role from token.');
@@ -82,14 +79,12 @@ const SubsManage: React.FC = () => {
   }, []);
 
   const handlePlanChange = async (id: number, name: string, value: any) => {
-    console.log('Updated plan:', { id, name, value }); // Log perubahan
     const updatedPlans = plans.map((plan) =>
       plan.subs_type_id === id ? { ...plan, [name]: value } : plan,
     );
     setPlans(updatedPlans);
 
     const updatedPlan = updatedPlans.find((plan) => plan.subs_type_id === id);
-    console.log('Sending updated plan to backend:', updatedPlan); // Log data yang dikirim
 
     if (updatedPlan) {
       try {

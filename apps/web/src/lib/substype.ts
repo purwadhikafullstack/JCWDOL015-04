@@ -64,8 +64,6 @@ export const updateSubsType = async (
     });
 
     const result = await response.json();
-    console.log(result);
-    
 
     return {
       ok: response.ok,
