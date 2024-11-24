@@ -18,7 +18,6 @@ export class ReviewRouter {
       verifyToken,
       this.reviewController.createReview,
     );
-    this.router.put('/update', verifyToken, this.reviewController.updateReview);
     this.router.get('/:company_id', this.reviewController.getReviewsByCompany);
     this.router.get(
       '/:company_id/average-rating',

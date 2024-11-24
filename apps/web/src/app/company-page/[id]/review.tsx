@@ -1,34 +1,30 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { IReview } from '@/types/review';
 import { createReview, fetchReviewsByCompany } from '@/lib/review';
 import ReviewList from './components/reviewlist';
 import AnonymousReviewForm from './components/formreview';
 import AverageRating from './components/avgrating';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ReviewsPage: React.FC<{ params: { companyId: string } }> = ({
+const ReviewsPage: React.FC<{ params: { companyId: number } }> = ({
   params,
 }) => {
-  const searchParams = useSearchParams();
-  const queryCompanyId = searchParams.get('companyId');
-  const dynamicCompanyId = params.companyId;
-  const [averageRating, setAverageRating] = useState(0);
-  const companyId = queryCompanyId || dynamicCompanyId;
+  const companyId = params.companyId; // Ambil companyId dari props
 
+  const [averageRating, setAverageRating] = useState(0);
   const [reviews, setReviews] = useState<IReview[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId) return; // Validasi jika companyId tidak valid
 
     const loadReviews = async () => {
       try {
-        const data = await fetchReviewsByCompany(Number(companyId));
+        const data = await fetchReviewsByCompany(companyId);
         setReviews(data);
 
         const totalRating = data.reduce(
@@ -45,6 +41,22 @@ const ReviewsPage: React.FC<{ params: { companyId: string } }> = ({
 
     loadReviews();
   }, [companyId]);
+
+  const reloadReviews = async () => {
+    try {
+      const data = await fetchReviewsByCompany(companyId);
+      setReviews(data);
+
+      const totalRating = data.reduce(
+        (sum, review) => sum + Number(review.rating),
+        0,
+      );
+      const average = totalRating / data.length;
+      setAverageRating(average || 0);
+    } catch (err) {
+      toast.error('Failed to reload reviews');
+    }
+  };
 
   const handleSubmitReview = async (
     review: string,
@@ -70,22 +82,27 @@ const ReviewsPage: React.FC<{ params: { companyId: string } }> = ({
       workLifeBalanceRating: ratings.workLifeBalance,
       facilitiesRating: ratings.facilities,
       careerOpportunitiesRating: ratings.careerOpportunities,
-      company_id: 1,
+      company_id: companyId,
     };
+
     try {
-      const newReview = await createReview(payload);
+      await createReview(payload);
       toast.success('Review created successfully!');
-      setReviews((prev) => [...prev, newReview]); // Tambahkan review ke state
+      setShowForm(false); // Tutup form setelah submit
+      await reloadReviews(); // Revalidate data reviews
     } catch (error: any) {
       toast.error(`Failed to create review: ${error.message}`);
     }
   };
 
+  const handleCancel = () => {
+    setShowForm(false); // Tutup form jika pengguna menekan tombol Cancel
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <ToastContainer />
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Reviews for Company {companyId}</h1>
+        <h1 className="text-2xl font-bold">Reviews Company</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -102,7 +119,14 @@ const ReviewsPage: React.FC<{ params: { companyId: string } }> = ({
         totalReviews={reviews.length}
       />
 
-      {showForm && <AnonymousReviewForm onSubmit={handleSubmitReview} />}
+      {showForm && (
+        <div className="p-4 border border-gray-300 rounded-md bg-gray-100">
+          <AnonymousReviewForm
+            onSubmit={handleSubmitReview}
+            onCancel={() => setShowForm(false)}
+          />
+        </div>
+      )}
 
       <h2 className="text-xl font-semibold mt-8 mb-4">Existing Reviews</h2>
       <ReviewList reviews={reviews} />

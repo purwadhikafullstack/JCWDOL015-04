@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { getCompanyById } from '@/lib/company';
@@ -10,6 +11,7 @@ import CompanyJobListings from './CompanyJobListings';
 import { industryOptions } from '@/utils/format';
 import DOMPurify from 'dompurify';
 import Image from 'next/image';
+import ReviewsPage from './review';
 
 const CompanyPage = () => {
   const { id } = useParams();
@@ -20,7 +22,7 @@ const CompanyPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { company, ok } = await getCompanyById(id as string)
+        const { company, ok } = await getCompanyById(id as string);
         if (ok && company) {
           setCompany(company);
         } else {
@@ -66,10 +68,9 @@ const CompanyPage = () => {
 
         {/* Content Section */}
         <div className="relative z-10 w-full max-w-7xl p-4 md:p-6 lg:p-8">
-          {/* Header Section */}
           <div className="flex flex-col items-start p-6 bg-white rounded-lg shadow-lg">
             <div className="flex items-center">
-            <Image
+              <Image
                 src={company.logo || '/default-logo.png'}
                 alt={`${company.company_name} Logo`}
                 width={64}
@@ -85,34 +86,13 @@ const CompanyPage = () => {
             </div>
           </div>
 
-          {/* Company Details Section */}
-          <div className="flex flex-col lg:flex-row gap-8 mt-6">
-            <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-6">
-              <h2 className="text-lg font-bold">About Us</h2>
-              {/* Render company.aboutUs as HTML */}
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: company.aboutUs || 'No description available.',
-                }}
-              />
-            </div>
-
-            {/* Sidebar with Company Information */}
-            <div className="w-full lg:w-1/3 space-y-6">
-              <div className="bg-white shadow-lg rounded-lg p-4">
-                <h2 className="text-lg font-bold">Company Details</h2>
-                <div className="mt-4">
-                  <CompanyOverview company={company} />
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Job Listings Section */}
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Job Listings</h2>
             <CompanyJobListings companyId={company.company_id} />
           </div>
+          {/* Reviews Section */}
+          <ReviewsPage params={{ companyId: company.company_id }} />
         </div>
       </div>
     </ProtectedRoute>

@@ -25,26 +25,21 @@ export class ReviewController {
       }
 
       // Ambil company_id dari database jika tidak ada di body
-      const userCompany = company_id
-        ? { company_id }
-        : await prisma.company.findFirst({
-            where: {
-              users: {
-                some: {
-                  user_id,
-                },
-              },
+      const userCompany = await prisma.company.findFirst({
+        where: {
+          company_id: req.body.company_id,
+          users: {
+            some: {
+              user_id: req.user?.user_id,
             },
-            select: {
-              company_id: true,
-            },
-          });
-
+          },
+        },
+      });
+      
       if (!userCompany) {
-        return res
-          .status(403)
-          .json({ message: 'User tidak terverifikasi untuk perusahaan ini' });
+        return res.status(403).json({ message: 'User tidak terverifikasi untuk perusahaan ini' });
       }
+      
 
       const verifiedCompanyId = userCompany.company_id;
 
@@ -101,108 +96,6 @@ export class ReviewController {
     } catch (error) {
       console.error('Error creating review:', error);
       return res.status(500).json({ message: 'Gagal membuat ulasan', error });
-    }
-  }
-
-  async updateReview(req: Request, res: Response) {
-    const {
-      comment,
-      salary_estimate,
-      position,
-      workCultureRating,
-      workLifeBalanceRating,
-      facilitiesRating,
-      careerOpportunitiesRating,
-      company_id,
-    } = req.body;
-
-    try {
-      const user_id = req.user?.user_id;
-
-      if (!user_id) {
-        return res.status(403).json({ message: 'User not authenticated' });
-      }
-
-      // Ambil company_id dari database jika tidak ada di body
-      const userCompany = company_id
-        ? { company_id }
-        : await prisma.company.findFirst({
-            where: {
-              users: {
-                some: {
-                  user_id,
-                },
-              },
-            },
-            select: {
-              company_id: true,
-            },
-          });
-
-      if (!userCompany) {
-        return res
-          .status(403)
-          .json({ message: 'User tidak terverifikasi untuk perusahaan ini' });
-      }
-
-      const verifiedCompanyId = userCompany.company_id;
-
-      // Cari ulasan yang sudah ada
-      const existingReview = await prisma.review.findFirst({
-        where: {
-          user_id,
-          company_id: verifiedCompanyId,
-        },
-      });
-
-      if (!existingReview) {
-        return res
-          .status(404)
-          .json({ message: 'Ulasan tidak ditemukan untuk perusahaan ini' });
-      }
-
-      // Hitung rata-rata rating dari empat aspek lainnya
-      const ratings = [
-        workCultureRating,
-        workLifeBalanceRating,
-        facilitiesRating,
-        careerOpportunitiesRating,
-      ];
-      const validRatings = ratings.filter((r) => r !== undefined && r !== null);
-      const averageRating = validRatings.length
-        ? parseFloat(
-            (
-              validRatings.reduce((a, b) => a + b, 0) / validRatings.length
-            ).toFixed(1),
-          )
-        : null;
-
-      // Update ulasan
-      const updatedReview = await prisma.review.update({
-        where: {
-          review_id: existingReview.review_id,
-        },
-        data: {
-          rating: averageRating,
-          comment,
-          salary_estimate,
-          position,
-          workCultureRating,
-          workLifeBalanceRating,
-          facilitiesRating,
-          careerOpportunitiesRating,
-        },
-      });
-
-      return res.status(200).json({
-        message: 'Ulasan berhasil diperbarui',
-        review: updatedReview,
-      });
-    } catch (error) {
-      console.error('Error updating review:', error);
-      return res
-        .status(500)
-        .json({ message: 'Gagal memperbarui ulasan', error });
     }
   }
 
