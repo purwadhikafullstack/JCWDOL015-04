@@ -22,8 +22,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
   if (checkRole(UserRole.Developer)) {
     return (
       <>
-        <li><Link href="/assessment-page" className="hover:text-Primary-blue">Dashboard Assessments</Link></li>
-        <li><Link href="/Subscription" className="hover:text-Primary-blue">Subscription</Link></li>
+        <li><Link href="/dashboard-developer" className="hover:text-Primary-blue">Dashboard</Link></li>
         <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
       </>
     );

@@ -56,16 +56,6 @@ const AvatarMenu: React.FC<AvatarMenuProps> = ({ onLogout, userRole }) => {
         <li>
           <button onClick={handleProfileClick}>Profile</button>
         </li>
-        {userRole === UserRole.Developer && (
-          <>
-            <li>
-              <button>Assessments</button>
-            </li>
-            <li>
-              <button>Subscription</button>
-            </li>
-          </>
-        )}
         <li>
           <button
             onClick={handleLogout}
