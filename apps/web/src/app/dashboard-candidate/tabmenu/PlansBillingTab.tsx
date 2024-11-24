@@ -10,7 +10,7 @@ const PlansBillingDashboard: React.FC = () => {
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const base_url = process.env.BASE_API_URL
+  const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
     useEffect(() => {
         const fetchUserData = async () => {
