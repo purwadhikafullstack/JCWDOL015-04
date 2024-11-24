@@ -37,7 +37,4 @@ yarn-error.log*
 
 # others
 dist
-
 .env
-
-apps/api/prisma/migrations

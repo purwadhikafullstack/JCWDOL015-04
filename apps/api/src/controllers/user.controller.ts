@@ -465,6 +465,13 @@ export class UserController {
           .json({ status: 'error', msg: 'User not found!' });
       }
 
+      if (!user.password || user.password.trim() === '') {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Social login detected. Password reset not available. Please Login with your Social Login.',
+        });
+      }
+
       const payload = { id: user.user_id };
       const resetToken = sign(payload, process.env.SECRET_JWT!, {
         expiresIn: '15m',
