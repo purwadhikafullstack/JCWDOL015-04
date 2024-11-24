@@ -1,24 +1,34 @@
 'use client';
 import { createCv } from '@/lib/cvgenerator';
 import { ResumeContent } from '@/types/cvgenerator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface ResumeFormProps {
-  onResumeCreated: () => void; // Callback untuk memperbarui state di CvDashboard
+  onResumeCreated: () => void;
+  onCancel: () => void;
+  initialData?: ResumeContent | null; // Data existing untuk update
 }
 
-export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
-  const [resumeContent, setResumeContent] = useState<ResumeContent>({
-    fullName: '',
-    email: '',
-    phone: '',
-    summary: '',
-    experiences: [{ company: '', position: '', years: 0 }],
-    skills: [],
-    education: [{ institution: '', degree: '', year: 0 }],
-  });
+export default function ResumeForm({
+  onResumeCreated,
+  onCancel,
+  initialData,
+}: ResumeFormProps) {
+  const [resumeContent, setResumeContent] = useState<ResumeContent>(
+    initialData || {
+      fullName: '',
+      email: '',
+      phone: '',
+      summary: '',
+      experiences: [
+        { company: '', position: '', years: 0, responsibilities: '' },
+      ],
+      skills: [],
+      education: [{ institution: '', degree: '', year: 0 }],
+    },
+  );
 
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +54,7 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
   const handleAddExperience = () => {
     handleChange('experiences', [
       ...resumeContent.experiences,
-      { company: '', position: '', years: 0 },
+      { company: '', position: '', years: 0, responsibilities: '' },
     ]);
   };
 
@@ -60,7 +70,10 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
       toast.error('Full Name is required.');
       return false;
     }
-    if (!resumeContent.email.trim() || !/^\S+@\S+\.\S+$/.test(resumeContent.email)) {
+    if (
+      !resumeContent.email.trim() ||
+      !/^\S+@\S+\.\S+$/.test(resumeContent.email)
+    ) {
       toast.error('Valid email is required.');
       return false;
     }
@@ -79,21 +92,29 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
       const result = await createCv('ATS', resumeContent); // Pastikan template sesuai dengan API Anda
 
       if (result.ok && result.cv) {
-        toast.success('Resume created successfully!');
-        onResumeCreated(); // Callback ke CvDashboard untuk memperbarui daftar resume
+        toast.success(
+          initialData
+            ? 'Resume updated successfully!'
+            : 'Resume created successfully!',
+        );
+        onResumeCreated();
 
-        // Reset form setelah sukses
-        setResumeContent({
-          fullName: '',
-          email: '',
-          phone: '',
-          summary: '',
-          experiences: [{ company: '', position: '', years: 0 }],
-          skills: [],
-          education: [{ institution: '', degree: '', year: 0 }],
-        });
+        // Reset form jika berhasil dibuat
+        if (!initialData) {
+          setResumeContent({
+            fullName: '',
+            email: '',
+            phone: '',
+            summary: '',
+            experiences: [
+              { company: '', position: '', years: 0, responsibilities: '' },
+            ],
+            skills: [],
+            education: [{ institution: '', degree: '', year: 0 }],
+          });
+        }
       } else {
-        toast.error('Failed to create resume. Please try again.');
+        toast.error('Failed to save resume. Please try again.');
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error);
@@ -104,8 +125,10 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
   };
 
   return (
-    <div className="p-6 border rounded">
-      <h2 className="text-lg font-bold mb-4">Create Resume (ATS Friendly)</h2>
+    <div className="p-6 border rounded bg-white shadow">
+      <h2 className="text-lg font-bold mb-4">
+        {initialData ? 'Update Resume' : 'Create Resume (ATS Friendly)'}
+      </h2>
       <div className="mb-4">
         <label className="block font-bold mb-2">Full Name</label>
         <input
@@ -172,6 +195,18 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
                 handleExperienceChange(index, 'years', e.target.value)
               }
             />
+            <textarea
+              placeholder="Responsibilities"
+              className="w-full p-2 border rounded"
+              value={experience.responsibilities}
+              onChange={(e) =>
+                handleExperienceChange(
+                  index,
+                  'responsibilities',
+                  e.target.value,
+                )
+              }
+            />
           </div>
         ))}
         <button
@@ -181,6 +216,19 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
           Add Experience
         </button>
       </div>
+      <div className="mb-4">
+  <label className="block font-bold mb-2">Skills</label>
+  <textarea
+    className="w-full p-2 border rounded"
+    value={Array.isArray(resumeContent.skills) ? resumeContent.skills.join(', ') : ''} // Pastikan skills adalah array
+    onChange={(e) =>
+      handleChange(
+        'skills',
+        e.target.value.split(',').map((skill) => skill.trim()) // Pecah string menjadi array
+      )
+    }
+  />
+</div>
       <div className="mb-4">
         <h3 className="font-bold mb-2">Education</h3>
         {resumeContent.education.map((edu, index) => (
@@ -221,13 +269,25 @@ export default function ResumeForm({ onResumeCreated }: ResumeFormProps) {
           Add Education
         </button>
       </div>
-      <button
-        className="bg-green-500 text-white px-4 py-2 rounded"
-        onClick={handleSubmit}
-        disabled={loading}
-      >
-        {loading ? 'Creating...' : 'Create Resume'}
-      </button>
+      <div className="flex gap-4">
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading
+            ? 'Saving...'
+            : initialData
+              ? 'Update Resume'
+              : 'Create Resume'}
+        </button>
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }

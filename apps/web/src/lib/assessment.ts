@@ -1,4 +1,4 @@
-import { Assessment } from '@/types/assessment';
+import { Assessment, UserAssessmentScore } from '@/types/assessment';
 import { getToken } from './server';
 
 const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
@@ -166,4 +166,57 @@ export async function fetchAssessmentToken(assessmentId: number): Promise<string
 
   const data = await response.json();
   return data.token; // Token assessment
+}
+
+export async function fetchUserScores(): Promise<UserAssessmentScore[]> {
+  // Retrieve token (replace with actual token retrieval logic)
+  const token = await getToken(); // Your token retrieval logic
+
+  if (!token) {
+    throw new Error("Failed to retrieve authentication token");
+  }
+
+  // Fetch data from the API
+  const response = await fetch(`${base_url}/assessment/user-score`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to fetch user scores");
+  }
+
+  // Map response to AssessmentScore type
+  const data = await response.json();
+  return data.scores.map((score: any) => ({
+    score_id: score.score_id,
+    badge: score.badge || "No Badge",
+    score: score.score,
+    status: score.status,
+    unique_code: score.unique_code,
+    created_at: score.created_at,
+    assessment_data: score.skillAssessment.assessment_data || "No Data",
+  }));
+}
+
+export async function fetchUserBadgesById(userId: string | number): Promise<{ badge: string; assessment_data: string | null }[]> {
+
+  const response = await fetch(`${base_url}/assessment/user-score/badge/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to fetch user badges");
+  }
+
+  const data = await response.json();
+  return data.badges;
 }

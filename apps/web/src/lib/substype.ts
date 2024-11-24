@@ -1,4 +1,3 @@
-// src/lib/substype.ts
 import { ISubsType } from '../types/substype';
 import { getToken } from './server';
 
@@ -65,8 +64,6 @@ export const updateSubsType = async (
     });
 
     const result = await response.json();
-    console.log(result);
-    
 
     return {
       ok: response.ok,

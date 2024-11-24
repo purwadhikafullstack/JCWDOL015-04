@@ -2,16 +2,24 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
-import { Typography, Paper, Select, MenuItem, FormControl, InputLabel, Button } from '@mui/material';
+import {
+  Typography,
+  Paper,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { getStatusLabel } from '@/utils/format';
 import base_url from '@/lib/user';
 import Image from 'next/image';
+import BadgeSystem from '@/components/badgesystem';
 
 type Applicant = {
   id: number;
+  user_id: number;
   name: string;
   position: string;
   experience: string;
@@ -34,11 +42,14 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
-        const response = await axios.get(`${base_url}/applications/job/${jobId}`, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get('token')}`,
+        const response = await axios.get(
+          `${base_url}/applications/job/${jobId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get('token')}`,
+            },
           },
-        });
+        );
         setApplicants(response.data.applications);
       } catch (error) {
         console.error('Error fetching applicants:', error);
@@ -67,13 +78,15 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
           headers: {
             Authorization: `Bearer ${Cookies.get('token')}`,
           },
-        }
+        },
       );
 
       setApplicants((prevApplicants) =>
         prevApplicants.map((applicant) =>
-          applicant.id === applicantId ? { ...applicant, status: newStatus } : applicant
-        )
+          applicant.id === applicantId
+            ? { ...applicant, status: newStatus }
+            : applicant,
+        ),
       );
 
       toast.success(`Status updated to ${getStatusLabel(newStatus)}`);
@@ -85,22 +98,30 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
 
   return (
     <Paper elevation={3} className="bg-white shadow-lg rounded-lg p-6 w-full">
-      <Typography variant="h6" className="font-semibold mb-4 text-center text-gray-800">
+      <Typography
+        variant="h6"
+        className="font-semibold mb-4 text-center text-gray-800"
+      >
         All Applications ({applicants.length})
       </Typography>
       {applicants.map((applicant) => (
         <div key={applicant.id} className="border-b border-gray-300 py-4">
           <div className="flex items-center mb-3">
             <Image
-              src={applicant.photoUrl || 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'}
+              src={
+                applicant.photoUrl ||
+                'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
+              }
               width={64}
               height={64}
               alt={`${applicant.name}'s photo`}
               className="w-16 h-16 rounded-full object-cover mr-4"
             />
             <div>
-              <Typography className="font-semibold text-gray-800 text-sm">
+              <Typography className="font-semibold text-gray-800 text-sm flex items-center">
                 {applicant.name}
+                {/* Render BadgeSystem untuk setiap applicant */}
+                <BadgeSystem userId={applicant.user_id} />
               </Typography>
               <Typography className="text-xs text-gray-500">
                 {applicant.position}
@@ -128,7 +149,11 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
           {applicant.resume && (
             <div className="text-center">
               <Typography className="text-xs text-blue-600">
-                <a href={applicant.resume} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={applicant.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   View Resume
                 </a>
               </Typography>
@@ -141,7 +166,9 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
               <Select
                 value={applicant.status}
                 label="Status"
-                onChange={(e) => handleStatusChange(applicant.id, e.target.value as string)}
+                onChange={(e) =>
+                  handleStatusChange(applicant.id, e.target.value as string)
+                }
               >
                 <MenuItem value="pending">Pending</MenuItem>
                 <MenuItem value="under_review">Under Review</MenuItem>

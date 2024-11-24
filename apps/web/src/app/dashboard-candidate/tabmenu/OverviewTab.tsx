@@ -6,7 +6,8 @@ import {
   fetchRecentlyAppliedJobs,
 } from '@/lib/applyJob';
 import { getUserInfo } from '@/lib/user';
-import { getStatusLabel } from '@/utils/format';
+import { fetchUserBadgesById } from '@/lib/assessment'; // Import fungsi baru untuk mengambil badge
+import BadgeSystem from '@/components/badgesystem';
 import { RecentlyAppliedJob } from '@/types/job';
 import moment from 'moment';
 import Image from 'next/image';
@@ -16,32 +17,38 @@ interface OverviewTabProps {
 }
 
 const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
-  const [userName, setUserName] = useState('');
-  const [appliedJobCount, setAppliedJobCount] = useState(0);
-  const [favoriteJobCount, setFavoriteJobCount] = useState(0);
-  const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<
-    RecentlyAppliedJob[]
-  >([]);
+  const [userName, setUserName] = useState<string>('');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [appliedJobCount, setAppliedJobCount] = useState<number>(0);
+  const [favoriteJobCount, setFavoriteJobCount] = useState<number>(0);
+  const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<RecentlyAppliedJob[]>([]);
+  const [hasBadge, setHasBadge] = useState<boolean>(false); // State untuk verifikasi badge
 
   useEffect(() => {
     const fetchData = async () => {
-      const userResponse = await getUserInfo();
-      if (userResponse.ok && userResponse.user) {
-        setUserName(
-          `${userResponse.user.first_name} ${userResponse.user.last_name}`,
-        );
-        const userId = userResponse.user.user_id;
+      try {
+        const userResponse = await getUserInfo();
+        if (userResponse.ok && userResponse.user) {
+          const { first_name, last_name, user_id } = userResponse.user;
+          setUserName(`${first_name} ${last_name}`);
+          setUserId(user_id);
 
-        const appliedCount = await fetchAppliedJobCount(userId);
-        setAppliedJobCount(appliedCount);
+          const [appliedCount, favoriteCount, recentJobs, badges] = await Promise.all([
+            fetchAppliedJobCount(user_id),
+            fetchFavoriteJobCount(user_id),
+            fetchRecentlyAppliedJobs(user_id),
+            fetchUserBadgesById(user_id), // Panggil API badge baru
+          ]);
 
-        const favoriteCount = await fetchFavoriteJobCount(userId);
-        setFavoriteJobCount(favoriteCount);
+          setAppliedJobCount(appliedCount);
+          setFavoriteJobCount(favoriteCount);
+          setRecentlyAppliedJobs(recentJobs.slice(0, 5));
 
-        const recentJobs = await fetchRecentlyAppliedJobs(userId);
-        setRecentlyAppliedJobs(recentJobs.slice(0, 5));
-      } else {
-        console.error('Failed to fetch user info');
+          // Jika terdapat badge, set state `hasBadge` ke true
+          setHasBadge(badges.length > 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
       }
     };
 
@@ -51,12 +58,13 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-semibold">Hello, {userName}</h1>
-        <p className="text-gray-600">
-          Here is your daily activities and job alerts
-        </p>
+        <div className="flex items-center space-x-2">
+          <h1 className="text-2xl font-semibold">Hello, {userName}</h1>
+          {userId && hasBadge && <BadgeSystem userId={userId} />}
+        </div>
       </div>
 
+      {/* Job Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 justify-center">
         <SummaryCard
           color="bg-blue-50"
@@ -72,6 +80,7 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
         />
       </div>
 
+      {/* Recently Applied Jobs */}
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Recently Applied</h2>
@@ -86,7 +95,6 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
 
         <div className="overflow-x-auto">
           <table className="table w-full">
-            {/* Table Head */}
             <thead>
               <tr>
                 <th>No.</th>
@@ -133,40 +141,37 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
                     </td>
                     <td>
                       <span className="block lg:hidden">
-                        {/* Display with line break on small screens */}
                         {moment(job.date_applied).format('D MMM, YYYY')}
                         <br />
                         {moment(job.date_applied).format('h:mm A')}
                       </span>
                       <span className="hidden lg:block">
-                        {/* Display in a single line on larger screens */}
                         {moment(job.date_applied).format(
                           'D MMM, YYYY | h:mm A',
                         )}
                       </span>
                     </td>
-
                     <td>
                       <span
                         className={`badge text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-1.5 leading-tight whitespace-nowrap ${
                           job.status === 'active'
                             ? 'badge-success'
                             : job.status === 'under_review'
-                              ? 'badge-warning'
-                              : job.status === 'interview'
-                                ? 'badge-warning'
-                                : job.status === 'pending'
-                                  ? 'badge-warning'
-                                  : job.status === 'accepted'
-                                    ? 'badge-warning'
-                                    : job.status === 'rejected'
-                                      ? 'badge-error'
-                                      : job.status === 'hired'
-                                        ? 'badge-primary'
-                                        : 'badge-neutral'
+                            ? 'badge-warning'
+                            : job.status === 'interview'
+                            ? 'badge-warning'
+                            : job.status === 'pending'
+                            ? 'badge-warning'
+                            : job.status === 'accepted'
+                            ? 'badge-warning'
+                            : job.status === 'rejected'
+                            ? 'badge-error'
+                            : job.status === 'hired'
+                            ? 'badge-primary'
+                            : 'badge-neutral'
                         }`}
                       >
-                        {getStatusLabel(job.status)}
+                        {job.status}
                       </span>
                     </td>
                   </tr>

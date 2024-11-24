@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../prisma'; // Adjust path as needed
-import { generatePdf } from '../utils/pdfGenerator'; // Utility for PDF export
+import { generatePdf } from '../utils/pdfCVGenerator'; // Utility for PDF export
 
 export class CvController {
   // Create or Update CV

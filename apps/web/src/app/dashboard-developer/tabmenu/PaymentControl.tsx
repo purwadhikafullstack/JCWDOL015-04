@@ -6,8 +6,9 @@ import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { MdOpenInNew } from "react-icons/md";
 
-const base_url = process.env.BASE_API_URL
+const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
 
 const BillsManage: React.FC = () => {
   const router = useRouter();
@@ -162,9 +163,9 @@ const BillsManage: React.FC = () => {
                       href={`${base_url}/public/payment-proof/${tx.receipt}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 underline"
+                      className="text-blue-500 flex justify-center"
                     >
-                      View
+                      <MdOpenInNew size={20} />
                     </a>
                   ) : (
                     'N/A'
@@ -187,7 +188,7 @@ const BillsManage: React.FC = () => {
                         }
                         className="bg-red-500 text-white px-3 py-1 rounded"
                       >
-                        Failed
+                        Reject
                       </button>
                     </div>
                   )}

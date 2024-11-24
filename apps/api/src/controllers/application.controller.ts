@@ -234,15 +234,14 @@ export class ApplicationController {
   }
 
   async getApplicationsByJobId(req: Request, res: Response) {
-    const jobId = parseInt(req.params.jobId, 10); 
-  
+    const jobId = parseInt(req.params.jobId, 10);
+
     try {
-  
       if (isNaN(jobId)) {
         console.warn('Invalid Job ID:', jobId);
         return res.status(400).json({ msg: 'Invalid Job ID' });
       }
-  
+
       const applications = await prisma.application.findMany({
         where: { job_id: jobId },
         include: {
@@ -264,12 +263,14 @@ export class ApplicationController {
           },
         },
       });
-  
+
       if (applications.length === 0) {
         console.warn(`Applications not found for job ID: ${jobId}`);
-        return res.status(404).json({ msg: 'No applications found for this job' });
+        return res
+          .status(404)
+          .json({ msg: 'No applications found for this job' });
       }
-  
+
       res.status(200).json({
         applications: applications.map((app) => ({
           id: app.application_id,
@@ -283,15 +284,21 @@ export class ApplicationController {
           resume: app.resume,
           status: app.status,
           photoUrl: app.user.profile_picture,
+          user_id: app.user_id,
         })),
       });
     } catch (error) {
       const err = error as Error; // Casting ke tipe Error
-      console.error('Error fetching applications for Job ID:', jobId, err.message);
-      res.status(500).json({ msg: 'Failed to fetch applications', error: err.message });
+      console.error(
+        'Error fetching applications for Job ID:',
+        jobId,
+        err.message,
+      );
+      res
+        .status(500)
+        .json({ msg: 'Failed to fetch applications', error: err.message });
     }
   }
-  
 
   async getInterviewApplicantsByCompany(req: Request, res: Response) {
     try {
@@ -329,7 +336,9 @@ export class ApplicationController {
       });
 
       if (interviewApplicants.length === 0) {
-        return res.status(404).json({ msg: 'No interview applicants found for this company' });
+        return res
+          .status(404)
+          .json({ msg: 'No interview applicants found for this company' });
       }
 
       res.status(200).json({
@@ -344,7 +353,9 @@ export class ApplicationController {
       });
     } catch (error) {
       console.error('Error fetching interview applicants by company:', error);
-      res.status(500).json({ msg: 'Failed to fetch interview applicants by company' });
+      res
+        .status(500)
+        .json({ msg: 'Failed to fetch interview applicants by company' });
     }
   }
 
@@ -353,13 +364,14 @@ export class ApplicationController {
       const { applicationId } = req.params;
       const { interviewDate, interviewTime } = req.body;
 
-  
       if (!applicationId || !interviewDate || !interviewTime) {
         return res
           .status(400)
-          .json({ msg: 'Application ID, interview date, and time are required' });
+          .json({
+            msg: 'Application ID, interview date, and time are required',
+          });
       }
-  
+
       const updatedApplication = await prisma.application.update({
         where: { application_id: Number(applicationId) },
         data: {
@@ -368,18 +380,16 @@ export class ApplicationController {
           status: 'interview',
         },
       });
-  
+
       res.status(200).json({
         msg: 'Interview schedule updated successfully!',
         application: updatedApplication,
       });
     } catch (error) {
       console.error('Error updating interview schedule:', error);
-      res.status(500).json({ msg: 'Failed to update interview schedule', error });
+      res
+        .status(500)
+        .json({ msg: 'Failed to update interview schedule', error });
     }
   }
-  
-  
-  
-  
 }

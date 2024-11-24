@@ -8,13 +8,17 @@ import {
   fetchAllAssessments,
   fetchStartAssessment,
   fetchSubmitAssessment,
+  fetchUserScores,
 } from '@/lib/assessment';
 import { fetchGenerateCertificate } from '@/lib/certif';
-import { Assessment, Question } from '@/types/assessment';
+import { Assessment, Question, UserAssessmentScore } from '@/types/assessment';
 import SkillAssessmentList from './components/UassessmentList';
 import AssessmentCard from './components/UassessmentCard';
 import { getToken } from '@/lib/server';
 import { checkSubscriptionStatus } from '@/lib/subsDashboard';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import ScoreCard from './components/scoreCard';
 
 const UserAssessment: React.FC = () => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -25,6 +29,7 @@ const UserAssessment: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30 * 60);
   const router = useRouter();
+  const [userScores, setUserScores] = useState<UserAssessmentScore[]>([]);
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -98,6 +103,7 @@ const UserAssessment: React.FC = () => {
   useEffect(() => {
     if (isActiveSubscription) {
       loadAssessments();
+      loadUserScores();
     }
   }, [isActiveSubscription]);
 
@@ -151,56 +157,71 @@ const UserAssessment: React.FC = () => {
     }
   };
 
-  const handleGenerateCertificate = async (assessmentId: number) => {
+  const loadUserScores = async () => {
     try {
       setLoading(true);
-
-      const response = await fetchGenerateCertificate(assessmentId);
-      const blob = new Blob([response], { type: 'application/pdf' });
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `certificate_${assessmentId}.pdf`;
-      a.click();
-
-      window.URL.revokeObjectURL(url);
-      toast.success('Certificate generated successfully! Downloading...');
+      const scores = await fetchUserScores();
+      setUserScores(scores);
     } catch (error: any) {
-      console.error('Error generating certificate:', error);
-      toast.error(error.message || 'Failed to generate certificate.');
+      console.error('Error loading user scores:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGenerateCertificate = async (score_id: number) => {
+    try {
+      const certificateBlob = await fetchGenerateCertificate(score_id);
+      const url = window.URL.createObjectURL(certificateBlob);
+
+      // Unduh file sertifikat
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `certificate_${score_id}.pdf`;
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+      toast.success('Certificate generated successfully!');
+    } catch (error) {
+      console.error('Error generating certificate:', error);
+      toast.error('Failed to generate certificate. Please try again.');
+    }
+  };
+
   if (isActiveSubscription === null) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
-          <p className="mt-4 text-gray-600 font-semibold">Checking subscription status...</p>
+          <p className="mt-4 text-gray-600 font-semibold">
+            Checking subscription status...
+          </p>
         </div>
       </div>
     );
   }
-  
+
   if (!isActiveSubscription) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen text-center">
-        <h2 className="text-xl font-bold text-gray-800 mb-2">Skill Assessment & Certificate</h2>
+      <div className="flex flex-col justify-center text-center">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">
+          Skill Assessment & Certificate
+        </h2>
         <p className="text-red-500 font-medium">
-          You need an active subscription to access this feature. Redirecting to subscription plans...
+          You need an active subscription to access this feature. Redirecting to
+          subscription plans...
         </p>
       </div>
     );
   }
-  
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       {!questions ? (
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Skill Assessments</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            Skill Assessments & Certificate
+          </h1>
           {assessments.length > 0 ? (
             <SkillAssessmentList
               assessments={assessments}
@@ -212,27 +233,29 @@ const UserAssessment: React.FC = () => {
               <p>No assessments available at the moment.</p>
             </div>
           )}
-          <div className="mt-10">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Generate Certificates</h2>
-            {assessments
-              .filter((assessment) => assessment.status === 'passed')
-              .map((assessment) => (
-                <div
-                  key={assessment.assessment_id}
-                  className="bg-white shadow rounded-lg p-4 mb-4 border"
-                >
-                  <p className="text-lg font-medium text-gray-700">
-                    Assessment: <span className="font-semibold">{assessment.assessment_data}</span>
-                  </p>
-                  <p>Score: {assessment.score}</p>
-                  <button
-                    onClick={() => handleGenerateCertificate(assessment.assessment_id)}
-                    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-                  >
-                    Generate Certificate
-                  </button>
-                </div>
-              ))}
+          <div className="p-6 max-w-4xl mx-auto">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              User Scores
+            </h2>
+            {userScores.length > 0 ? (
+              userScores.map((score) => (
+                <ScoreCard
+                  key={score.score_id}
+                  badge={score.badge}
+                  score={score.score}
+                  status={score.status}
+                  unique_code={score.unique_code}
+                  created_at={score.created_at}
+                  assessment_data={score.assessment_data}
+                  score_id={score.score_id} // Berikan score_id
+                  onGenerateCertificate={handleGenerateCertificate} // Fungsi menerima score_id
+                />
+              ))
+            ) : (
+              <div className="text-center text-gray-600">
+                <p>No scores available at the moment.</p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -257,7 +280,6 @@ const UserAssessment: React.FC = () => {
       )}
     </div>
   );
-  
 };
 
 export default UserAssessment;

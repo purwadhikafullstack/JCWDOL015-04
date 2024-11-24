@@ -1,59 +1,101 @@
-import PDFDocument from "pdfkit";
-import { Response } from "express";
+import PDFDocument from 'pdfkit';
+import { Response } from 'express';
 
 export const certificatePDF = async (
   res: Response,
-  assessmentData: {
-    assessment_id: number;
+  scoreData: {
+    score_id: number;
     assessment_data: string;
     score: number;
     user_name: string;
-    badge: string | null; // Tambahkan properti badge
-    qrCodeData: string; // Properti untuk QR Code
-  }
-) => {
+    badge: string | null; // Properti badge
+    qrCodeData: string; // Base64 data untuk QR Code
+  },
+): Promise<void> => {
   try {
-    const doc = new PDFDocument();
-    const chunks: any[] = [];
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    const chunks: Buffer[] = [];
 
-    doc.on("data", (chunk) => chunks.push(chunk));
-    doc.on("end", () => {
+    // Tangkap data PDF saat dibuat
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => {
       const result = Buffer.concat(chunks);
-      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader('Content-Type', 'application/pdf');
       res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=certificate_${assessmentData.assessment_id}.pdf`
+        'Content-Disposition',
+        `attachment; filename=certificate_${scoreData.score_id}.pdf`,
       );
       res.send(result);
     });
 
     // Tambahkan konten ke PDF
-    doc.fontSize(20).text("Certificate of Achievement", { align: "center" });
+    doc.fontSize(26).font('Helvetica-Bold').text('Certificate of Achievement', {
+      align: 'center',
+    });
     doc.moveDown(2);
-    doc.fontSize(16).text(`This certifies that`, { align: "center" });
-    doc.fontSize(24).text(assessmentData.user_name, { align: "center" });
-    doc.moveDown(2);
-    doc.fontSize(16).text(`has successfully completed the assessment:`, { align: "center" });
-    doc.fontSize(18).text(assessmentData.assessment_data, { align: "center" });
-    doc.moveDown(2);
-    doc.fontSize(16).text(`with a score of ${assessmentData.score}.`, { align: "center" });
+    doc.fontSize(16).font('Helvetica').text(`This certifies that`, {
+      align: 'center',
+    });
+    doc.fontSize(22).font('Helvetica-Bold').text(scoreData.user_name, {
+      align: 'center',
+    });
+    doc.moveDown(1);
+    doc
+      .fontSize(16)
+      .font('Helvetica')
+      .text(`has successfully completed the assessment:`, { align: 'center' });
+    doc
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .text(scoreData.assessment_data, {
+        align: 'center',
+      });
+    doc.moveDown(1);
+    doc
+      .fontSize(16)
+      .font('Helvetica')
+      .text(`with a score of ${scoreData.score}.`, { align: 'center' });
 
-    // Tambahkan badge jika ada
-    if (assessmentData.badge) {
+    // Tambahkan badge jika tersedia
+    if (scoreData.badge) {
       doc.moveDown(2);
-      doc.fontSize(14).text(`Awarded Badge: ${assessmentData.badge}`, { align: "center" });
+      doc
+        .fontSize(14)
+        .font('Helvetica-Bold')
+        .text(`Awarded Badge: ${scoreData.badge}`, { align: 'center' });
     }
 
-    // Tambahkan QR code ke PDF
-    doc.moveDown(2);
-    doc.text("Scan the QR code to verify this certificate:", { align: "center" });
-    doc.moveDown(1);
-    const imageBuffer = Buffer.from(assessmentData.qrCodeData.split(",")[1], "base64"); // Konversi Base64 ke Buffer
-    doc.image(imageBuffer, doc.page.width / 2 - 50, doc.y, { fit: [100, 100] });
+    // Tambahkan QR code jika tersedia
+    if (scoreData.qrCodeData) {
+      doc.moveDown(2);
+      doc
+        .fontSize(12)
+        .font('Helvetica')
+        .text('Scan the QR code to verify this certificate:', {
+          align: 'center',
+        });
+      const imageBuffer = Buffer.from(
+        scoreData.qrCodeData.split(',')[1],
+        'base64',
+      ); // Konversi Base64 ke Buffer
+      doc.moveDown(1).image(imageBuffer, doc.page.width / 2 - 50, doc.y, {
+        fit: [100, 100],
+      });
+    }
 
+    // Tambahkan footer
+    doc.moveDown(7);
+    doc
+      .fontSize(10)
+      .font('Helvetica-Oblique')
+      .text(`Generated on: ${new Date().toLocaleDateString('id-ID')}`, {
+        align: 'center',
+      });
+
+    // Akhiri PDF
     doc.end();
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ message: "Error generating PDF", error });
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ message: 'Error generating PDF', error });
   }
 };
