@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
         router.push('/auth');
       } else if (requiredRole && role !== requiredRole) {
         router.push('/');
-        toast.error('Access denied. Only'+' '+ requiredRole +'s can view this page.');
+        toast.error('Access denied. Only'+' '+ requiredRole +`'s can view this page.`);
       }
     }
   }, [isAuthenticated, role, router, requiredRole, isClient]);
