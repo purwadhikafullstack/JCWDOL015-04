@@ -47,7 +47,6 @@ export const createReview = async (
   payload: CreateReviewPayload,
 ): Promise<IReview> => {
   const token = await getToken();
-  console.log('Token:', token);
 
   const response = await fetch(`${base_url}/review/create`, {
     method: 'POST',
