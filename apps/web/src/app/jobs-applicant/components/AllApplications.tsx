@@ -30,6 +30,7 @@ type Applicant = {
   email: string;
   resume?: string;
   phone: string;
+  correctAnswers: number;
 };
 
 type AllApplicationsProps = {
@@ -105,81 +106,85 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
         All Applications ({applicants.length})
       </Typography>
       {applicants.map((applicant) => (
-        <div key={applicant.id} className="border-b border-gray-300 py-4">
-          <div className="flex items-center mb-3">
-            <Image
-              src={
-                applicant.photoUrl ||
-                'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
-              }
-              width={64}
-              height={64}
-              alt={`${applicant.name}'s photo`}
-              className="w-16 h-16 rounded-full object-cover mr-4"
-            />
-            <div>
-              <Typography className="font-semibold text-gray-800 text-sm flex items-center">
-                {applicant.name}
-                {/* Render BadgeSystem untuk setiap applicant */}
-                <BadgeSystem userId={applicant.user_id} />
-              </Typography>
-              <Typography className="text-xs text-gray-500">
-                {applicant.position}
-              </Typography>
-            </div>
-          </div>
-          <div className="text-center mb-2">
-            <Typography className="text-xs text-gray-600">
-              {applicant.experience} Experience
-            </Typography>
-            <Typography className="text-xs text-gray-600">
-              Education: {applicant.education}
-            </Typography>
-            <Typography className="text-xs text-gray-600">
-              Email: {applicant.email}
-            </Typography>
-            <Typography className="text-xs text-gray-600">
-              Phone: {applicant.phone}
-            </Typography>
-            <Typography className="text-xs text-gray-600">
-              Applied: {formatDate(applicant.dateApplied)}
-            </Typography>
-          </div>
+  <div key={applicant.id} className="border-b border-gray-300 py-4">
+    <div className="flex items-center mb-3">
+      <Image
+        src={
+          applicant.photoUrl ||
+          'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
+        }
+        width={64}
+        height={64}
+        alt={`${applicant.name}'s photo`}
+        className="w-16 h-16 rounded-full object-cover mr-4"
+      />
+      <div>
+        <Typography className="font-semibold text-gray-800 text-sm flex items-center">
+          {applicant.name}
+          {/* Render BadgeSystem untuk setiap applicant */}
+          <BadgeSystem userId={applicant.user_id} />
+        </Typography>
+        <Typography className="text-xs text-gray-500">
+          {applicant.position}
+        </Typography>
+      </div>
+    </div>
+    <div className="text-center mb-2">
+      <Typography className="text-xs text-gray-600">
+        {applicant.experience || 'No Experience Listed'} Experience
+      </Typography>
+      <Typography className="text-xs text-gray-600">
+        Education: {applicant.education || 'No Education Listed'}
+      </Typography>
+      <Typography className="text-xs text-gray-600">
+        Email: {applicant.email || 'No Email Provided'}
+      </Typography>
+      <Typography className="text-xs text-gray-600">
+        Phone: {applicant.phone || 'No Phone Provided'}
+      </Typography>
+      <Typography className="text-xs text-gray-600">
+        Applied: {formatDate(applicant.dateApplied)}
+      </Typography>
+      <Typography className="text-xs text-gray-800 font-semibold">
+        Correct Answers: {applicant.correctAnswers}
+      </Typography>
+    </div>
 
-          {applicant.resume && (
-            <div className="text-center">
-              <Typography className="text-xs text-blue-600">
-                <a
-                  href={applicant.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Resume
-                </a>
-              </Typography>
-            </div>
-          )}
+    {applicant.resume && (
+      <div className="text-center">
+        <Typography className="text-xs text-blue-600">
+          <a
+            href={applicant.resume}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Resume
+          </a>
+        </Typography>
+      </div>
+    )}
 
-          <div className="flex justify-between items-center mt-2">
-            <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={applicant.status}
-                label="Status"
-                onChange={(e) =>
-                  handleStatusChange(applicant.id, e.target.value as string)
-                }
-              >
-                <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="under_review">Under Review</MenuItem>
-                <MenuItem value="interview">Interview</MenuItem>
-                <MenuItem value="rejected">Rejected</MenuItem>
-                <MenuItem value="hired">Hired</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </div>
-      ))}
+    <div className="flex justify-between items-center mt-2">
+      <FormControl fullWidth>
+        <InputLabel>Status</InputLabel>
+        <Select
+          value={applicant.status}
+          label="Status"
+          onChange={(e) =>
+            handleStatusChange(applicant.id, e.target.value as string)
+          }
+        >
+          <MenuItem value="pending">Pending</MenuItem>
+          <MenuItem value="under_review">Under Review</MenuItem>
+          <MenuItem value="interview">Interview</MenuItem>
+          <MenuItem value="rejected">Rejected</MenuItem>
+          <MenuItem value="hired">Hired</MenuItem>
+        </Select>
+      </FormControl>
+    </div>
+  </div>
+))}
+
     </Paper>
   );
 };

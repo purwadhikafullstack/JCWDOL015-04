@@ -16,11 +16,10 @@ type InterviewSchedule = {
 
 type InterviewSchedulesProps = {
   schedules: InterviewSchedule[];
-  onEdit: (schedule: InterviewSchedule) => void;
   onDelete: (id: number) => void;
 };
 
-const InterviewSchedules: React.FC<InterviewSchedulesProps> = ({ schedules, onEdit, onDelete }) => {
+const InterviewSchedules: React.FC<InterviewSchedulesProps> = ({ schedules, onDelete }) => {
   return (
     <Paper className="p-4 shadow-lg rounded-lg">
       <Typography variant="h6" className="font-semibold mb-4">
@@ -50,23 +49,15 @@ const InterviewSchedules: React.FC<InterviewSchedulesProps> = ({ schedules, onEd
                   </div>
                 </TableCell>
                 <TableCell>{schedule.date}</TableCell>
-                <TableCell>{schedule.time}</TableCell>
+                <TableCell>{new Date(schedule.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</TableCell>
                 <TableCell>
-                  <Button
-                    size="small"
-                    className="text-blue-600 hover:text-blue-800 text-xs mx-1"
-                    startIcon={<Edit />}
-                    onClick={() => onEdit(schedule)}
-                  >
-                    Accept
-                  </Button>
                   <Button
                     size="small"
                     className="text-red-600 hover:text-red-800 text-xs mx-1"
                     startIcon={<Delete />}
                     onClick={() => onDelete(schedule.id)}
                   >
-                    Reject
+                    Delete Schedule
                   </Button>
                 </TableCell>
               </TableRow>

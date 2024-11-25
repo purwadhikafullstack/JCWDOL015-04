@@ -51,6 +51,12 @@ export class ApplicationRouter {
     this.router.get('/user/:userId/recent', verifyToken, this.applicationController.getRecentlyAppliedJobs);
     this.router.get('/job/:jobId', this.applicationController.getApplicationsByJobId);
     this.router.get('/interview-applicants/:companyId', this.applicationController.getInterviewApplicantsByCompany);
+    this.router.get('/interview-schedules/:companyId',this.applicationController.getInterviewSchedules);
+    this.router.delete(
+      '/interview-schedules/:scheduleId',
+      this.applicationController.deleteInterviewSchedule,
+    );
+    
     this.router.patch('/:applicationId/interview-schedule', this.applicationController.updateInterviewSchedule);
 
   }

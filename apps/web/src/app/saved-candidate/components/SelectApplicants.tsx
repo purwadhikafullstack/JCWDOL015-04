@@ -75,7 +75,7 @@ const SelectApplicants: React.FC<SelectApplicantsProps> = ({ companyId }) => {
       alert('Please fill all fields before scheduling.');
       return;
     }
-  
+
     try {
       const interviewDateTime = new Date(`${interviewDate}T${interviewTime}:00`).toISOString();
   

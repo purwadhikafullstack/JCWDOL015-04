@@ -33,11 +33,11 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
           setUserName(`${first_name} ${last_name}`);
           setUserId(user_id);
 
-          const [appliedCount, favoriteCount, recentJobs, badges] = await Promise.all([
+          const [appliedCount, favoriteCount, recentJobs] = await Promise.all([
             fetchAppliedJobCount(user_id),
             fetchFavoriteJobCount(user_id),
             fetchRecentlyAppliedJobs(user_id),
-            fetchUserBadgesById(user_id), // Panggil API badge baru
+            // fetchUserBadgesById(user_id), // Panggil API badge baru
           ]);
 
           setAppliedJobCount(appliedCount);
@@ -45,7 +45,7 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
           setRecentlyAppliedJobs(recentJobs.slice(0, 5));
 
           // Jika terdapat badge, set state `hasBadge` ke true
-          setHasBadge(badges.length > 0);
+          // setHasBadge(badges.length > 0);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
