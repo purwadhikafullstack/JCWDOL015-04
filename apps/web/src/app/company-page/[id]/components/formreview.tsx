@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 interface ReviewFormProps {
   onSubmit: (review: string, position: string, minSalary: number, maxSalary: number, ratings: Ratings) => void;
+  onCancel: () => void; // Tambahkan prop untuk handleCancel
 }
 
 interface Ratings {
@@ -11,7 +12,7 @@ interface Ratings {
   careerOpportunities: number;
 }
 
-const AnonymousReviewForm: React.FC<ReviewFormProps> = ({ onSubmit }) => {
+const AnonymousReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, onCancel }) => {
   const [review, setReview] = useState('');
   const [position, setPosition] = useState('');
   const [minSalary, setMinSalary] = useState<number>(0);
@@ -105,12 +106,21 @@ const AnonymousReviewForm: React.FC<ReviewFormProps> = ({ onSubmit }) => {
         </div>
       ))}
 
-      <button
-        type="submit"
-        className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Submit Review
-      </button>
+      <div className="flex justify-end gap-4">
+        <button
+          type="button"
+          onClick={onCancel} // Panggil fungsi onCancel saat tombol Cancel diklik
+          className="py-2 px-4 bg-gray-400 text-white rounded-md hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Submit Review
+        </button>
+      </div>
     </form>
   );
 };

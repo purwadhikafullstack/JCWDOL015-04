@@ -27,7 +27,7 @@ const AverageRating: React.FC<AverageRatingProps> = ({ averageRating, totalRevie
   };
 
   return (
-    <div className="p-4 bg-blue-100 rounded-md shadow-md text-center">
+    <div className="p-4 bg-white rounded-md shadow-lg text-center">
       <h2 className="text-xl font-semibold mb-2">Rata-rata Rating Perusahaan</h2>
       <div className="flex justify-center items-center space-x-2">
         {renderStars(averageRating)}

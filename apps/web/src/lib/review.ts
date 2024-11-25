@@ -47,6 +47,7 @@ export const createReview = async (
   payload: CreateReviewPayload,
 ): Promise<IReview> => {
   const token = await getToken();
+
   const response = await fetch(`${base_url}/review/create`, {
     method: 'POST',
     headers: {
@@ -66,22 +67,3 @@ export const createReview = async (
   return responseData.review; // Return data review
 };
 
-export const updateReview = async (
-  payload: UpdateReviewPayload,
-): Promise<IReview> => {
-  const token = await getToken();
-  const response = await fetch(`${base_url}/review/update`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    throw new Error('Error updating review');
-  }
-
-  return response.json();
-};

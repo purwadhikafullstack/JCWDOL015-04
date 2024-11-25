@@ -11,6 +11,7 @@ import BadgeSystem from '@/components/badgesystem';
 import { RecentlyAppliedJob } from '@/types/job';
 import moment from 'moment';
 import Image from 'next/image';
+import { getStatusLabel } from '@/utils/format';
 
 interface OverviewTabProps {
   setSelectedTab: (tab: string) => void;
@@ -21,8 +22,19 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [appliedJobCount, setAppliedJobCount] = useState<number>(0);
   const [favoriteJobCount, setFavoriteJobCount] = useState<number>(0);
-  const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<RecentlyAppliedJob[]>([]);
+  const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<
+    RecentlyAppliedJob[]
+  >([]);
   const [hasBadge, setHasBadge] = useState<boolean>(false); // State untuk verifikasi badge
+
+  const fetchUserBadges = async (user_id: string) => {
+    try {
+      const badges = await fetchUserBadgesById(user_id);
+      setHasBadge(badges.length > 0); // Set state `hasBadge`
+    } catch (error) {
+      console.error('Failed to fetch user badges:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,19 +45,19 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
           setUserName(`${first_name} ${last_name}`);
           setUserId(user_id);
 
+          // Panggil API untuk applied job count, favorite job count, dan recently applied jobs
           const [appliedCount, favoriteCount, recentJobs] = await Promise.all([
             fetchAppliedJobCount(user_id),
             fetchFavoriteJobCount(user_id),
             fetchRecentlyAppliedJobs(user_id),
-            // fetchUserBadgesById(user_id), // Panggil API badge baru
           ]);
 
           setAppliedJobCount(appliedCount);
           setFavoriteJobCount(favoriteCount);
           setRecentlyAppliedJobs(recentJobs.slice(0, 5));
 
-          // Jika terdapat badge, set state `hasBadge` ke true
-          // setHasBadge(badges.length > 0);
+          // Panggil fungsi fetchUserBadges setelah user_id diatur
+          fetchUserBadges(user_id);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -157,21 +169,21 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
                           job.status === 'active'
                             ? 'badge-success'
                             : job.status === 'under_review'
-                            ? 'badge-warning'
-                            : job.status === 'interview'
-                            ? 'badge-warning'
-                            : job.status === 'pending'
-                            ? 'badge-warning'
-                            : job.status === 'accepted'
-                            ? 'badge-warning'
-                            : job.status === 'rejected'
-                            ? 'badge-error'
-                            : job.status === 'hired'
-                            ? 'badge-primary'
-                            : 'badge-neutral'
+                              ? 'badge-warning'
+                              : job.status === 'interview'
+                                ? 'badge-warning'
+                                : job.status === 'pending'
+                                  ? 'badge-warning'
+                                  : job.status === 'accepted'
+                                    ? 'badge-warning'
+                                    : job.status === 'rejected'
+                                      ? 'badge-error'
+                                      : job.status === 'hired'
+                                        ? 'badge-primary'
+                                        : 'badge-neutral'
                         }`}
                       >
-                        {job.status}
+                        {getStatusLabel(job.status)}
                       </span>
                     </td>
                   </tr>
