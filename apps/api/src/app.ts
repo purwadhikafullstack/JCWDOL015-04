@@ -37,7 +37,7 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors({ origin: `http://localhost:3000`, credentials: true }));
+    this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
     this.app.use('/api/public', express.static('public'));
