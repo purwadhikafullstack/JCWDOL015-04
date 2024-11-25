@@ -1,0 +1,51 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Application Status Update</title>
+    <style>
+      body { font-family: 'Arial', sans-serif; background-color: #f7f8fa;
+      margin: 0; padding: 0; display: flex; justify-content: center;
+      align-items: center; height: 100vh; } .email-container { background-color:
+      #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 500px; padding: 20px; text-align: center; } h2 { color:
+      #2d3748; font-size: 24px; margin-bottom: 16px; } p { color: #4a5568;
+      font-size: 16px; margin-bottom: 24px; } a { text-decoration: none; } .btn
+      { background-color: #007bff; color: #ffffff; padding: 14px 28px;
+      border-radius: 30px; font-size: 18px; font-weight: 600; display:
+      inline-block; text-align: center; text-decoration: none; transition:
+      background-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px
+      rgba(0, 123, 255, 0.4); border: none; cursor: pointer; } .btn:hover {
+      background-color: #0056b3; } .footer { margin-top: 40px; font-size: 12px;
+      color: #a0aec0; }
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <h2>Application Status Update</h2>
+      <p>Hello {{name}},</p>
+      <p>Your application for the position of
+        <strong>{{jobTitle}}</strong>
+        at
+        <strong>{{companyName}}</strong>
+        has changed status from
+        <strong>{{currentStatus}}</strong>
+        to
+        <strong>{{newStatus}}</strong>.</p>
+      <p>Log in to view more details about your application.</p>
+      <a href='{{loginLink}}' target='_blank' class='btn'>Log In to Your Account</a>
+
+      <div class='footer'>
+        <p>Thank you for choosing HireMe. We wish you the best of luck with your
+          application!</p>
+        <p>If you need assistance, feel free to reply to this email or visit our
+          <a
+            href='{{base_fe_url}}/Contact-center'
+            style='color: #007bff; text-decoration: none;'
+          >Contact Center</a>.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
