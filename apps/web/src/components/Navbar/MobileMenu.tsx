@@ -49,16 +49,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 <button className="hover:text-Primary-blue">Profile</button>
               </Link>
             )}
-            {userRole === UserRole.Developer && (
-              <Link href="/dashboard-developer">
-                <button className="hover:text-Primary-blue">Profile</button>
-              </Link>
-            )}
-            {userRole === UserRole.Developer && (
-              <Link href="/assessments">
-                <button className="hover:text-Primary-blue">Assessments</button>
-              </Link>
-            )}
             <button
               onClick={onLogout}
               className="bg-red-500 text-white w-full py-2 rounded-md hover:bg-red-600"
