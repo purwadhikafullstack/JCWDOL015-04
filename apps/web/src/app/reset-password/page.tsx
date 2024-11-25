@@ -54,7 +54,7 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
       <div className="max-w-md w-full text-center m-6 mt-[-80px] lg:mt-[-280px] md:mt-[-280px]">
         <h2 className="text-3xl font-semibold mb-4">Reset Password</h2>
         <p className="text-gray-600 mb-8">

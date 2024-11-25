@@ -86,6 +86,29 @@ const CompanyPage = () => {
             </div>
           </div>
 
+           {/* Company Details Section */}
+           <div className="flex flex-col lg:flex-row gap-8 mt-6">
+            <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-6">
+              <h2 className="text-lg font-bold">About Us</h2>
+              {/* Render company.aboutUs as HTML */}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: company.aboutUs || 'No description available.',
+                }}
+              />
+            </div>
+
+            {/* Sidebar with Company Information */}
+            <div className="w-full lg:w-1/3 space-y-6">
+              <div className="bg-white shadow-lg rounded-lg p-4">
+                <h2 className="text-lg font-bold">Company Details</h2>
+                <div className="mt-4">
+                  <CompanyOverview company={company} />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Job Listings Section */}
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Job Listings</h2>

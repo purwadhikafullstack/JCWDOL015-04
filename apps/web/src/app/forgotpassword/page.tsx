@@ -39,7 +39,7 @@ const ForgetPassword = () => {
 
   return (
     <div className="min-h-screen flex bg-white">
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
       <div className="w-full lg:w-1/2 bg-white py-16 lg:py-28 px-6 sm:px-12 flex flex-col justify-center relative">
         <div className="max-w-md mx-auto m-6 lg:mt-[-250px] md:mt-[-120px]">
           <h2 className="text-3xl pb-3 font-semibold">Forget Password</h2>

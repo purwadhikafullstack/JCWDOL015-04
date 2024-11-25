@@ -12,7 +12,7 @@ type Location = { latitude: number; longitude: number } | null;
 export default function JobListingsPage() {
   const [jobs, setJobs] = useState<JobCardProps[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 9; // Changed to limit to 9 cards per page
+  const jobsPerPage = 9;
   const [sortOrder, setSortOrder] = useState('latest');
   const [locationAccessDenied, setLocationAccessDenied] = useState(false);
   const [location, setLocation] = useState<Location>(null);
