@@ -25,13 +25,15 @@ const PreSelectionTest = ({ params }: { params: { id: string } }) => {
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: number }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<number | null>(null);
+  const [testId, setTestId] = useState<number | null>(null);
+
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const response = await getUserInfo();
         if (response.ok && response.user) {
-          setUserId(response.user.user_id); 
+          setUserId(response.user.user_id);
         } else {
           console.error('Gagal mendapatkan informasi pengguna');
           alert('Anda harus login untuk mengakses halaman ini.');
@@ -47,48 +49,67 @@ const PreSelectionTest = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     if (!jobId || !userId) return;
-
+  
     const fetchQuestions = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${base_url}/preselection/1`);
+        const response = await fetch(`${base_url}/preselection/get-questions/${jobId}`);
         const data = await response.json();
-
-        if (response.ok && data.test && data.test.questions) {
-          setQuestions(data.test.questions);
+  
+        if (response.ok && data.questions && data.testId) {
+          setTestId(data.testId);
+  
+          const parsedQuestions = data.questions.map((q: any) => ({
+            question_id: q.questionId,
+            question_text: q.questionText,
+            options: q.options.map((o: any) => ({
+              option_id: o.optionId,
+              option_text: o.text,
+            })),
+          }));
+  
+          setQuestions(parsedQuestions);
         } else {
           console.error('Invalid data format:', data);
           setQuestions([]);
         }
       } catch (error) {
         console.error('Error fetching questions:', error);
+        setQuestions([]);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchQuestions();
   }, [jobId, userId]);
+  
 
   const handleAnswerChange = (questionId: number, optionId: number) => {
     setUserAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [questionId]: optionId,
+      [questionId]: optionId, 
     }));
   };
+  
+  
+  
 
   const handleSubmit = async () => {
-    if (!userId) {
-      alert('User tidak ditemukan. Silakan login kembali.');
+    if (!userId || !testId) {
+      alert('User atau test ID tidak ditemukan.');
       return;
     }
-
+  
+    const answers = Object.entries(userAnswers).map(([questionId, selectedOption]) => {
+      const validOption = selectedOption % 4 || 4; 
+      return {
+        questionId: parseInt(questionId, 10),
+        selectedOption: validOption,
+      };
+    });
+  
     try {
-      const answers = Object.entries(userAnswers).map(([questionId, optionId]) => ({
-        questionId: parseInt(questionId),
-        selectedOptionId: optionId,
-      }));
-
       const response = await fetch(`${base_url}/preselection/save-answer`, {
         method: 'POST',
         headers: {
@@ -96,35 +117,37 @@ const PreSelectionTest = ({ params }: { params: { id: string } }) => {
         },
         body: JSON.stringify({
           userId,
-          testId: jobId,
+          testId: testId, 
           answers,
         }),
       });
-
       if (response.ok) {
-        alert('Test submitted successfully! Mohon tunggu pemberitahuan selanjutnya.');
+        alert('Test submitted successfully!');
       } else {
-        alert('Failed to submit test');
+        const errorData = await response.json();
+        console.error('Failed to submit test:', errorData);
+        alert(errorData.msg || 'Failed to submit test');
       }
     } catch (error) {
-      console.error('Error submitting test:', error);
-      alert('Error submitting test');
+      console.error('Error submitting answers:', error);
+      alert('Something went wrong, please try again.');
     }
   };
-
-  if (!jobId) {
-    return (
-      <Container maxWidth="md" className="bg-white p-6 rounded-lg shadow-md my-8 text-center">
-        <Typography variant="h6">Job ID tidak ditemukan. Silakan periksa URL Anda.</Typography>
-      </Container>
-    );
-  }
+   
 
   if (loading) {
     return (
       <Container maxWidth="md" className="bg-white p-6 rounded-lg shadow-md my-8 text-center">
         <CircularProgress />
         <Typography variant="h6">Loading questions...</Typography>
+      </Container>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <Container maxWidth="md" className="bg-white p-6 rounded-lg shadow-md my-8 text-center">
+        <Typography variant="h6">No questions available for this test.</Typography>
       </Container>
     );
   }

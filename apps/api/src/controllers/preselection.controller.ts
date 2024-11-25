@@ -105,41 +105,56 @@ export class PreSelectionTestController {
 
   async saveTestAnswer(req: Request, res: Response) {
     try {
-      const { userId, testId, questionId, selectedOption } = req.body;
-
-      if (!userId || !testId || !questionId || selectedOption == null) {
+      const { userId, testId, answers } = req.body;
+  
+      if (!userId || !testId || !Array.isArray(answers) || answers.length === 0) {
         return res.status(400).json({ msg: 'All fields are required' });
       }
-
-      const question = await prisma.testQuestion.findUnique({
-        where: { question_id: questionId },
-        include: { options: true },
-      });
-
-      if (!question) {
-        return res.status(404).json({ msg: 'Question not found' });
+  
+      const savedAnswers = [];
+  
+      for (const answer of answers) {
+        const { questionId, selectedOption } = answer;
+  
+        if (!questionId || selectedOption == null) {
+          return res
+            .status(400)
+            .json({ msg: 'Each answer must include questionId and selectedOption' });
+        }
+  
+        const question = await prisma.testQuestion.findUnique({
+          where: { question_id: questionId },
+          include: { options: true },
+        });
+  
+        if (!question) {
+          return res.status(404).json({ msg: `Question not found: ${questionId}` });
+        }
+  
+        const isCorrect = question.correct_answer === selectedOption;
+  
+        const testAnswer = await prisma.testAnswer.create({
+          data: {
+            user_id: userId,
+            test_id: testId,
+            question_id: questionId,
+            selected_option: selectedOption,
+            is_correct: isCorrect,
+          },
+        });
+  
+        savedAnswers.push(testAnswer);
       }
-
-      const isCorrect = question.correct_answer === selectedOption;
-
-      const testAnswer = await prisma.testAnswer.create({
-        data: {
-          user_id: userId,
-          test_id: testId,
-          question_id: questionId,
-          selected_option: selectedOption,
-          is_correct: isCorrect,
-        },
-      });
-
+  
       res
         .status(201)
-        .json({ msg: 'Answer saved successfully!', answer: testAnswer });
+        .json({ msg: 'Answers saved successfully!', answers: savedAnswers });
     } catch (error) {
-      console.error('Error saving test answer:', error);
-      res.status(500).json({ msg: 'Failed to save answer' });
+      console.error('Error saving test answers:', error);
+      res.status(500).json({ msg: 'Failed to save answers' });
     }
   }
+  
 
   async getQuestionsByJobId(req: Request, res: Response) {
     try {

@@ -1,7 +1,6 @@
-// pages/SchedulePage.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Typography,
   Dialog,
@@ -16,6 +15,8 @@ import {
 import SelectApplicants from './components/SelectApplicants';
 import InterviewSchedules from './components/InterviewSchedules';
 import MyCompanyJobSideBar from '@/components/MyCompanyJobSideBar';
+import Cookies from 'js-cookie';
+import base_url from '@/lib/user';
 
 type Applicant = {
   id: number;
@@ -34,17 +35,64 @@ type InterviewSchedule = {
 };
 
 const SchedulePage: React.FC = () => {
-  const [applicants] = useState<Applicant[]>([
-    { id: 1, name: 'Ronald Richards', position: 'UI/UX Designer', experience: '7 Years', education: 'Master Degree' },
-    { id: 2, name: 'Theresa Webb', position: 'Product Designer', experience: '5 Years', education: 'Bachelor Degree' },
-  ]);
-
+  const [companyId, setCompanyId] = useState<number | null>(null);
+  const [company, setCompany] = useState<{ name: string } | null>(null);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [schedules, setSchedules] = useState<InterviewSchedule[]>([]);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const companyId = 29;
+
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      try {
+        const response = await fetch(`${base_url}/companies/user`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        });
+        const data = await response.json();
+
+        if (response.ok && data.company) {
+          setCompanyId(data.company.company_id); // Simpan company_id
+          setCompany({ name: data.company.company_name }); // Simpan nama perusahaan
+        } else {
+          throw new Error('Failed to fetch company data');
+        }
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+      }
+    };
+
+    fetchCompanyData();
+  }, []);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const response = await fetch(`${base_url}/applications/interview-schedules/${companyId}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        });
+        const data = await response.json();
+  
+        if (response.ok && data.schedules) {
+          setSchedules(data.schedules); 
+        } else {
+          throw new Error('Failed to fetch interview schedules');
+        }
+      } catch (error) {
+        console.error('Error fetching interview schedules:', error);
+      }
+    };
+  
+    if (companyId) {
+      fetchSchedules();
+    }
+  }, [companyId]);
+  
 
   const handleOpenDialog = (applicant: Applicant) => {
     setSelectedApplicant(applicant);
@@ -71,24 +119,48 @@ const SchedulePage: React.FC = () => {
     }
   };
 
-  const handleDeleteSchedule = (id: number) => {
-    setSchedules(schedules.filter(schedule => schedule.id !== id));
+  const handleDeleteSchedule = async (id: number) => {
+    try {
+      const response = await fetch(`${base_url}/applications/interview-schedules/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token')}`,
+        },
+      });
+  
+      if (response.ok) {
+        setSchedules(schedules.filter((schedule) => schedule.id !== id)); // Perbarui state
+      } else {
+        throw new Error('Failed to delete schedule');
+      }
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+    }
   };
+
+  if (!companyId) {
+    return (
+      <Box className="flex justify-center items-center h-screen">
+        <Typography variant="h6" className="text-gray-600">
+          Loading company information...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex justify-center bg-gray-100 min-h-screen p-6 space-x-6">
       <MyCompanyJobSideBar />
-      
+
       <Paper elevation={3} className="w-full max-w-5xl p-6 rounded-lg shadow-lg space-y-6 bg-white">
         <Typography variant="h4" className="font-semibold text-center text-blue-800">
-          Interview Schedule Management
+          {company ? `Interview Schedule for ${company.name}` : 'Interview Schedule Management'}
         </Typography>
 
-        <SelectApplicants companyId={companyId}/>
-        <InterviewSchedules 
-          schedules={schedules} 
-          onEdit={(schedule) => handleOpenDialog(applicants.find(app => app.id === schedule.applicantId)!)} 
-          onDelete={handleDeleteSchedule} 
+        <SelectApplicants companyId={companyId} />
+        <InterviewSchedules
+          schedules={schedules}
+          onDelete={handleDeleteSchedule}
         />
 
         <Dialog open={isDialogOpen} onClose={handleCloseDialog}>

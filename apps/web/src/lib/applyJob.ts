@@ -113,3 +113,18 @@ export const fetchRecentlyAppliedJobs = async (
   const data = await res.json();
   return (data.applications as RecentlyAppliedJob[]) || [];
 };
+
+export const checkPreSelectionTest = async (jobId: number) => {
+  try {
+    const response = await fetch(`${base_url}/preselection/check-test/${jobId}`);
+    const data = await response.json();
+
+    if (response.ok && data.hasTest) {
+      return true; 
+    }
+    return false; 
+  } catch (error) {
+    console.error('Error checking pre-selection test:', error);
+    return false;
+  }
+};
