@@ -82,18 +82,32 @@ export class AssessmentController {
     }
   }
 
-  public async deleteAssessment(req: Request, res: Response): Promise<void> {
+  public async deleteAssessment(req: Request, res: Response) {
     try {
       const { assessment_id } = req.params;
 
+      // Pastikan `assessment_id` adalah angka
+      const id = parseInt(assessment_id, 10);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: 'Invalid assessment ID' });
+      }
+
+      // Hapus data dari tabel SkillAssessment (cascade deletion berlaku)
       await this.prisma.skillAssessment.delete({
-        where: { assessment_id: parseInt(assessment_id, 10) },
+        where: { assessment_id: id },
       });
 
       res.status(200).json({ message: 'Assessment deleted successfully' });
     } catch (error) {
-      console.error('Error deleting assessment:', error);
-      res.status(500).json({ message: 'Internal server error', error });
+      if (error instanceof Error) {
+        console.error('Error deleting assessment:', error.message); // Mengakses pesan error
+        res
+          .status(500)
+          .json({ message: "This assessment has been applied by a customer and cannot be deleted at this time.", error: error.message });
+      } else {
+        console.error('Unexpected error:', error);
+        res.status(500).json({ message: 'Unexpected error occurred' });
+      }
     }
   }
 
@@ -314,13 +328,10 @@ export class AssessmentController {
       });
     }
   }
-  public async getUserBadgesById(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  public async getUserBadgesById(req: Request, res: Response): Promise<void> {
     try {
       const { user_id } = req.params; // Ambil user_id dari parameter URL
-  
+
       if (!user_id) {
         res.status(400).json({ message: 'Bad Request. User ID is required.' });
         return;

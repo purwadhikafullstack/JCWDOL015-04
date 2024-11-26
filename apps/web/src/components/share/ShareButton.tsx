@@ -51,7 +51,6 @@ export default function ShareButton({ id }: { id: number }): JSX.Element {
       {isTextareaVisible && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={closeModal}
         >
           <div className="bg-white p-4 rounded-md shadow-md w-1/2">
             <button
