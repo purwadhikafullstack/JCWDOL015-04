@@ -94,7 +94,6 @@ export class UserController {
         company: newCompany,
       });
     } catch (err) {
-      console.error('Error during registration:', err);
       res.status(400).json({
         status: 'error',
         msg: 'An error occurred during user registration.',
@@ -155,7 +154,6 @@ export class UserController {
         user,
       });
     } catch (err) {
-      console.error(err);
       res.status(400).send({
         status: 'error',
         msg: err,
@@ -190,7 +188,6 @@ export class UserController {
         user,
       });
     } catch (err) {
-      console.error('Error fetching user:', err);
       res.status(500).send({
         status: 'error',
         msg: 'Internal server error',
@@ -246,7 +243,6 @@ export class UserController {
         msg: 'Account successfully verified!',
       });
     } catch (err) {
-      console.error('Verification Error:', err);
       res.status(400).send({
         status: 'error',
         msg: 'Invalid or expired verification token',
@@ -386,7 +382,6 @@ export class UserController {
         user: updatedUser,
       });
     } catch (err) {
-      console.error('Update Error:', err);
       res.status(400).send({
         status: 'error',
         msg: 'An error occurred while updating user information',
@@ -446,7 +441,6 @@ export class UserController {
         msg: 'Verification link resent successfully!',
       });
     } catch (err) {
-      console.error('Resend Verification Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred while resending verification link.',
@@ -501,7 +495,6 @@ export class UserController {
 
       res.status(200).json({ status: 'ok', msg: 'Password reset link sent!' });
     } catch (err) {
-      console.error('Password Reset Request Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred during password reset request.',
@@ -542,7 +535,6 @@ export class UserController {
         .status(200)
         .json({ status: 'ok', msg: 'Password has been reset successfully!' });
     } catch (err) {
-      console.error('Password Reset Error:', err);
       res
         .status(400)
         .json({ status: 'error', msg: 'Invalid or expired token' });
@@ -581,7 +573,6 @@ export class UserController {
         user,
       });
     } catch (error) {
-      console.error('Error in social login:', error);
       res.status(500).json({
         status: 'error',
         msg: 'Internal server error during social login',
@@ -621,7 +612,6 @@ export class UserController {
         msg: 'Account deleted successfully!',
       });
     } catch (err) {
-      console.error('Delete Account Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'Failed to delete account. Please try again.',
@@ -658,7 +648,6 @@ export class UserController {
         data: subscriptions,
       });
     } catch (error: any) {
-      console.error('Error fetching subscriptions:', error);
       res.status(500).json({
         status: 'error',
         msg: 'Failed to fetch subscriptions',
@@ -680,7 +669,6 @@ export class UserController {
         data: payments,
       });
     } catch (error: any) {
-      console.error('Error fetching payments:', error);
       res.status(500).json({
         status: 'error',
         msg: 'Failed to fetch payments',

@@ -53,7 +53,6 @@ export const getCompanyById = async (
     const result = await res.json();
     return { company: result.company, ok: true };
   } catch (error) {
-    console.error('Error fetching company:', error);
     return { company: null, ok: false };
   }
 };
@@ -66,7 +65,6 @@ export const getJobsByCompanyId = async (
     const result = await res.json();
     return { jobs: result.jobs, ok: res.ok };
   } catch (error) {
-    console.error('Error fetching jobs for company:', error);
     return { jobs: [], ok: false };
   }
 };
@@ -97,7 +95,6 @@ export const fetchUserCompany = async (): Promise<{ company: Company | null; use
 
     return { company, user, ok: true };
   } catch (error) {
-    console.error('Error:', error);
     return { company: null, user: null, ok: false };
   }
 };
@@ -119,7 +116,6 @@ export const updateCompany = async (companyId: string, data: FormData): Promise<
     const result = await res.json();
     return { company: result.company, ok: true };
   } catch (error) {
-    console.error('Error updating company:', error);
     return { company: null, ok: false };
   }
 };

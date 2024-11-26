@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 interface DecodedToken {
   user_id: number;
   assessment_id: number;
-  role: string; // Pastikan role ditambahkan ke token
+  role: string;
   iat: number;
   exp: number;
 }
@@ -15,7 +15,6 @@ export const verifyAssessmentToken = (
   next: NextFunction
 ) => {
   try {
-    // Ambil token dari header Authorization
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
       return res.status(401).json({ message: 'Authorization token is required' });
@@ -26,19 +25,16 @@ export const verifyAssessmentToken = (
       return res.status(401).json({ message: 'Token is missing' });
     }
 
-    // Verifikasi token
     const decoded = jwt.verify(token, process.env.SECRET_JWT!) as DecodedToken;
 
-    // Simpan user_id, role, dan assessment_id ke req untuk digunakan di controller
     req.user = {
       user_id: decoded.user_id,
-      role: decoded.role, // Tambahkan role ke req.user
+      role: decoded.role,
     };
     req.assessment_id = decoded.assessment_id;
 
     next();
   } catch (error) {
-    console.error('Error verifying token:', error);
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ message: 'Token has expired' });
     }

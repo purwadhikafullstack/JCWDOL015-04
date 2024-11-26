@@ -63,10 +63,8 @@ const JobDetail = ({ params }: { params: { id: string } }) => {
           is_active: result.job.is_active || false,
         });
       } else {
-        console.error('Job data not found');
       }
     } catch (error) {
-      console.error('Error fetching job detail:', error);
     }
   };
 
@@ -98,14 +96,12 @@ const JobDetail = ({ params }: { params: { id: string } }) => {
   
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Backend error response:", errorData);
         alert(`Failed to update job: ${errorData.msg || 'Unknown error'}`);
         return;
       }
   
       alert('Job updated successfully!');
     } catch (error) {
-      console.error('Error updating job:', error);
       alert('Failed to update job information.');
     }
   };

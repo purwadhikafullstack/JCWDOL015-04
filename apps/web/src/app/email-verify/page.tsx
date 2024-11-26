@@ -34,7 +34,6 @@ const EmailVerification = () => {
         toast.error(message || 'Failed to resend verification link.');
       }
     } catch (error: any) {
-      console.error('Error in handleVerifyClick:', error.message);
       toast.error(error.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);

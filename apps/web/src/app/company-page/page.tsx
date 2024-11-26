@@ -22,7 +22,6 @@ export default function CompanyPage() {
           ...filters,
           dateRange: sortOrder,
         };
-        console.log('Filters sent to API:', companyFilters);
 
         const data = await getFilteredCompanies(companyFilters);
 
@@ -40,7 +39,6 @@ export default function CompanyPage() {
 
         setCompanies(sortedCompanies);
       } catch (error) {
-        console.error('Error fetching companies:', error);
         setCompanies([]);
       }
     },

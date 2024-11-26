@@ -25,14 +25,13 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
   const [recentlyAppliedJobs, setRecentlyAppliedJobs] = useState<
     RecentlyAppliedJob[]
   >([]);
-  const [hasBadge, setHasBadge] = useState<boolean>(false); // State untuk verifikasi badge
+  const [hasBadge, setHasBadge] = useState<boolean>(false);
 
   const fetchUserBadges = async (user_id: string) => {
     try {
       const badges = await fetchUserBadgesById(user_id);
-      setHasBadge(badges.length > 0); // Set state `hasBadge`
+      setHasBadge(badges.length > 0);
     } catch (error) {
-      console.error('Failed to fetch user badges:', error);
     }
   };
 
@@ -45,7 +44,6 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
           setUserName(`${first_name} ${last_name}`);
           setUserId(user_id);
 
-          // Panggil API untuk applied job count, favorite job count, dan recently applied jobs
           const [appliedCount, favoriteCount, recentJobs] = await Promise.all([
             fetchAppliedJobCount(user_id),
             fetchFavoriteJobCount(user_id),
@@ -56,11 +54,9 @@ const OverviewTab = ({ setSelectedTab }: OverviewTabProps) => {
           setFavoriteJobCount(favoriteCount);
           setRecentlyAppliedJobs(recentJobs.slice(0, 5));
 
-          // Panggil fungsi fetchUserBadges setelah user_id diatur
           fetchUserBadges(user_id);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
       }
     };
 

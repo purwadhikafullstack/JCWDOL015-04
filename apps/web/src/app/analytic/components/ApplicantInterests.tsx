@@ -49,7 +49,6 @@ const ApplicantInterests: React.FC = () => {
           formattedLocations.sort((a: Location, b: Location) => b.count - a.count).slice(0, 3)
         );
       } catch (error) {
-        console.error('Error fetching applicant interests:', error);
       }
     };
 

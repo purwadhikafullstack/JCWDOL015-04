@@ -48,7 +48,6 @@ export default function JobListingsPage() {
 
         setJobs(formattedJobs || []);
       } catch (error) {
-        console.error('Error fetching jobs:', error);
         setJobs([]);
       }
     },

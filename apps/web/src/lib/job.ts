@@ -75,7 +75,6 @@ export const toggleSaveJob = async (jobId: number) => {
     const result = await res.json();
     return { result, ok: res.ok };
   } catch (error) {
-    console.error('Error in toggleSaveJob:', error);
     return { msg: 'Failed to toggle favorite job', ok: false };
   }
 };
@@ -85,7 +84,6 @@ export const fetchFavoriteJobs = async (
 ): Promise<FavoriteJob[]> => {
   const token = await getToken();
   if (!token) {
-    console.error('No token found');
     return [];
   }
 
@@ -103,11 +101,9 @@ export const fetchFavoriteJobs = async (
     if (response.ok) {
       return data.favorites as FavoriteJob[];
     } else {
-      console.error(data.msg || 'Failed to fetch favorite jobs');
       return [];
     }
   } catch (error) {
-    console.error('Error fetching favorite jobs:', error);
     return [];
   }
 };
@@ -115,7 +111,6 @@ export const fetchFavoriteJobs = async (
 export const fetchTotalJobsCount = async (userId: number) => {
   const token = await getToken(); 
   if (!token) {
-    console.error('No token found');
     return { totalJobsCount: 0, ok: false }; 
   }
 
@@ -130,7 +125,6 @@ export const fetchTotalJobsCount = async (userId: number) => {
     const result = await res.json();
     return { totalJobsCount: result.totalJobsCount, ok: res.ok };
   } catch (error) {
-    console.error('Error fetching total jobs count:', error);
     return { totalJobsCount: 0, ok: false };
   }
 };
@@ -138,7 +132,6 @@ export const fetchTotalJobsCount = async (userId: number) => {
 export const fetchRecentlyPostedJobs = async (userId: number) => {
   const token = await getToken();
   if (!token) {
-    console.error('No token found');
     return { jobs: [], ok: false };
   }
 
@@ -153,7 +146,6 @@ export const fetchRecentlyPostedJobs = async (userId: number) => {
     const result = await res.json();
     return { jobs: result.jobs, ok: res.ok };
   } catch (error) {
-    console.error('Error fetching recently posted jobs:', error);
     return { jobs: [], ok: false };
   }
 };

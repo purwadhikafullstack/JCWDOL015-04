@@ -23,7 +23,6 @@ export class FavoriteJobController {
         favorites,
       });
     } catch (error) {
-      console.error('Error fetching favorite jobs:', error);
       res.status(500).json({ msg: 'Failed to fetch favorite jobs' });
     }
   }
@@ -51,7 +50,6 @@ export class FavoriteJobController {
         return res.status(200).json({ applied: false });
       }
     } catch (error) {
-      console.error('Error checking application status:', error);
       res.status(500).json({ msg: 'Failed to check application status' });
     }
   }

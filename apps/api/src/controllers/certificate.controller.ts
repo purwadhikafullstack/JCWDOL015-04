@@ -21,13 +21,12 @@ export class CertificateController {
         return;
       }
 
-      // Cari data UserAssessmentScore berdasarkan score_id dan user_id
       const userAssessmentScore =
         await this.prisma.userAssessmentScore.findFirst({
           where: { score_id: parsedScoreId, user_id, status: 'passed' },
           include: {
-            user: true, // Pastikan data user dimuat langsung
-            skillAssessment: true, // Memuat data skillAssessment jika diperlukan
+            user: true,
+            skillAssessment: true,
           },
         });
 
@@ -38,7 +37,6 @@ export class CertificateController {
         return;
       }
 
-      // Pastikan status adalah "passed"
       if (userAssessmentScore.status !== 'passed') {
         res.status(400).json({
           message: 'Certificate can only be generated for passed assessments.',
@@ -46,14 +44,11 @@ export class CertificateController {
         return;
       }
 
-      // Buat QR code data
       const qrCodeData = await QRCode.toDataURL(
         `${process.env.URL_WEB!}/certificate-verify?code=${userAssessmentScore.unique_code}`,
       );
-
-      // Panggil fungsi generate PDF
       await certificatePDF(res, {
-        score_id: userAssessmentScore.score_id, // Langsung gunakan score_id
+        score_id: userAssessmentScore.score_id,
         assessment_data:
           typeof userAssessmentScore.skillAssessment?.assessment_data ===
           'string'
@@ -61,15 +56,14 @@ export class CertificateController {
             : JSON.stringify(
                 userAssessmentScore.skillAssessment?.assessment_data,
               ) || 'Assessment data not available',
-        score: userAssessmentScore.score!, // Ambil skor langsung dari userAssessmentScore
+        score: userAssessmentScore.score!,
         user_name: `${userAssessmentScore.user?.first_name || 'Unknown'} ${
           userAssessmentScore.user?.last_name || 'User'
-        }`, // Langsung ambil nama dari userAssessmentScore -> user
-        badge: userAssessmentScore.badge || 'No badge', // Ambil badge langsung dari userAssessmentScore
-        qrCodeData, // QR code yang sudah di-generate
+        }`,
+        badge: userAssessmentScore.badge || 'No badge',
+        qrCodeData,
       });
     } catch (error) {
-      console.error('Error generating certificate:', error);
       res.status(500).json({ message: 'Internal server error', error });
     }
   }
@@ -78,18 +72,16 @@ export class CertificateController {
     try {
       const { code } = req.query;
   
-      // Validasi parameter code
       if (!code || typeof code !== 'string' || code.length !== 36) {
         res.status(400).json({ message: 'Invalid or missing certificate code.' });
         return;
       }
   
-      // Cari berdasarkan `unique_code`
       const userAssessmentScore = await this.prisma.userAssessmentScore.findUnique({
         where: { unique_code: code },
         include: {
-          user: true, // Memuat data pengguna
-          skillAssessment: true, // Memuat data skillAssessment
+          user: true,
+          skillAssessment: true,
         },
       });
   
@@ -103,7 +95,6 @@ export class CertificateController {
         return;
       }
   
-      // Return valid certificate details, termasuk unique_code
       res.status(200).json({
         message: 'Certificate is valid',
         certificate: {
@@ -117,7 +108,6 @@ export class CertificateController {
         },
       });
     } catch (error) {
-      console.error('Error verifying certificate:', error);
       res.status(500).json({
         message: 'Internal server error',
         error: error instanceof Error ? error.message : error,

@@ -53,7 +53,6 @@ const UserDemographics: React.FC = () => {
           topLocations: formattedTopLocations,
         });
       } catch (error) {
-        console.error('Error fetching demographics data:', error);
       } finally {
         setIsLoading(false);
       }

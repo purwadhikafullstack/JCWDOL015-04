@@ -43,7 +43,6 @@ const FoundingInfo = () => {
           setError('Failed to fetch company data.');
         }
       } catch (error) {
-        console.error('Error fetching company data:', error);
         setError('An error occurred while fetching company data.');
       } finally {
         setLoading(false);

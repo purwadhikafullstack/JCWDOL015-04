@@ -45,7 +45,6 @@ export class ApplicationController {
           .json({ msg: 'You have already applied for this job.' });
       }
 
-      // Fetch job and user details for the email content
       const job = await prisma.job.findUnique({
         where: { job_id: jobIdInt },
         include: { company: true },
@@ -56,7 +55,6 @@ export class ApplicationController {
         return res.status(404).json({ msg: 'Job or user not found' });
       }
 
-      // Create the application in the database
       const application = await prisma.application.create({
         data: {
           resume: resumePath,
@@ -68,7 +66,6 @@ export class ApplicationController {
         },
       });
 
-      // Send application status notification within the app
       await sendNotification({
         userId,
         subject: 'Application Submitted',
@@ -79,7 +76,6 @@ export class ApplicationController {
         link: `/applications/${application.application_id}`,
       });
 
-      // Send application confirmation email to the user
       const templatePath = path.join(
         __dirname,
         '../templates/applicationConfirmation.hbs',
@@ -104,7 +100,6 @@ export class ApplicationController {
         .status(201)
         .json({ msg: 'Application submitted successfully!', application });
     } catch (error) {
-      console.error('Error applying for job:', error);
       res.status(500).json({ msg: 'Error creating application' });
     }
   }
@@ -122,7 +117,6 @@ export class ApplicationController {
 
       res.status(200).json({ applications });
     } catch (error) {
-      console.error('Error fetching applications:', error);
       res.status(500).json({ msg: 'Failed to fetch applications' });
     }
   }
@@ -143,7 +137,6 @@ export class ApplicationController {
 
       res.status(200).json({ application });
     } catch (error) {
-      console.error('Error fetching application:', error);
       res.status(500).json({ msg: 'Failed to fetch application' });
     }
   }
@@ -159,7 +152,6 @@ export class ApplicationController {
           .json({ msg: 'Application ID and new status are required' });
       }
 
-      // Validate the new status
       if (
         !Object.values(ApplicationStatus).includes(
           newStatus as ApplicationStatus,
@@ -168,7 +160,6 @@ export class ApplicationController {
         return res.status(400).json({ msg: 'Invalid application status' });
       }
 
-      // Retrieve the current status before updating
       const currentApplication = await prisma.application.findUnique({
         where: { application_id: Number(applicationId) },
       });
@@ -179,13 +170,11 @@ export class ApplicationController {
 
       const currentStatus = currentApplication.status;
 
-      // Update the application status in the database
       const updatedApplication = await prisma.application.update({
         where: { application_id: Number(applicationId) },
         data: { status: newStatus },
       });
 
-      // Notify the user about the status change
       await notifyApplicationStatusChange(
         updatedApplication.user_id,
         updatedApplication.application_id,
@@ -198,7 +187,6 @@ export class ApplicationController {
         application: updatedApplication,
       });
     } catch (error) {
-      console.error('Error updating application status:', error);
       res.status(500).json({ msg: 'Error updating application status' });
     }
   }
@@ -238,24 +226,20 @@ export class ApplicationController {
   
     try {
       if (isNaN(jobId)) {
-        console.warn('Invalid Job ID:', jobId);
         return res.status(400).json({ msg: 'Invalid Job ID' });
       }
   
-      // Dapatkan test_id berdasarkan job_id
       const test = await prisma.preSelectionTest.findUnique({
         where: { job_id: jobId },
         select: { test_id: true },
       });
   
       if (!test) {
-        console.warn(`No test found for job ID: ${jobId}`);
         return res.status(404).json({ msg: 'No test found for this job' });
       }
   
       const testId = test.test_id;
   
-      // Ambil aplikasi berdasarkan job_id
       const applications = await prisma.application.findMany({
         where: { job_id: jobId },
         include: {
@@ -279,7 +263,6 @@ export class ApplicationController {
       });
   
       if (applications.length === 0) {
-        console.warn(`Applications not found for job ID: ${jobId}`);
         return res
           .status(404)
           .json({ msg: 'No applications found for this job' });
@@ -309,7 +292,7 @@ export class ApplicationController {
             status: app.status,
             photoUrl: app.user.profile_picture,
             user_id: app.user_id,
-            correctAnswers: correctAnswersCount, // Tambahkan jumlah jawaban benar
+            correctAnswers: correctAnswersCount,
           };
         }),
       );
@@ -318,12 +301,7 @@ export class ApplicationController {
         applications: applicationsWithTestAnswers,
       });
     } catch (error) {
-      const err = error as Error; // Casting ke tipe Error
-      console.error(
-        'Error fetching applications for Job ID:',
-        jobId,
-        err.message,
-      );
+      const err = error as Error;
       res
         .status(500)
         .json({ msg: 'Failed to fetch applications', error: err.message });
@@ -383,7 +361,6 @@ export class ApplicationController {
         })),
       });
     } catch (error) {
-      console.error('Error fetching interview applicants by company:', error);
       res
         .status(500)
         .json({ msg: 'Failed to fetch interview applicants by company' });
@@ -469,7 +446,6 @@ export class ApplicationController {
       application: updatedApplication,
     });
   } catch (error) {
-    console.error('Error updating interview schedule:', error);
     res
       .status(500)
       .json({ msg: 'Failed to update interview schedule and send email', error });
@@ -527,7 +503,6 @@ async getInterviewSchedules(req: Request, res: Response) {
 
     res.status(200).json({ schedules });
   } catch (error) {
-    console.error('Error fetching interview schedules:', error);
     res.status(500).json({ msg: 'Failed to fetch interview schedules', error });
   }
 }
@@ -555,7 +530,6 @@ async deleteInterviewSchedule(req: Request, res: Response) {
 
     res.status(200).json({ msg: 'Interview schedule deleted successfully' });
   } catch (error) {
-    console.error('Error deleting interview schedule:', error);
     res.status(500).json({ msg: 'Failed to delete interview schedule', error });
   }
 }

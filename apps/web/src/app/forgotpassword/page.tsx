@@ -32,7 +32,6 @@ const ForgetPassword = () => {
         toast.error(data.msg || 'Failed to send reset link.');
       }
     } catch (error) {
-      console.error('Error sending password reset request:', error);
       toast.error('An unexpected error occurred.');
     }
   };

@@ -56,7 +56,6 @@ export const useSocialLogin = () => {
         toast.error(result.msg || 'Social login failed.');
       }
     } catch (error) {
-      console.error('Error during social login:', error);
       toast.error('Error while saving user data.');
     } finally {
       setLoading(false);

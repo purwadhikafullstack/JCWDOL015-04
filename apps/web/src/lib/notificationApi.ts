@@ -5,7 +5,6 @@ import base_url from './user';
 export const getUnreadNotifications = async (): Promise<{ notifications: Notification[]; ok: boolean }> => {
   const token = await getToken();
   if (!token) {
-    console.error('No token found');
     return { notifications: [], ok: false };
   }
 
@@ -20,14 +19,12 @@ export const getUnreadNotifications = async (): Promise<{ notifications: Notific
     });
 
     if (!res.ok) {
-      console.error('Failed to fetch notifications:', res.status, res.statusText);
       return { notifications: [], ok: false };
     }
 
     const result = await res.json();
     return { notifications: result.notifications || [], ok: true };
   } catch (error) {
-    console.error("Error in getUnreadNotifications:", error);
     return { notifications: [], ok: false };
   }
 };
@@ -36,7 +33,6 @@ export const markNotificationAsRead = async (notificationId: number): Promise<{ 
   const token = await getToken();
 
   if (!token) {
-    console.error('No token found');
     return { ok: false };
   }
 
@@ -51,13 +47,11 @@ export const markNotificationAsRead = async (notificationId: number): Promise<{ 
     });
 
     if (!res.ok) {
-      console.error('Failed to mark notification as read:', res.status, res.statusText);
       return { ok: false };
     }
 
     return { ok: true };
   } catch (error) {
-    console.error("Error in markNotificationAsRead:", error);
     return { ok: false };
   }
 };
@@ -66,7 +60,6 @@ export const markAllNotificationsAsRead = async (): Promise<{ ok: boolean }> => 
   const token = await getToken();
 
   if (!token) {
-    console.error('No token found');
     return { ok: false };
   }
 
@@ -81,13 +74,11 @@ export const markAllNotificationsAsRead = async (): Promise<{ ok: boolean }> => 
     });
 
     if (!res.ok) {
-      console.error('Failed to mark all notifications as read:', res.status, res.statusText);
       return { ok: false };
     }
 
     return { ok: true };
   } catch (error) {
-    console.error("Error in markAllNotificationsAsRead:", error);
     return { ok: false };
   }
 };

@@ -53,7 +53,6 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
         );
         setApplicants(response.data.applications);
       } catch (error) {
-        console.error('Error fetching applicants:', error);
         toast.error('Failed to load applications.');
       }
     };
@@ -92,7 +91,6 @@ const AllApplications: React.FC<AllApplicationsProps> = ({ jobId }) => {
 
       toast.success(`Status updated to ${getStatusLabel(newStatus)}`);
     } catch (error) {
-      console.error('Error updating status:', error);
       toast.error('Failed to update status.');
     }
   };

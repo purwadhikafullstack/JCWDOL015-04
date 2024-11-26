@@ -22,7 +22,6 @@ const FavoriteJobsTab = () => {
         const jobs = await fetchFavoriteJobs(userId);
         setFavoriteJobs(jobs);
       } else {
-        console.error('Failed to fetch user info');
       }
     };
   

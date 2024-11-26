@@ -47,7 +47,6 @@ const ResetPassword = () => {
         toast.error(data.msg || 'Failed to reset password.');
       }
     } catch (error) {
-      console.error('Error resetting password:', error);
       toast.error('An unexpected error occurred.');
     }
   };

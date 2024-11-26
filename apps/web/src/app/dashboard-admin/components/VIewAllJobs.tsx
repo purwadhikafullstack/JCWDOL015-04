@@ -24,7 +24,6 @@ const ViewAllJobsPosted = () => {
         const recentJobs = await fetchRecentlyPostedJobs(userId);
         setRecentlyPostedJobs(recentJobs.jobs || []);
       } else {
-        console.error('Failed to fetch user info');
       }
     };
 

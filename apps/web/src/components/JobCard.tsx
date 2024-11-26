@@ -20,7 +20,6 @@ const Card: React.FC<CardProps> = ({ job, isFavorited = false }) => {
     if (response.ok) {
       setIsSaved((prev) => !prev);
     } else {
-      console.error(response.msg);
     }
   };
 

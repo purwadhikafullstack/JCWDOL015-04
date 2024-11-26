@@ -53,7 +53,6 @@ const MyJobs: React.FC = () => {
         }));
         setJobs(jobsData);
       } else {
-        console.error('Failed to fetch user info');
       }
     };
 
@@ -87,7 +86,6 @@ const MyJobs: React.FC = () => {
         ),
       );
     } catch (error) {
-      console.error('Error updating job status:', error);
     }
   };
 
@@ -113,7 +111,6 @@ const MyJobs: React.FC = () => {
       setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
       alert('Job successfully deleted!');
     } catch (error) {
-      console.error('Error deleting job:', error);
       alert('Failed to delete the job. Please try again later.');
     }
   };

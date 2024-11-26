@@ -272,7 +272,6 @@ export class JobController {
         job: updatedJob,
       });
     } catch (error) {
-      console.error('Update Error:', error);
       res.status(400).json({
         status: 'error',
         msg: 'An error occurred while updating job information',
@@ -293,7 +292,6 @@ export class JobController {
 
       res.status(200).json({ count });
     } catch (error) {
-      console.error('Error fetching applied job count:', error);
       res.status(500).json({ msg: 'Failed to fetch applied job count' });
     }
   }
@@ -311,7 +309,6 @@ export class JobController {
 
       res.status(200).json({ count });
     } catch (error) {
-      console.error('Error fetching favorite job count:', error);
       res.status(500).json({ msg: 'Failed to fetch favorite job count' });
     }
   }
@@ -344,7 +341,6 @@ export class JobController {
         res.status(200).json({ msg: 'Job saved to favorites' });
       }
     } catch (error) {
-      console.error('Error toggling favorite job:', error);
       res.status(500).json({ msg: 'Failed to save job' });
     }
   }
@@ -370,7 +366,6 @@ export class JobController {
         favorites,
       });
     } catch (error) {
-      console.error('Error fetching favorite jobs:', error);
       res.status(500).json({ msg: 'Failed to fetch favorite jobs' });
     }
   }
@@ -414,7 +409,6 @@ export class JobController {
         })),
       });
     } catch (error) {
-      console.error('Error fetching recently posted jobs:', error);
       res.status(500).json({ msg: 'Failed to fetch recently posted jobs' });
     }
   }
@@ -438,7 +432,6 @@ export class JobController {
         totalJobsCount,
       });
     } catch (error) {
-      console.error('Error fetching total jobs count:', error);
       res.status(500).json({ msg: 'Failed to fetch total jobs count' });
     }
   }
@@ -466,7 +459,6 @@ export class JobController {
   
       res.status(200).json({ status: 'ok', msg: 'Job deleted successfully' });
     } catch (error) {
-      console.error('Error deleting job:', error);
       res.status(500).json({ status: 'error', msg: 'Failed to delete job' });
     }
   }

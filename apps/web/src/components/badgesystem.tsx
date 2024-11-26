@@ -25,7 +25,6 @@ const BadgeSystem: React.FC<{ userId: string | number }> = ({ userId }) => {
   }, [userId]);
 
   if (error) {
-    console.error(error); 
     return null; 
   }
 

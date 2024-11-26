@@ -18,11 +18,9 @@ export async function geocodeAddress(address: string) {
       const { lat, lng } = data.results[0].geometry;
       return { latitude: lat, longitude: lng };
     } else {
-      console.warn(`No results found for address: ${address}`);
       return null;
     }
   } catch (error) {
-    console.error('Error with OpenCage Geocoding:', error);
     throw error;
   }
 }
