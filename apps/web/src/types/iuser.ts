@@ -22,11 +22,6 @@ export interface IUserVerify {
   is_verified: boolean;
 }
 
-export interface DecodedToken {
-  user_id: string;
-  userProfile: IUserProfile;
-}
-
 export interface JwtPayload {
   id: string;
 }
@@ -70,3 +65,10 @@ export interface IUserProfile {
   updated_at: Date;
   is_verified: boolean;
 }
+export interface DecodedToken {
+  user_id: number;
+  role: UserRole; // Role is directly at the top level
+  iat: number;
+  exp: number;
+}
+

@@ -56,3 +56,20 @@ export const checkCandidate = async (
     });
   }
 };
+
+export const checkDeveloperRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (req.user?.role !== 'developer') throw new Error('Unauthorized');
+
+    next();
+  } catch (err) {
+    res.status(400).send({
+      status: 'error',
+      msg: 'Unauthorized',
+    });
+  }
+};

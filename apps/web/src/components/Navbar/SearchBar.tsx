@@ -21,7 +21,7 @@ const SearchBar = () => {
           placeholder="Job title, keyword, company"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full min-w-[350px] pl-10 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+          className="w-full min-w-[350px] pl-10 p-3 border border-gray-300 bg-white rounded-md focus:outline-none focus:border-blue-500"
         />
       </div>
       <button

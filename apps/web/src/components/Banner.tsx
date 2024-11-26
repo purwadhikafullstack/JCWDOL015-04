@@ -85,7 +85,7 @@ const LandingPage = () => {
                   placeholder="Job title, Keyword..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="flex-grow focus:outline-none"
+                  className="flex-grow bg-white focus:outline-none"
                 />
               </div>
 

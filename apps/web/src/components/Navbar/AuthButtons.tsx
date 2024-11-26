@@ -19,7 +19,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
     {isLoggedIn ? (
       <>
         {(userRole === UserRole.Admin) && (
-          <Link href="/ ISI DISINI ">
+          <Link href="/my-jobs">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
               Manage Jobs
             </button>

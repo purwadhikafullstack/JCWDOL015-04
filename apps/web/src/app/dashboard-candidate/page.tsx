@@ -6,18 +6,20 @@ import { getToken } from '@/lib/server';
 import base_url from '@/lib/user';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/types/iuser';
-import Sidebar from './components/Sidebar';
-import OverviewTab from './components/OverviewTab';
-import AppliedJobsTab from './components/AppliedJobsTab';
-import SubscriptionTab from './components/SubscriptionTab';
-import FavoriteJobsTab from './components/FavoriteJobsTab';
-import PlansBillingTab from './components/PlansBillingTab';
-import SettingsTab from './components/SettingsTab';
-import { useSearchParams } from 'next/navigation';
+import Sidebar from './tabmenu/Sidebar';
+import OverviewTab from './tabmenu/OverviewTab';
+import AppliedJobsTab from './tabmenu/AppliedJobsTab';
+import FavoriteJobsTab from './tabmenu/FavoriteJobsTab';
+import SettingsTab from './tabmenu/SettingsTab';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import CVGeneratorTab from './components/CVGenerator';
+import UserAssessment from './tabmenu/skillAssessment';
+import CustomerPlans from './tabmenu/SubscriptionTab';
+import CvDashboard from './tabmenu/CVGenerator';
+import PlansBillingDashboard from './tabmenu/PlansBillingTab';
 
 const CandidateDashboard = () => {
+  const router = useRouter()
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'overview';
   const [selectedTab, setSelectedTab] = useState(initialTab);
@@ -64,6 +66,18 @@ const CandidateDashboard = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setSelectedTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: string) => {
+    setSelectedTab(tab);
+    router.push(`/dashboard-candidate?tab=${tab}`);
+  };
+
   const renderTabContent = () => {
     switch (selectedTab) {
       case 'overview':
@@ -72,12 +86,14 @@ const CandidateDashboard = () => {
         return <AppliedJobsTab />;
       case 'favoriteJobs':
         return <FavoriteJobsTab />;
-        case 'CVGenerator':
-          return <CVGeneratorTab />;
-      case 'subscription':
-        return <SubscriptionTab />;
+      case 'CVGenerator':
+        return <CvDashboard />;
+      case 'Subscription':
+        return <CustomerPlans />;
       case 'plansBilling':
-        return <PlansBillingTab />;
+        return <PlansBillingDashboard />;
+      case 'userAssessment':
+        return <UserAssessment />;
       case 'settings':
         return <SettingsTab />;
       default:
@@ -87,12 +103,10 @@ const CandidateDashboard = () => {
 
   return (
     <ProtectedRoute requiredRole="candidate">
-    <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
-      <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-      <main className="p-4">
-        {renderTabContent()}
-      </main>
-    </div>
+      <div className="min-h-screen bg-gray-100 pt-20 lg:pt-0">
+        <Sidebar selectedTab={selectedTab} setSelectedTab={handleTabChange} />
+        <main className="p-4">{renderTabContent()}</main>
+      </div>
     </ProtectedRoute>
   );
 };

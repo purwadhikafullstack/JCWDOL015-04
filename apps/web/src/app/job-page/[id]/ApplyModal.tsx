@@ -4,6 +4,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { applyForJob } from '@/lib/applyJob';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+import { checkPreSelectionTest } from '@/lib/applyJob';
 
 const ApplyModal = ({ jobId }: any) => {
   const [coverLetter, setCoverLetter] = useState('');
@@ -11,6 +13,7 @@ const ApplyModal = ({ jobId }: any) => {
   const [showConfirmation, setShowConfirmation] = useState<{
     type: 'apply' | 'cancel' | null;
   }>({ type: null });
+  const router = useRouter();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -22,8 +25,14 @@ const ApplyModal = ({ jobId }: any) => {
     setShowConfirmation({ type: 'cancel' });
   };
 
-  const handleApplyClick = () => {
-    setShowConfirmation({ type: 'apply' });
+  const handleApplyClick = async () => {
+    const hasTest = await checkPreSelectionTest(jobId);
+
+    if (hasTest) {
+      setShowConfirmation({ type: 'apply' });
+    } else {
+      setShowConfirmation({ type: 'apply' });
+    }
   };
 
   const handleConfirm = async () => {
@@ -35,7 +44,7 @@ const ApplyModal = ({ jobId }: any) => {
       const response = await applyForJob(jobId, coverLetter, resume);
       if (response.ok) {
         toast.success('Application submitted successfully!');
-        window.history.back();
+        router.push(`/pre-selectiontest/${jobId}`);
         setShowConfirmation({ type: null });
         return;
       } else {

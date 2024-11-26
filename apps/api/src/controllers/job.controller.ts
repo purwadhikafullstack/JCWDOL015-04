@@ -12,6 +12,7 @@ import {
 export class JobController {
   async createJob(req: Request, res: Response) {
     try {
+
       const {
         job_title,
         description,
@@ -22,6 +23,8 @@ export class JobController {
         jobCategory,
         jobEducationLevel,
         jobExperience,
+        responsibility,
+        jobExpired_at,
         companyId,
         is_active,
       } = req.body;
@@ -43,6 +46,8 @@ export class JobController {
         jobCategory,
         jobExperience,
         jobEducationLevel,
+        jobExpired_at,
+        responsibility,
         salary: salary ? parseFloat(salary) : null,
         is_active: is_active === 'true',
         company: { connect: { company_id: parseInt(companyId, 10) } },
@@ -57,7 +62,9 @@ export class JobController {
     } catch (err) {
       res.status(400).json({
         msg: err instanceof Error ? err.message : 'An error occurred',
+        error: err, // Tambahkan log untuk error detail
       });
+      
     }
   }
 
@@ -215,18 +222,21 @@ export class JobController {
 
   async updateJob(req: Request, res: Response) {
     try {
+      const jobId = parseInt(req.params.id, 10); 
       const {
         job_title,
         description,
+        responsibility,
         location,
         country,
         salary,
         jobCategory,
         jobEducationLevel,
         jobExperience,
+        jobExpired_at,
         is_active,
       } = req.body;
-      const jobId = parseInt(req.params.jobId, 10);
+      
 
       if (isNaN(jobId)) {
         return res
@@ -244,12 +254,14 @@ export class JobController {
         data: {
           job_title,
           description,
+          responsibility,
           location,
           country,
           salary: salary ? parseFloat(salary) : job.salary,
           jobCategory,
           jobEducationLevel,
           jobExperience,
+          jobExpired_at,
           is_active: is_active !== undefined ? is_active : job.is_active,
         },
       });
@@ -260,7 +272,6 @@ export class JobController {
         job: updatedJob,
       });
     } catch (error) {
-      console.error('Update Error:', error);
       res.status(400).json({
         status: 'error',
         msg: 'An error occurred while updating job information',
@@ -281,7 +292,6 @@ export class JobController {
 
       res.status(200).json({ count });
     } catch (error) {
-      console.error('Error fetching applied job count:', error);
       res.status(500).json({ msg: 'Failed to fetch applied job count' });
     }
   }
@@ -299,7 +309,6 @@ export class JobController {
 
       res.status(200).json({ count });
     } catch (error) {
-      console.error('Error fetching favorite job count:', error);
       res.status(500).json({ msg: 'Failed to fetch favorite job count' });
     }
   }
@@ -332,7 +341,6 @@ export class JobController {
         res.status(200).json({ msg: 'Job saved to favorites' });
       }
     } catch (error) {
-      console.error('Error toggling favorite job:', error);
       res.status(500).json({ msg: 'Failed to save job' });
     }
   }
@@ -353,14 +361,11 @@ export class JobController {
         },
       });
 
-      console.log('Favorites found:', favorites);
-
       res.status(200).json({
         status: 'ok',
         favorites,
       });
     } catch (error) {
-      console.error('Error fetching favorite jobs:', error);
       res.status(500).json({ msg: 'Failed to fetch favorite jobs' });
     }
   }
@@ -404,7 +409,6 @@ export class JobController {
         })),
       });
     } catch (error) {
-      console.error('Error fetching recently posted jobs:', error);
       res.status(500).json({ msg: 'Failed to fetch recently posted jobs' });
     }
   }
@@ -412,7 +416,6 @@ export class JobController {
   async getTotalJobsCount(req: Request, res: Response) {
     try {
       const userId = req.user?.user_id;
-      console.log("User ID from token:", userId);
   
       if (!userId) {
         return res.status(400).json({ msg: 'User ID is required' });
@@ -429,8 +432,34 @@ export class JobController {
         totalJobsCount,
       });
     } catch (error) {
-      console.error('Error fetching total jobs count:', error);
       res.status(500).json({ msg: 'Failed to fetch total jobs count' });
+    }
+  }
+  
+  async deleteJob(req: Request, res: Response) {
+    try {
+      const jobId = parseInt(req.params.id, 10);
+
+  
+      if (isNaN(jobId)) {
+        return res.status(400).json({ msg: 'Invalid job ID provided' });
+      }
+
+      const job = await prisma.job.findUnique({
+        where: { job_id: jobId },
+      });
+  
+      if (!job) {
+        return res.status(404).json({ msg: 'Job not found' });
+      }
+  
+      await prisma.job.delete({
+        where: { job_id: jobId },
+      });
+  
+      res.status(200).json({ status: 'ok', msg: 'Job deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ status: 'error', msg: 'Failed to delete job' });
     }
   }
   

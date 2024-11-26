@@ -5,7 +5,6 @@ export const signInWithGoogle = async () => {
     provider: 'google',
   });
   if (error) {
-    console.error('Error with Google sign-in:', error.message);
   }
   return data;
 };
@@ -15,7 +14,6 @@ export const signInWithFacebook = async () => {
     provider: 'facebook',
   });
   if (error) {
-    console.error('Error with Facebook sign-in:', error.message);
   }
   return data;
 };

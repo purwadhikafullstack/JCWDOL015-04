@@ -70,7 +70,6 @@ export class CompanyController {
         .status(201)
         .json({ status: 'ok', msg: 'Company created successfully!', company });
     } catch (err) {
-      console.error('Error creating company:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred while creating the company.',
@@ -97,7 +96,6 @@ export class CompanyController {
         address,
         description,
       } = req.body;
-      console.log(req.body);
 
       const logoUrl = req.files?.logo?.[0]
         ? `${base_url}/public/company_logos/${req.files.logo[0].filename}`
@@ -106,7 +104,6 @@ export class CompanyController {
       const bannerUrl = req.files?.banner?.[0]
         ? `${base_url}/public/company_banners/${req.files.banner[0].filename}`
         : undefined;
-      console.log('aboutUs', aboutUs);
       const updatedCompany = await prisma.company.update({
         where: { company_id: parseInt(req.params.id) },
         data: {
@@ -136,7 +133,6 @@ export class CompanyController {
         company: updatedCompany,
       });
     } catch (err) {
-      console.error('Update Company Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred while updating company information',
@@ -149,7 +145,6 @@ export class CompanyController {
       const companies = await prisma.company.findMany();
       res.status(200).json({ status: 'ok', companies });
     } catch (err) {
-      console.error('Error fetching companies:', err);
       res.status(400).json({
         status: 'error',
         msg: 'An error occurred while fetching companies.',
@@ -203,7 +198,6 @@ export class CompanyController {
   
       res.status(200).json({ status: 'ok', companies });
     } catch (error) {
-      console.error('Error fetching companies:', error);
       res
         .status(500)
         .json({ status: 'error', message: 'Failed to fetch companies' });
@@ -226,7 +220,6 @@ export class CompanyController {
 
       res.status(200).json({ status: 'ok', company });
     } catch (err) {
-      console.error('Error fetching company:', err);
       res.status(400).json({
         status: 'error',
         msg: 'An error occurred while fetching the company.',
@@ -242,7 +235,6 @@ export class CompanyController {
         .status(200)
         .json({ status: 'ok', msg: 'Company deleted successfully!' });
     } catch (err) {
-      console.error('Error deleting company:', err);
       res.status(400).json({
         status: 'error',
         msg: 'An error occurred while deleting the company.',
@@ -288,7 +280,6 @@ export class CompanyController {
         company,
       });
     } catch (err) {
-      console.error('Error fetching company:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred while fetching company information.',

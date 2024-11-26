@@ -86,6 +86,7 @@ export interface JobCardProps {
     company_name: string;
     logo: string | null;
   };
+  
 }
 
 export interface RecentlyPostedJob {

@@ -112,6 +112,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/analytic" className="hover:text-white">
+                  Website Analytics
+                </Link>
+              </li>
+              <li>
                 <Link href="/terms-and-conditions" className="hover:text-white">
                   Terms & Conditions
                 </Link>
