@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { getCompanyById } from '@/lib/company';
@@ -9,6 +10,8 @@ import CompanyOverview from './CompanyOverview';
 import CompanyJobListings from './CompanyJobListings';
 import { industryOptions } from '@/utils/format';
 import DOMPurify from 'dompurify';
+import Image from 'next/image';
+import ReviewsPage from './review';
 
 const CompanyPage = () => {
   const { id } = useParams();
@@ -19,8 +22,7 @@ const CompanyPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { company, ok } = await getCompanyById(id as string)
-        console.log("data", company?.aboutUs)
+        const { company, ok } = await getCompanyById(id as string);
         if (ok && company) {
           setCompany(company);
         } else {
@@ -66,13 +68,14 @@ const CompanyPage = () => {
 
         {/* Content Section */}
         <div className="relative z-10 w-full max-w-7xl p-4 md:p-6 lg:p-8">
-          {/* Header Section */}
           <div className="flex flex-col items-start p-6 bg-white rounded-lg shadow-lg">
             <div className="flex items-center">
-              <img
-                src={company.logo}
+              <Image
+                src={company.logo || '/default-logo.png'}
                 alt={`${company.company_name} Logo`}
-                className="h-16 w-16 object-contain rounded-full"
+                width={64}
+                height={64}
+                className="rounded-full"
               />
               <div className="ml-4">
                 <h1 className="text-3xl font-bold">{company.company_name}</h1>
@@ -83,8 +86,8 @@ const CompanyPage = () => {
             </div>
           </div>
 
-          {/* Company Details Section */}
-          <div className="flex flex-col lg:flex-row gap-8 mt-6">
+           {/* Company Details Section */}
+           <div className="flex flex-col lg:flex-row gap-8 mt-6">
             <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-6">
               <h2 className="text-lg font-bold">About Us</h2>
               {/* Render company.aboutUs as HTML */}
@@ -111,6 +114,8 @@ const CompanyPage = () => {
             <h2 className="text-xl font-semibold mb-4">Job Listings</h2>
             <CompanyJobListings companyId={company.company_id} />
           </div>
+          {/* Reviews Section */}
+          <ReviewsPage params={{ companyId: company.company_id }} />
         </div>
       </div>
     </ProtectedRoute>

@@ -5,12 +5,25 @@ type User = {
   role: string;
 };
 
+
+
 declare namespace Express {
   export interface Request {
-    user?: User;
-    files?: {
-      logo?: Express.Multer.File[];
-      banner?: Express.Multer.File[];
+    user?: {
+      user_id: number;
+      role: string;
     };
+    file?: Express.Multer.File; // Properti file untuk single file upload
+    files?: { [fieldname: string]: Express.Multer.File[] }; // Properti files untuk multiple upload
+  }
+}
+
+declare namespace Express {
+  export interface Request {
+    user?: {
+      user_id: number;
+      role: string;
+    };
+    assessment_id?: number;
   }
 }

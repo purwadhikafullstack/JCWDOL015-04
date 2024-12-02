@@ -31,7 +31,6 @@ const FeatureJob = () => {
 
       setJobs(formattedJobs);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
       setJobs([]);
     }
   };
@@ -76,7 +75,6 @@ const JobCard = ({ job }: JobCardComponentProps) => {
     if (response.ok) {
       setIsSaved((prev) => !prev);
     } else {
-      console.error(response.msg);
     }
   };
 

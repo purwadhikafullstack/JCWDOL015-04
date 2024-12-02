@@ -40,7 +40,6 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
     cb(null, true); 
   } else {
     cb(null, false); 
-    console.error('Unexpected file type:', file.mimetype); 
   }
 };
 

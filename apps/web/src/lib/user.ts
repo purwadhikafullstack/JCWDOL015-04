@@ -21,14 +21,12 @@ export const regUser = async (data: IUserReg) => {
       return { result, ok: res.ok };
     } else {
       const text = await res.text();
-      console.error('Unexpected response format:', text);
       return {
         result: { status: 'error', msg: 'Unexpected response format' },
         ok: false,
       };
     }
   } catch (error) {
-    console.error('Error in regUser:', error);
     return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
   }
 };
@@ -49,14 +47,12 @@ export const loginUser = async (data: IUserLogin) => {
       return { result, ok: res.ok };
     } else {
       const text = await res.text();
-      console.error('Unexpected response format:', text);
       return {
         result: { status: 'error', msg: 'Unexpected response format' },
         ok: false,
       };
     }
   } catch (error) {
-    console.error('Error in loginUser:', error);
     return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
   }
 };
@@ -94,7 +90,6 @@ export const getUserInfo = async () => {
   try {
     const token = await getToken();
     if (!token) {
-      console.error('No token found');
       return { user: null, ok: false };
     }
 
@@ -102,7 +97,6 @@ export const getUserInfo = async () => {
     const userId = decoded?.user_id;
 
     if (!userId) {
-      console.error('Invalid token');
       return { user: null, ok: false };
     }
 
@@ -110,7 +104,6 @@ export const getUserInfo = async () => {
     const result = await res.json();
     return { result, user: result.user, ok: res.ok };
   } catch (error) {
-    console.error('Error fetching user info:', error);
     return { user: null, ok: false };
   }
 };
@@ -129,7 +122,6 @@ export const updateUserInfo = async (data: FormData): Promise<{ result: any; ok:
     const result = await res.json();
     return { result, ok: res.ok };
   } catch (error) {
-    console.error('Error updating user info:', error);
     return { result: { status: 'error', msg: 'An error occurred on updating profile, maybe image too large maximum 1MB' }, ok: false };
   }
 };
@@ -149,7 +141,6 @@ export const updateUserCredential = async (data: { email?: string; phone?: strin
     const result = await res.json();
     return { result, ok: res.ok };
   } catch (error) {
-    console.error('Error updating user credentials:', error);
     return { result: { status: 'error', msg: 'An error occurred' }, ok: false };
   }
 };
@@ -169,9 +160,12 @@ export const deleteUserAccount = async (email: string, password: string) => {
     const result = await response.json();
     return { ok: response.ok, result };
   } catch (error) {
-    console.error('Error deleting account:', error);
     return { ok: false, result: { status: 'error', msg: 'An error occurred while deleting the account' } };
   }
 };
+
+
+
+
 
 export default base_url;

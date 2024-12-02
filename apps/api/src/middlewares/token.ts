@@ -4,6 +4,7 @@ import { verify } from 'jsonwebtoken';
 type IUser = {
   user_id: number;
   role: string;
+  company_id?: number;
 };
 
 export const verifyToken = async (
@@ -13,7 +14,6 @@ export const verifyToken = async (
 ) => {
   try {
     const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
-    console.log('Token received in middleware:', token); 
 
     if (!token) throw new Error('Token is missing');
 
@@ -23,7 +23,6 @@ export const verifyToken = async (
 
     next();
   } catch (err) {
-    console.error('Error:', err);
     res.status(400).send({
       status: 'error',
       msg: 'Invalid or expired token',
