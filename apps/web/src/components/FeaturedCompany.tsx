@@ -26,7 +26,6 @@ const FeaturedCompany = () => {
 
       setCompanies(formattedCompanies);
     } catch (error) {
-      console.error('Error fetching companies:', error);
       setCompanies([]);
     }
   };

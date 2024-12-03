@@ -5,7 +5,6 @@ export const fetchJobs = async (
   sortOrder: string,
   filters: Record<string, string | string[]> = {},
 ): Promise<Job[]> => {
-  console.log('Filters:', filters);
   const params = new URLSearchParams();
 
   for (const [key, value] of Object.entries(filters)) {

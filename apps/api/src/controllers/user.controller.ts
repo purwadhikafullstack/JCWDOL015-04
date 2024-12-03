@@ -7,18 +7,28 @@ import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
 
-export const base_url = process.env.BASE_API_URL
-export const base_fe_url = process.env.BASE_FE_URL
+export const base_url = process.env.BASE_API_URL;
+export const base_fe_url = process.env.BASE_FE_URL;
 
 export class UserController {
   async createUser(req: Request, res: Response) {
     try {
-      const { first_name, last_name, email, password, role, company_name, company_email, country } = req.body;
-      console.log('Request body:', req.body);
-      
+      const {
+        first_name,
+        last_name,
+        email,
+        password,
+        role,
+        company_name,
+        company_email,
+        country,
+      } = req.body;
+
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        return res.status(400).json({ status: 'error', msg: 'Email already in use!' });
+        return res
+          .status(400)
+          .json({ status: 'error', msg: 'Email already in use!' });
       }
 
       const salt = await genSalt(10);
@@ -26,9 +36,15 @@ export class UserController {
 
       const createdData = await prisma.$transaction(async (prisma) => {
         const newUser = await prisma.user.create({
-          data: { first_name, last_name, email, password: hashedPassword, role, is_verified: false },
+          data: {
+            first_name,
+            last_name,
+            email,
+            password: hashedPassword,
+            role,
+            is_verified: false,
+          },
         });
-
 
         let newCompany = null;
         if (role === 'admin' && company_name && company_email) {
@@ -48,7 +64,9 @@ export class UserController {
       const { newUser, newCompany } = createdData;
 
       const payload = { id: newUser.user_id };
-      const token = sign(payload, process.env.SECRET_JWT!, { expiresIn: '60m' });
+      const token = sign(payload, process.env.SECRET_JWT!, {
+        expiresIn: '60m',
+      });
 
       const templatePath = path.join(
         __dirname,
@@ -76,8 +94,10 @@ export class UserController {
         company: newCompany,
       });
     } catch (err) {
-      console.error('Error during registration:', err);
-      res.status(400).json({ status: 'error', msg: 'An error occurred during user registration.' });
+      res.status(400).json({
+        status: 'error',
+        msg: 'An error occurred during user registration.',
+      });
     }
   }
 
@@ -134,7 +154,6 @@ export class UserController {
         user,
       });
     } catch (err) {
-      console.error(err);
       res.status(400).send({
         status: 'error',
         msg: err,
@@ -169,7 +188,6 @@ export class UserController {
         user,
       });
     } catch (err) {
-      console.error('Error fetching user:', err);
       res.status(500).send({
         status: 'error',
         msg: 'Internal server error',
@@ -225,7 +243,6 @@ export class UserController {
         msg: 'Account successfully verified!',
       });
     } catch (err) {
-      console.error('Verification Error:', err);
       res.status(400).send({
         status: 'error',
         msg: 'Invalid or expired verification token',
@@ -244,6 +261,11 @@ export class UserController {
         Newpassword,
         Confirmpassword,
         website,
+        linkedin,
+        github,
+        twitter,
+        facebook,
+        instagram,
         title,
         education,
         biography,
@@ -252,6 +274,8 @@ export class UserController {
         languages,
         nationality,
         gender,
+        country,
+        tempat_lahir,
         DateOfBirth,
         years_of_experience,
       } = req.body;
@@ -298,7 +322,6 @@ export class UserController {
       if (last_name) updateData.last_name = last_name;
       if (phone) updateData.phone = phone;
       if (email) {
-       
         updateData.email = email;
         updateData.is_verified = false;
       }
@@ -359,7 +382,6 @@ export class UserController {
         user: updatedUser,
       });
     } catch (err) {
-      console.error('Update Error:', err);
       res.status(400).send({
         status: 'error',
         msg: 'An error occurred while updating user information',
@@ -419,7 +441,6 @@ export class UserController {
         msg: 'Verification link resent successfully!',
       });
     } catch (err) {
-      console.error('Resend Verification Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred while resending verification link.',
@@ -437,6 +458,14 @@ export class UserController {
           .status(404)
           .json({ status: 'error', msg: 'User not found!' });
       }
+
+      if (!user.password || user.password.trim() === '') {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Social login detected. Password reset not available. Please Login with your Social Login.',
+        });
+      }
+
       const payload = { id: user.user_id };
       const resetToken = sign(payload, process.env.SECRET_JWT!, {
         expiresIn: '15m',
@@ -466,7 +495,6 @@ export class UserController {
 
       res.status(200).json({ status: 'ok', msg: 'Password reset link sent!' });
     } catch (err) {
-      console.error('Password Reset Request Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'An error occurred during password reset request.',
@@ -507,7 +535,6 @@ export class UserController {
         .status(200)
         .json({ status: 'ok', msg: 'Password has been reset successfully!' });
     } catch (err) {
-      console.error('Password Reset Error:', err);
       res
         .status(400)
         .json({ status: 'error', msg: 'Invalid or expired token' });
@@ -546,7 +573,6 @@ export class UserController {
         user,
       });
     } catch (error) {
-      console.error('Error in social login:', error);
       res.status(500).json({
         status: 'error',
         msg: 'Internal server error during social login',
@@ -586,7 +612,6 @@ export class UserController {
         msg: 'Account deleted successfully!',
       });
     } catch (err) {
-      console.error('Delete Account Error:', err);
       res.status(500).json({
         status: 'error',
         msg: 'Failed to delete account. Please try again.',
@@ -598,7 +623,7 @@ export class UserController {
     try {
       const userCount = await prisma.user.count({
         where: {
-          is_verified: true, 
+          is_verified: true,
         },
       });
       res.status(200).json({ status: 'ok', userCount });
@@ -606,6 +631,48 @@ export class UserController {
       res.status(500).json({
         status: 'error',
         message: 'Failed to fetch total user subscribe count',
+      });
+    }
+  }
+  async getUserSubscriptions(req: Request, res: Response) {
+    const user_id = req.user?.user_id;
+
+    try {
+      const subscriptions = await prisma.subscription.findMany({
+        where: { user_id },
+        include: { subscriptionType: true },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: subscriptions,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to fetch subscriptions',
+        error: error.message,
+      });
+    }
+  }
+
+  async getUserPayments(req: Request, res: Response) {
+    const user_id = req.user?.user_id;
+
+    try {
+      const payments = await prisma.paymentTransaction.findMany({
+        where: { user_id },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: payments,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: 'error',
+        msg: 'Failed to fetch payments',
+        error: error.message,
       });
     }
   }

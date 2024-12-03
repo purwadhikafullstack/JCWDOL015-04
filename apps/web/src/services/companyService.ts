@@ -29,7 +29,6 @@ export const getFilteredCompanies = async (filters: {
     const data = await response.json();
     return data.companies;
   } catch (error) {
-    console.error('Error fetching filtered companies:', error);
     return [];
   }
 };

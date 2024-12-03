@@ -1,58 +1,57 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import CompanyFilterBar from './CompanyFilterBar';
 import CompanyCard from '@/components/CompanyCard';
 import { getFilteredCompanies } from '@/services/companyService';
 import { Company } from '@/types/company';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { fetchUserLocation } from '@/services/locationService';
-
-type Location = { latitude: number; longitude: number } | null;
 
 export default function CompanyPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const companiesPerPage = 9;
   const [sortOrder, setSortOrder] = useState('latest');
-  const [location, setLocation] = useState<Location>(null);
-  const [locationAccessDenied, setLocationAccessDenied] = useState(false);
 
-  useEffect(() => {
-    fetchUserLocation(setLocation, setLocationAccessDenied);
-  }, []);
+  const loadCompanies = useCallback(
+    async (filters: { search: string } = { search: '' }) => {
+      try {
+        const companyFilters: {
+          search: string;
+          [key: string]: string | string[];
+        } = {
+          ...filters,
+          dateRange: sortOrder,
+        };
 
-  const loadCompanies = async (
-    filters: { search: string } = { search: '' },
-    lat?: number,
-    lng?: number,
-    radius = 25,
-  ) => {
-    try {
-      const companyFilters: {
-        search: string;
-        [key: string]: string | string[];
-      } = {
-        ...filters,
-        dateRange: sortOrder,
-      };
+        const data = await getFilteredCompanies(companyFilters);
 
-      if (lat !== undefined) companyFilters.lat = lat.toString();
-      if (lng !== undefined) companyFilters.lng = lng.toString();
-      companyFilters.radius = radius.toString();
+        const sortedCompanies = [...data].sort((a, b) => {
+          if (sortOrder === 'latest') {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          }
+          return (
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
+        });
 
-      const data = await getFilteredCompanies(companyFilters);
-      setCompanies(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching companies:', error);
-      setCompanies([]);
-    }
-  };
+        setCompanies(sortedCompanies);
+      } catch (error) {
+        setCompanies([]);
+      }
+    },
+    [sortOrder],
+  );
 
   useEffect(() => {
     if (location) {
-      loadCompanies({ search: '' }, location.latitude, location.longitude);
+      loadCompanies({ search: '' });
     } else {
       loadCompanies();
     }
-  }, [sortOrder, location]);
+  }, [sortOrder, location, loadCompanies]);
 
   const handleSearch = (filters: {
     search: string;
@@ -60,10 +59,27 @@ export default function CompanyPage() {
     country?: string;
   }) => {
     if (location) {
-      loadCompanies(filters, location.latitude, location.longitude);
+      loadCompanies(filters);
     } else {
       loadCompanies(filters);
     }
+  };
+
+  const indexOfLastCompany = currentPage * companiesPerPage;
+  const indexOfFirstCompany = indexOfLastCompany - companiesPerPage;
+  const currentCompanies = companies.slice(
+    indexOfFirstCompany,
+    indexOfLastCompany,
+  );
+
+  const totalPages = Math.ceil(companies.length / companiesPerPage);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   return (
@@ -81,13 +97,21 @@ export default function CompanyPage() {
             <div className="flex space-x-2">
               <button
                 onClick={() => setSortOrder('latest')}
-                className={`p-2 rounded-md ${sortOrder === 'latest' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                className={`p-2 rounded-md ${
+                  sortOrder === 'latest'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'
+                }`}
               >
                 Latest
               </button>
               <button
                 onClick={() => setSortOrder('oldest')}
-                className={`p-2 rounded-md ${sortOrder === 'oldest' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                className={`p-2 rounded-md ${
+                  sortOrder === 'oldest'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'
+                }`}
               >
                 Oldest
               </button>
@@ -98,7 +122,7 @@ export default function CompanyPage() {
           <div className="my-10 flex justify-center items-center w-full h-full">
             {companies.length > 0 ? (
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full">
-                {companies.map((company) => (
+                {currentCompanies.map((company) => (
                   <CompanyCard key={company.company_id} company={company} />
                 ))}
               </div>
@@ -110,6 +134,27 @@ export default function CompanyPage() {
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-center items-center mt-6">
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className="btn btn-outline btn-sm mx-2"
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="btn btn-outline btn-sm mx-2"
+            >
+              Next
+            </button>
           </div>
         </div>
       </ProtectedRoute>

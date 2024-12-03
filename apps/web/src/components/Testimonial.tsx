@@ -84,7 +84,7 @@ const Testimonial = () => {
                       <FaQuoteRight className="text-gray-300 text-3xl" />
                     </div>
                     <p className="text-gray-600 mb-6 truncate-2-lines">
-                      "{testimonial.feedback}"
+                    &quot;{testimonial.feedback}&quot;
                     </p>
                     <div className="flex items-center">
                       <FaUserCircle className="text-gray-400 text-5xl" />

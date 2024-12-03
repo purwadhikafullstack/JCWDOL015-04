@@ -10,7 +10,6 @@ export const applyForJob = async (
   const token = await getToken();
 
   if (!token) {
-    console.error('No token found');
     return { msg: 'Unauthorized', ok: false };
   }
 
@@ -31,7 +30,6 @@ export const applyForJob = async (
     const result = await res.json();
     return { result, ok: res.ok };
   } catch (error) {
-    console.error('Error in applyForJob:', error);
     return { msg: 'Failed to apply for the job', ok: false };
   }
 };
@@ -42,7 +40,6 @@ export const checkApplicationStatus = async (
   const token = await getToken();
 
   if (!token) {
-    console.error('No token found');
     return false;
   }
 
@@ -59,7 +56,6 @@ export const checkApplicationStatus = async (
     const data = await res.json();
     return data.applied || false;
   } catch (error) {
-    console.error('Error checking application status:', error);
     return false;
   }
 };
@@ -67,7 +63,6 @@ export const checkApplicationStatus = async (
 export const fetchAppliedJobCount = async (userId: number) => {
   const token = await getToken();
   if (!token) {
-    console.error('No token found');
     return 0;
   }
 
@@ -83,7 +78,6 @@ export const fetchAppliedJobCount = async (userId: number) => {
 export const fetchFavoriteJobCount = async (userId: number) => {
   const token = await getToken();
   if (!token) {
-    console.error('No token found');
     return 0;
   }
 
@@ -101,7 +95,6 @@ export const fetchRecentlyAppliedJobs = async (
 ): Promise<RecentlyAppliedJob[]> => {
   const token = await getToken();
   if (!token) {
-    console.error('No token found');
     return [];
   }
 
@@ -112,4 +105,18 @@ export const fetchRecentlyAppliedJobs = async (
   });
   const data = await res.json();
   return (data.applications as RecentlyAppliedJob[]) || [];
+};
+
+export const checkPreSelectionTest = async (jobId: number) => {
+  try {
+    const response = await fetch(`${base_url}/preselection/check-test/${jobId}`);
+    const data = await response.json();
+
+    if (response.ok && data.hasTest) {
+      return true; 
+    }
+    return false; 
+  } catch (error) {
+    return false;
+  }
 };
